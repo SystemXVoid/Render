@@ -20,7 +20,12 @@ return (function(ria)
 	
 	maingui.IgnoreGuiInset = true
 	local mainframe = Instance.new('Frame')
-	mainframe.Position = UDim2.new(0.287, 0, 0.409, 0)
+	mainframe.Position =  UDim2.new(0.5, -150, 0.5, -100)
+	local function centermainframe()
+		mainframe.Position = UDim2.new(0.5, -mainframe.Size.X.Offset / 2, 0.5, -mainframe.Size.Y.Offset / 2)
+	end
+	centermainframe()
+	mainframe:GetPropertyChangedSignal("Size"):Connect(centermainframe)
 	mainframe.Size = UDim2.new(0, 539, 0, 236)
 	mainframe.Parent = maingui
 	mainframe.ZIndex = 1
@@ -171,29 +176,36 @@ return (function(ria)
 	progressbk.ZIndex = 4
 	progressbk.Parent = maingui
 	progressbk.Visible = false
+
+	local screenResolution = game.Players.LocalPlayer.PlayerGui:WaitForChild("ScreenGui").AbsoluteSize
 	
 	local progressbar = Instance.new('Frame')
 	progressbar.Name = 'Progress Bar'
-	progressbar.AnchorPoint = Vector2.new(1, 1)
+	progressbar.AnchorPoint = Vector2.new(0.5, 0.5)
 	progressbar.BackgroundColor3 = Color3.new()
-	progressbar.Size = UDim2.new(0, 1335, 0, 45)
-	progressbar.Position = UDim2.new(0.84, 0, 0.65, 0)
+	progressbar.Size = UDim2.new(0, screenResolution.X - 100, 0, 45)
+	progressbar.Position = UDim2.new(0.5, 0, 0.6, 0)
 	progressbar.ZIndex = 5
 	progressbar.Visible = false
 	progressbar.Parent = maingui
-	
+
 	local progessrounding = Instance.new('UICorner')
 	progessrounding.CornerRadius = UDim.new(1, 9)
 	progessrounding.Parent = progressbar
-	
-	local progressbar2 = progressbar:Clone()
+
+	local progressbar2 = Instance.new('Frame')
 	progressbar2.Name = 'Main Bar'
-	progressbar2.AnchorPoint = Vector2.new(0, 0, 0, 0)
-	progressbar2.ZIndex = 5
-	progressbar2.Size = UDim2.new(0, 0, 0, 45)
-	progressbar2.Position = UDim2.new(0.9, -1202, 0, 0)
+	progressbar2.AnchorPoint = Vector2.new(0.5, 0.5)
 	progressbar2.BackgroundColor3 = Color3.fromRGB(42, 6, 103)
+	progressbar2.Size = progressbar.Size
+	progressbar2.Position = progressbar.Position - UDim2.new(0, 0, 0.13, 0)
+	progressbar2.ZIndex = 5
+	progressbar2.Visible = false
 	progressbar2.Parent = progressbar
+
+	local progessrounding2 = Instance.new('UICorner')
+	progessrounding2.CornerRadius = UDim.new(1, 9)
+	progessrounding2.Parent = progressbar2
 	
 	local progesshighlight = Instance.new('UIStroke')
 	progesshighlight.Color = Color3.fromRGB(255, 255, 255)
@@ -203,12 +215,12 @@ return (function(ria)
 	local rendericon2 = Instance.new('ImageLabel')
 	rendericon2.Image = 'rbxassetid://15688086520'
 	rendericon2.BackgroundTransparency = 1
-	rendericon2.AnchorPoint = Vector2.new(1, 1)
-	rendericon2.Position = UDim2.new(0.575, 0, 0.569, 0)
-	rendericon2.Size = UDim2.new(0, 309, 0, 285)
+	rendericon2.AnchorPoint = Vector2.new(0.5, 0)
+	rendericon2.Position = UDim2.new(0.5, 0, 0, 0)
+	rendericon2.Size = UDim2.new(0, 200, 0, 200)
 	rendericon2.ZIndex = 5
 	rendericon2.Parent = progressbk
-	
+
 	local progresstext = Instance.new('TextLabel')
 	progresstext.Text = ''
 	progresstext.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -219,12 +231,12 @@ return (function(ria)
 	progresstext.Position = UDim2.new(0.494, 0, 0.7, 0)
 	progresstext.Parent = progressbk
 	
-	local abortbutton = installbutton:Clone() -- lazy moment
+	local abortbutton = installbutton:Clone() -- not so lazy moment anymore :D -ercho
 	abortbutton.Name = 'Abort Button'
 	abortbutton.Text = 'Abort'
 	abortbutton.BackgroundColor3 = Color3.fromRGB(135, 0, 0)
 	abortbutton.AnchorPoint = Vector2.new(1, 1)
-	abortbutton.Position = UDim2.new(0.550, 0, 0.8, 0) 
+	abortbutton.Position = UDim2.new(0.550, 50, 0.9, 10) 
 	abortbutton.ZIndex = 5
 	abortbutton.Parent = progressbk 
 	
@@ -270,8 +282,8 @@ return (function(ria)
 					pcall(function() tweenService:Create(progressbar2, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {BackgroundColor3 = Color3.fromRGB(42, 6, 103)}):Play() end)
 				end)
 			end
-			local offset = (tasknum <= 0 and 1335 or 1335 / tasknum)
-			pcall(function() tweenService:Create(progressbar2, TweenInfo.new(0.3, Enum.EasingStyle.Linear), {Size = UDim2.new(0, offset, 0, 45)}):Play() end)
+			local offset = (tasknum <= 0 and 490 or 490 / tasknum)
+			pcall(function() tweenService:Create(progressbar2, TweenInfo.new(0.3, Enum.EasingStyle.Linear, Enum.EasingDirection.Out, 0, true, 0), {Size = UDim2.new(0, offset, 0, 45)}):Play() end)
 			tasknum = (tasknum - 1)
 		end 
 		local color = (failures < #taskfunctions and failures > 0 and Color3.fromRGB(255, 255, 34) or failures >= #taskfunctions and failures > 0 and Color3.fromRGB(255, 0, 4) or Color3.fromRGB(43, 255, 10))
