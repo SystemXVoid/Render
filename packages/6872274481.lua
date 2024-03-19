@@ -13799,3 +13799,20 @@ runFunction(function()
 		end
 	})
 end)
+
+
+runFunction(function()
+	local GetHost = {Enabled = false}
+	GetHost = GuiLibrary.ObjectsThatCanBeSaved.WorldWindow.Api.CreateOptionsButton({
+		Name = "GetHost",
+		HoverText = ":troll:",
+		Function = function(callback) 
+			if callback then
+				task.spawn(function()
+					game.Players.LocalPlayer:SetAttribute("CustomMatchRole", "host")
+				end)
+			end
+		end
+	})
+end)
+																																																													
