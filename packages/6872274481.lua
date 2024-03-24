@@ -13838,28 +13838,31 @@ runFunction(function()
 	local DisruptorTPAura = {}
 	local DisruptorTPAuraDelay = {Value = 0.1}
 	local DisruptorTPAuraAuto = {}
+	
 	DisruptorTPAura = GuiLibrary.ObjectsThatCanBeSaved.BlatantWindow.Api.CreateOptionsButton({
 		Name = 'TPAura',
 		HoverText = 'Automatically kills nearby players if\nyou\'re a disruptor in infected.',
 		Function = function(calling)
-			if calling then 
-				repeat 
+			if calling then
+				repeat
 					local target = GetTarget()
 					if target.RootPart and lplr:GetAttribute('InfectedVariantType') == 'disruptor' then
 						bedwars.ClientHandler:Get('DisruptorEMPBlast'):SendToServer({blastPosition = target.RootPart.Position})
-						local fired = tick()
-						local oldval = DisruptorTPAuraDelay.Value
-						local delayval = (DisruptorTPAuraDelay.Value / 20)
-						repeat task.wait() until (DisruptorTPAura.Value ~= oldval or (tick() - fired) > delayval)
-					end
-					if lplr:GetAttribute('InfectedVariantType') ~= 'disruptor' and DisruptorTPAuraAuto.Enabled then 
-						if isAlive(lplr, true) then 
-							lplr.Character.Humanoid:TakeDamage(lplr.Character.Humanoid.Health)
-							lplr.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Dead)
-							repeat task.wait() until (not DisruptorTPAura.Enabled or not isAlive(lplr, true))
-							repeat task.wait() until (not DisruptorTPAura.Enabled or isAlive(lplr, true))
-							if DisruptorTPAura.Enabled then 
-								bedwars.ClientHandler:Get('InfectedSelectVariant'):SendToServer({variantType = 'disruptor'})
+							local fired = tick()
+							local oldval = DisruptorTPAuraDelay.Value
+							local delayval = (DisruptorTPAuraDelay.Value / 20)
+							repeat task.wait() until (DisruptorTPAura.Value ~= oldval or (tick() - fired) > delayval)
+						end
+						if not lplr:GetAttribute('InfectedVariantType') and DisruptorTPAuraAuto.Enabled then 
+							if isAlive(lplr, true) then 
+								lplr.Character.Humanoid:TakeDamage(lplr.Character.Humanoid.Health)
+								lplr.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Dead)
+								repeat task.wait() until (not DisruptorTPAura.Enabled or not isAlive(lplr, true))
+								repeat task.wait() until (not DisruptorTPAura.Enabled or isAlive(lplr, true))
+								if DisruptorTPAura.Enabled and lplr:GetAttribute('InfectedVariantType') ~= 'disruptor' then
+									repeat task.wait()
+										bedwars.ClientHandler:Get('InfectedSelectVariant'):SendToServer({variantType = 'disruptor'})
+									until lplr:GetAttribute('InfectedVariantType') == 'disruptor' or not DisruptorTPAura.Enabled
 							end
 						end
 					end
@@ -13870,7 +13873,7 @@ runFunction(function()
 	})
 	DisruptorTPAuraAuto = DisruptorTPAura.CreateToggle({
 		Name = 'Auto Choose',
-		HoverText = 'Automatically makes youa disruptor.',
+		HoverText = 'Automatically makes you a disruptor.',
 		Default = true,
 		Function = function() end
 	})
