@@ -13855,6 +13855,7 @@ runFunction(function()
 						end
 						if not lplr:GetAttribute('InfectedVariantType') and DisruptorTPAuraAuto.Enabled then 
 							if isAlive(lplr, true) then 
+								repeat task.wait() until bedwarsStore.matchState ~= 0																																																																																																																																																																																																																																																																																																																																																						
 								lplr.Character.Humanoid:TakeDamage(lplr.Character.Humanoid.Health)
 								lplr.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Dead)
 								repeat task.wait() until (not DisruptorTPAura.Enabled or not isAlive(lplr, true))
