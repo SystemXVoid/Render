@@ -6970,6 +6970,9 @@ if shared.VapeExecuted then
 					if input1.KeyCode == Enum.KeyCode[profiletab["Keybind"]] then
 						GuiLibrary["SwitchProfile"](profilenametext)
 					end
+					if input1.UserInputType == Enum.UserInputType.Touch then
+						GuiLibrary["SwitchProfile"](profilenametext)
+					end
 				end
 			end
 		end
