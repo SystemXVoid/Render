@@ -13639,10 +13639,25 @@ runFunction(function()
 		HoverText = 'Disables float check and allows speeds up to 45.',
 		Function = function(calling)
 			if calling then 
-				repeat 
-					bedwars.ClientHandler:Get('RocketImpulse').instance:InvokeServer({velocity = Vector3.new(lplr.Character.PrimaryPart.Velocity)})
-					task.wait()
-				until (not PartialDisabler.Enabled)
+				task.spawn(function()
+					repeat 
+						bedwars.ClientHandler:Get('RocketImpulse').instance:InvokeServer({velocity = Vector3.new(lplr.Character.PrimaryPart.Velocity)})
+						task.wait()
+					until (not PartialDisabler.Enabled)
+				end)
+			end
+		end
+	})
+end)
+
+runFunction(function()
+	local MechExploit = {} -- from windowsdefenderyeshaha
+	MechExploit = GuiLibrary.ObjectsThatCanBeSaved.BlatantWindow.Api.CreateOptionsButton({
+		Name = 'MechExploit',
+		HoverText = 'Give yourself shield and give you another sword which you can heal',
+		Function = function(calling)
+			if calling then 
+				replicatedStorageService['events-@easy-games/game-core:shared/game-core-networking@getEvents.Events'].useAbility:FireServer('tinker_summon', {})
 			end
 		end
 	})
