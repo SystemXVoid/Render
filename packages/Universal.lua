@@ -7235,21 +7235,22 @@ runFunction(function()
 	end
 	local function updateTargetUI4(target)
 		local trashcheck = 0
+		local health = 0
 		if type(target) ~= 'table' or target.Player == nil then
 			TargetInfo.Visible = GuiLibrary.MainGui.ScaledGui.ClickGui.Visible
 			targetactive = false
 			return 
 		end
-		local health = (target.Humanoid and target.Humanoid.Health or isAlive(target.Player) and target.Player.Character.Humanoid.Health or 0)
+		if health < target.Humanoid.Health then
+			task.wait(0.1)
+			tweenService:Create(TargetProfile, TweenInfo.new(0.1, Enum.EasingStyle.Quad), {ImageColor3 = Color3.fromRGB(255, 0, 0)}):Play()
+			task.wait(0.2)
+			tweenService:Create(TargetProfile, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {ImageColor3 = Color3.fromRGB(255, 255, 255)}):Play()
+		end
+		health = (target.Humanoid and target.Humanoid.Health or isAlive(target.Player) and target.Player.Character.Humanoid.Health or 0)
 		local maxhealth = (target.Humanoid and target.Humanoid.MaxHealth or isAlive(target.Player, true) and target.Player.Character.Humanoid.MaxHealth or 100)
 		local damage = (maxhealth - health)
 		local npctarget = false 
-		task.spawn(function()
-			task.wait(0.3)
-			tweenService:Create(TargetProfile, TweenInfo.new(0.2, Enum.EasingStyle.Quad), {ImageColor3 = Color3.fromRGB(255, 0, 0)}):Play()
-			task.wait(0.5)
-			tweenService:Create(TargetProfile, TweenInfo.new(0.15, Enum.EasingStyle.Quad), {ImageColor3 = Color3.fromRGB(255, 255, 255)}):Play()
-		end)
 		if target.Player.UserId == 1443379645 then 
 			npctarget = true 
 		end
@@ -7258,7 +7259,6 @@ runFunction(function()
 		TargetHP.Text = tostring(math.round(health))
 		TargetProfile.Image = 'rbxthumb://type=AvatarHeadShot&id='..(target.Player.UserId)..'&w=420&h=420'
 		TargetName.Text = (target.Player.DisplayName or target.Player.Name or 'Target')
-		
 	end
 	local RenderUI = GuiLibrary.CreateCustomWindow({
 		Name = 'OG Render HUD',

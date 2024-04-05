@@ -6923,6 +6923,8 @@ if shared.VapeExecuted then
 		button.Transparency = 0.1
 		button.Visible = (RenderDeveloper and true or false)
 		button.Image = ''
+		button.Active = true
+		button.Draggable = true
 		local stroke = Instance.new('UIStroke', button)
 		stroke.Thickness = 2.63
 		stroke.Color = Color3.fromRGB(255, 0, 242)
