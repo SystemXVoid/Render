@@ -488,7 +488,10 @@ local function getSpeed()
 			speed += 19
 		end
 		if isEnabled('PartialDisabler') then 
-			speed += 21
+			speed += 19.5
+		end
+		if isEnabled('FullDisabler') then 
+			speed += 80 
 		end
 		if bedwarsStore.desyncActive then 
 			speed += 3.8
@@ -11160,6 +11163,14 @@ runFunction(function()
 			bedtween:Play()
 			bedtween.Completed:Wait() 
 		end,
+		Instant = function()
+			local bed = getEnemyBed(nil, BedTPAutoRaycast.Enabled == false)  
+			if bed == nil then 
+				return BedTP.ToggleButton()
+			end
+			lplr.Character.HumanoidRootPart.CFrame = (bed.CFrame + Vector3.new(0, 5, 0)) 
+			BedTP.ToggleButton()
+		end,
 		Recall = function()
 			if not isAlive(lplr, true) or lplr.Character.Humanoid.FloorMaterial == Enum.Material.Air then 
 				errorNotification('BedTP', 'Recall ability not available.', 7)
@@ -11195,9 +11206,16 @@ runFunction(function()
 		HoverText = 'Tweens you to a nearby bed.',
 		Function = function(calling) 
 			if calling then 
+
 				if getEnemyBed(nil, BedTPAutoRaycast.Enabled == false) == nil or not shared.VapeFullyLoaded then 
 					BedTP.ToggleButton()
 					return 
+				end
+				if isEnabled('FullDisabler') and isAlive(lplr, true) then 
+					return bypassmethods.Instant()
+				end
+				if isEnabled('FullDisabler') then 
+					return BedTP.ToggleButton()
 				end
 				bypassmethods[isAlive() and BedTPTeleport.Value or 'Respawn']()
 				if BedTP.Enabled then 
@@ -11302,6 +11320,14 @@ runFunction(function()
 			playertween:Play() 
 			playertween.Completed:Wait()
 		end,
+		Instant = function() 
+			local target = GetTarget(nil, PlayerTPSort.Value == 'Health', true)
+			if target.RootPart == nil then 
+				return PlayerTP.ToggleButton()
+			end
+			lplr.Character.HumanoidRootPart.CFrame = (target.RootPart.CFrame + Vector3.new(0, 5, 0)) 
+			PlayerTP.ToggleButton()
+		end,
 		Recall = function()
 			if not isAlive(lplr, true) or lplr.Character.Humanoid.FloorMaterial == Enum.Material.Air then 
 				errorNotification('PlayerTP', 'Recall ability not available.', 7)
@@ -11337,6 +11363,12 @@ runFunction(function()
 		HoverText = 'Tweens you to a nearby target.',
 		Function = function(calling)
 			if calling then 
+				if isEnabled('FullDisabler') and isAlive(lplr, true) then 
+					return bypassmethods.Instant()
+				end
+				if isEnabled('FullDisabler') then 
+					return PlayerTP.ToggleButton()
+				end
 				if GetTarget(nil, PlayerTPSort.Value == 'Health', true).RootPart and shared.VapeFullyLoaded then 
 					bypassmethods[isAlive() and PlayerTPTeleport.Value or 'Respawn']() 
 				end
@@ -13632,6 +13664,54 @@ runFunction(function()
 	})
 end)
 
+
+runFunction(function()
+	local AttackDodger = {}
+	local AttackDodgerRange = {Value = 18}
+	local function getdodgeside(root) 
+		local range = (AttackDodgerRange.Value - 0.3)
+		local lowestblock = workspace:Raycast(root.Position, Vector3.new(0, -range, 0), bedwarsStore.blockRaycast)
+		if lowestblock == nil then 
+			return Vector3.new(0, -range, 0)
+		end
+		local side = workspace:Raycast(root.Position, Vector3.new(range, 0, 0), bedwarsStore.blockRaycast)
+		if side == nil then 
+			return Vector3.new(range, 0, 0)
+		end
+		local side2 = workspace:Raycast(root.Position, Vector3.new(-range, 0, 0), bedwarsStore.blockRaycast)
+		if side2 == nil then 
+			return Vector3.new(-range, 0, 0)
+		end
+		local side3 = workspace:Raycast(root.Position, Vector3.new(0, 0, range), bedwarsStore.blockRaycast)
+		if side3 == nil then 
+			return Vector3.new(0, 0, range)
+		end
+		local side4 = workspace:Raycast(root.Position, Vector3.new(0, 0, -range), bedwarsStore.blockRaycast)
+		if side4 == nil then 
+			return Vector3.new(0, 0, -range)
+		end
+	end
+	AttackDodger = GuiLibrary.ObjectsThatCanBeSaved.BlatantWindow.Api.CreateOptionsButton({
+		Name = 'AttackDodger',	
+		HoverText = 'Automatically tries to dodge attacks.',
+		Function = function(calling)
+			if calling then 
+				repeat 
+					local target = GetTarget(18, nil, true)
+					if isAlive(lplr, true) and target.RootPart then 
+						local vec = getdodgeside(target.RootPart)
+						if vec then 
+							local distance = (RenderStore.LocalPosition - target.RootPart.Position).Magnitude
+							tweenService:Create(lplr.Character.HumanoidRootPart, TweenInfo.new(distance >= 13 and 0.3 or 1), {CFrame = (target.RootPart.CFrame + vec)}):Play()
+						end
+					end
+					task.wait(0)
+				until (not AttackDodger.Enabled)
+			end
+		end
+	})
+end)
+
 runFunction(function()
 	local PartialDisabler = {} -- ty relevent my bbg <3 (joke but thank you)
 	PartialDisabler = GuiLibrary.ObjectsThatCanBeSaved.BlatantWindow.Api.CreateOptionsButton({
@@ -13639,26 +13719,37 @@ runFunction(function()
 		HoverText = 'Disables float check and allows speeds up to 45.',
 		Function = function(calling)
 			if calling then 
-				task.spawn(function()
-					repeat 
-						bedwars.ClientHandler:Get('RocketImpulse').instance:InvokeServer({velocity = Vector3.new(lplr.Character.PrimaryPart.Velocity)})
-						task.wait()
-					until (not PartialDisabler.Enabled)
-				end)
+				repeat 
+					bedwars.ClientHandler:Get('RocketImpulse').instance:InvokeServer({velocity = Vector3.new(-9e9, -9e9, -9e9)})
+					task.wait()
+				until (not PartialDisabler.Enabled)
 			end
 		end
 	})
 end)
 
 runFunction(function()
-	local MechExploit = {} -- from windowsdefenderyeshaha
-	MechExploit = GuiLibrary.ObjectsThatCanBeSaved.BlatantWindow.Api.CreateOptionsButton({
-		Name = 'MechExploit',
-		HoverText = 'Give yourself shield and give you another sword which you can heal',
+	local TinkerExploit = {} 
+	TinkerExploit = GuiLibrary.ObjectsThatCanBeSaved.BlatantWindow.Api.CreateOptionsButton({
+		Name = 'TinkerExploit',
+		HoverText = 'Spawns a tinker without kit needs (basically extra hp)',
 		Function = function(calling)
-			if calling then 
-				replicatedStorageService['events-@easy-games/game-core:shared/game-core-networking@getEvents.Events'].useAbility:FireServer('tinker_summon', {})
-			end
+			repeat 
+				pcall(function() lplr.Character.Humanoid.HipHeight = 2 end)
+				if isAlive(lplr, true) and lplr.Character:FindFirstChild('tinker') == nil and bedwars.AbilityController:canUseAbility('tinker_summon') then 
+					bedwars.AbilityController:useAbility('tinker_summon')
+					task.spawn(function()
+						pcall(function()
+							lplr.Character:WaitForChild('tinker').PrimaryPart:Remove()
+							for i,v in next, lplr.Character.Humanoid:GetPlayingAnimationTracks() do 
+								v:Stop()
+							end
+						end)
+					end)
+				end
+				task.wait()
+			until (not TinkerExploit.Enabled)
 		end
 	})
 end)
+
