@@ -13713,16 +13713,16 @@ runFunction(function()
 end)
 
 runFunction(function()
-	local PartialDisabler = {} -- ty relevent my bbg <3 (joke but thank you)
-	PartialDisabler = GuiLibrary.ObjectsThatCanBeSaved.BlatantWindow.Api.CreateOptionsButton({
-		Name = 'PartialDisabler',
-		HoverText = 'Disables float check and allows speeds up to 45.',
+	local FullDisabler = {}
+	FullDisabler = GuiLibrary.ObjectsThatCanBeSaved.BlatantWindow.Api.CreateOptionsButton({
+		Name = 'FullDisabler',
+		HoverText = 'Disables float check and allows infinite speed and teleporting.',
 		Function = function(calling)
 			if calling then 
 				repeat 
-					bedwars.ClientHandler:Get('RocketImpulse').instance:InvokeServer({velocity = Vector3.new(-9e9, -9e9, -9e9)})
+					bedwars.ClientHandler:Get('RocketImpulse').instance:InvokeServer({velocity = Vector3.new(math.huge, math.huge, math.huge)})
 					task.wait()
-				until (not PartialDisabler.Enabled)
+				until (not FullDisabler.Enabled)
 			end
 		end
 	})
