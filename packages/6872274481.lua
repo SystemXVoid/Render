@@ -13728,28 +13728,3 @@ runFunction(function()
 	})
 end)
 
-runFunction(function()
-	local TinkerExploit = {} 
-	TinkerExploit = GuiLibrary.ObjectsThatCanBeSaved.BlatantWindow.Api.CreateOptionsButton({
-		Name = 'TinkerExploit',
-		HoverText = 'Spawns a tinker without kit needs (basically extra hp)',
-		Function = function(calling)
-			repeat 
-				pcall(function() lplr.Character.Humanoid.HipHeight = 2 end)
-				if isAlive(lplr, true) and lplr.Character:FindFirstChild('tinker') == nil and bedwars.AbilityController:canUseAbility('tinker_summon') then 
-					bedwars.AbilityController:useAbility('tinker_summon')
-					task.spawn(function()
-						pcall(function()
-							lplr.Character:WaitForChild('tinker').PrimaryPart:Remove()
-							for i,v in next, lplr.Character.Humanoid:GetPlayingAnimationTracks() do 
-								v:Stop()
-							end
-						end)
-					end)
-				end
-				task.wait()
-			until (not TinkerExploit.Enabled)
-		end
-	})
-end)
-
