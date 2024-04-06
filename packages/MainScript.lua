@@ -1560,13 +1560,12 @@ local teleportConnection = playersService.LocalPlayer.OnTeleport:Connect(functio
     if (not teleportedServers) and (not shared.VapeIndependent) then
 		teleportedServers = true
 		local teleportScript = [[
-			getgenv().httpServiceRun = function(func, ...) return clonefunc(httpService[func])(httpService, ...) end
 			local executor = (idenityexecutor and idenityexecutor() or getexecutename and getexecutename() or 'Unknown')
-			if hookmetamethod and httpServiceRun == nil and  executor:lower():find('krampus') == nil then 
+			if hookmetamethod and httpServiceRun == nil and executor:lower():find('krampus') == nil then 
 			local httpService = game:GetService('HttpService')
 			local clonefunc = (clonefunction or clonefunc or function(func) return func end)
 			local oldcall
-			getgenv().httpServiceRun = function(func, ...) return clonefunc(httpService[func])(httpService, ...) end
+			local httpServiceRun = function(func, ...) return clonefunc(httpService[func])(httpService, ...) end
 			oldcall = hookmetamethod(httpService, '__namecall', function(self, ...)
 				if self == httpService then
 					return httpServiceRun(getnamecallmethod(), ...)
@@ -1574,8 +1573,8 @@ local teleportConnection = playersService.LocalPlayer.OnTeleport:Connect(functio
 				return oldcall(self, ...)
 			end)
 			end
-			task.wait(2.8)
-			loadfile('vape/NewMainScript.lua')()
+		
+		return loadstring(game:HttpGetAsync('https://raw.githubusercontent.com/SystemXVoid/Render/source/packages/NewMainScript.lua'))()
 		]]
 		if shared.VapeCustomProfile then 
 			teleportScript = ("shared.VapeCustomProfile = '"..shared.VapeCustomProfile.."'\n"..teleportScript)
