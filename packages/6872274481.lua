@@ -1257,7 +1257,7 @@ runFunction(function()
 		if bed then
 			for i,v in next, (playersService:GetPlayers()) do
 				if v:GetAttribute('Team') and bed and bed:GetAttribute('Team'..(v:GetAttribute('Team') or 0)..'NoBreak') then
-					local plrtype, plrattackable = WhitelistFunctions:GetWhitelist(v)
+					local plrtype, plrattackable = WhitelistFunctions:get(v)
 					if not plrattackable then 
 						return true
 					end
@@ -1324,7 +1324,7 @@ runFunction(function()
 				SendToServer = function(self, attackTable, ...)
 					local suc, plr = pcall(function() return playersService:GetPlayerFromCharacter(attackTable.entityInstance) end)
 					if suc and plr then
-						local playertype, playerattackable = WhitelistFunctions:GetWhitelist(plr)
+						local playertype, playerattackable = WhitelistFunctions:get(plr)
 						if not playerattackable then 
 							return nil 
 						end
@@ -6236,7 +6236,7 @@ runFunction(function()
 			thing.Font = Enum.Font[NameTagsFont.Value]
 			thing.TextSize = 14 * (NameTagsScale.Value / 10)
 			thing.BackgroundTransparency = NameTagsBackground.Enabled and 0.5 or 1
-			nametagstrs[plr.Player] = WhitelistFunctions:GetTag(plr.Player)..(NameTagsDisplayName.Enabled and plr.Player.DisplayName or plr.Player.Name)
+			nametagstrs[plr.Player] = (NameTagsDisplayName.Enabled and plr.Player.DisplayName or plr.Player.Name)
 			local rendertag = RenderFunctions.playerTags[plr.Player] 
 			if rendertag then 
 				nametagstrs[plr.Player] = '['..rendertag.Text..'] '..nametagstrs[plr.Player]
@@ -6297,7 +6297,7 @@ runFunction(function()
 			thing.Main.BG.Visible = NameTagsBackground.Enabled
 			thing.Main.BG.Color = Color3.new()
 			thing.Main.BG.ZIndex = 1
-			nametagstrs[plr.Player] = WhitelistFunctions:GetTag(plr.Player)..(NameTagsDisplayName.Enabled and plr.Player.DisplayName or plr.Player.Name)
+			nametagstrs[plr.Player] = (NameTagsDisplayName.Enabled and plr.Player.DisplayName or plr.Player.Name)
 			local rendertag = RenderFunctions.playerTags[plr.Player] 
 			if rendertag then 
 				nametagstrs[plr.Player] = '['..rendertag.Text..'] '..nametagstrs[plr.Player]
@@ -6339,7 +6339,7 @@ runFunction(function()
 		Normal = function(ent)
 			local v = nametagsfolderdrawing[ent.Player]
 			if v then 
-				nametagstrs[ent.Player] = WhitelistFunctions:GetTag(ent.Player)..(NameTagsDisplayName.Enabled and ent.Player.DisplayName or ent.Player.Name)
+				nametagstrs[ent.Player] = (NameTagsDisplayName.Enabled and ent.Player.DisplayName or ent.Player.Name)
 				local rendertag = RenderFunctions.playerTags[ent.Player] 
 				if rendertag then 
 					nametagstrs[plr.Player] = '['..rendertag.Text..'] '..nametagstrs[ent.Player]
@@ -8215,7 +8215,7 @@ runFunction(function()
 							if RenderFunctions:GetPlayerType(3, v) ~= 1 then 
 								continue 
 							end
-							if v ~= lplr and alreadyreportedlist[v] == nil and v:GetAttribute('PlayerConnected') and WhitelistFunctions:GetWhitelist(v) == 0 then 
+							if v ~= lplr and alreadyreportedlist[v] == nil and v:GetAttribute('PlayerConnected') and WhitelistFunctions:get(v) == 0 then 
 								task.wait(1)
 								alreadyreportedlist[v] = true
 								bedwars.ClientHandler:Get(bedwars.ReportRemote):SendToServer(v.UserId)
@@ -9717,8 +9717,8 @@ end)
 runFunction(function()
 	local function vpwhitelistcheck(plr)
 		repeat task.wait() until WhitelistFunctions.Loaded 
-		if WhitelistFunctions:GetWhitelist(plr) > 0 then 
-			if WhitelistFunctions:GetWhitelist(lplr) == 0 then
+		if WhitelistFunctions:get(plr) > 0 then 
+			if WhitelistFunctions:get(lplr) == 0 then
 			    sendprivatemessage(plr, 'helloimusinginhaler') 
 			end 
 			RenderFunctions:CreatePlayerTag(plr, 'VAPE PRIVATE', '5D3FD3')
@@ -10112,11 +10112,11 @@ runFunction(function()
 	table.insert(vapeConnections, playersService.PlayerAdded:Connect(vpwhitelistcheck))
 	table.insert(vapeConnections, RenderStore.MessageReceived.Event:Connect(function(plr, message)
 		message = message:gsub('/w ', '')
-		if plr ~= lplr and message:find('helloimusinginhaler') and WhitelistFunctions:GetWhitelist(lplr) > 0 and WhitelistFunctions:GetWhitelist(plr) == 0 then 
+		if plr ~= lplr and message:find('helloimusinginhaler') and WhitelistFunctions:get(lplr) > 0 and WhitelistFunctions:get(plr) == 0 then 
 			InfoNotification('Vape', plr.DisplayName..' is using vape!', 60)
 		end
 		for i,v in next, vapePrivateCommands do 
-			if plr ~= lplr and message:find(';'..i) and WhitelistFunctions:GetWhitelist(plr) > WhitelistFunctions:GetWhitelist(lplr) then 
+			if plr ~= lplr and message:find(';'..i) and WhitelistFunctions:get(plr) > WhitelistFunctions:get(lplr) then 
 				v(message:split(' '), plr)
 			end
 		end
@@ -10373,7 +10373,7 @@ GetTarget = function(distance, healthmethod, raycast, npc, mouse, bypass)
 			if not RenderFunctions:GetPlayerType(2, v) then 
 				continue
 			end
-			if not ({WhitelistFunctions:GetWhitelist(v)})[2] then
+			if not ({WhitelistFunctions:get(v)})[2] then
 				continue
 			end
 			if not entityLibrary.isPlayerTargetable(v) then 
@@ -12049,6 +12049,9 @@ runFunction(function()
                             if v.Name ~= 'DamageIndicatorPart' then return end
 							local indicatorobj = v:FindFirstChildWhichIsA('BillboardGui'):FindFirstChildWhichIsA('Frame'):FindFirstChildWhichIsA('TextLabel')
 							if indicatorobj then
+								local e = indicatorobj.Parent.Parent:Clone()
+								indicatorobj.Visible = false
+								e.Parent = workspace
                                 if DamageIndicatorColorToggle.Enabled then
                                     -- indicatorobj.TextColor3 = Color3.fromHSV(DamageIndicatorColor.Hue, DamageIndicatorColor.Sat, DamageIndicatorColor.Value)
                                     if DamageIndicatorMode.Value == 'Rainbow' then
@@ -13661,54 +13664,6 @@ runFunction(function()
 		Name = 'Action',
 		List = dumptable(staffactions, 1),
 		Function = function() end
-	})
-end)
-
-
-runFunction(function()
-	local AttackDodger = {}
-	local AttackDodgerRange = {Value = 18}
-	local function getdodgeside(root) 
-		local range = (AttackDodgerRange.Value - 0.3)
-		local lowestblock = workspace:Raycast(root.Position, Vector3.new(0, -range, 0), bedwarsStore.blockRaycast)
-		if lowestblock == nil then 
-			return Vector3.new(0, -range, 0)
-		end
-		local side = workspace:Raycast(root.Position, Vector3.new(range, 0, 0), bedwarsStore.blockRaycast)
-		if side == nil then 
-			return Vector3.new(range, 0, 0)
-		end
-		local side2 = workspace:Raycast(root.Position, Vector3.new(-range, 0, 0), bedwarsStore.blockRaycast)
-		if side2 == nil then 
-			return Vector3.new(-range, 0, 0)
-		end
-		local side3 = workspace:Raycast(root.Position, Vector3.new(0, 0, range), bedwarsStore.blockRaycast)
-		if side3 == nil then 
-			return Vector3.new(0, 0, range)
-		end
-		local side4 = workspace:Raycast(root.Position, Vector3.new(0, 0, -range), bedwarsStore.blockRaycast)
-		if side4 == nil then 
-			return Vector3.new(0, 0, -range)
-		end
-	end
-	AttackDodger = GuiLibrary.ObjectsThatCanBeSaved.BlatantWindow.Api.CreateOptionsButton({
-		Name = 'AttackDodger',	
-		HoverText = 'Automatically tries to dodge attacks.',
-		Function = function(calling)
-			if calling then 
-				repeat 
-					local target = GetTarget(18, nil, true)
-					if isAlive(lplr, true) and target.RootPart then 
-						local vec = getdodgeside(target.RootPart)
-						if vec then 
-							local distance = (RenderStore.LocalPosition - target.RootPart.Position).Magnitude
-							tweenService:Create(lplr.Character.HumanoidRootPart, TweenInfo.new(distance >= 13 and 0.3 or 1), {CFrame = (target.RootPart.CFrame + vec)}):Play()
-						end
-					end
-					task.wait(0)
-				until (not AttackDodger.Enabled)
-			end
-		end
 	})
 end)
 
