@@ -191,7 +191,7 @@ warningNotification = function(title, text, delay)
 		local color = GuiLibrary.ObjectsThatCanBeSaved['Gui ColorSliderColor'].Api
 		local frame = GuiLibrary.CreateNotification(title, text, delay, 'assets/WarningNotification.png')
 		frame.Frame.Frame.ImageColor3 = Color3.fromHSV(color.Hue, color.Sat, color.Value)
-		frame.Frame.Frame.ImageColor3 = Color3.fromHSV(color.Hue, color.Sat, color.Value)
+		frame.IconLabel.ImageColor3 = Color3.fromHSV(color.Hue, color.Sat, color.Value)
 		return frame
 	end)
 	return (suc and res)
@@ -13636,22 +13636,6 @@ runFunction(function()
 					end
 					task.wait(0)
 				until (not AttackDodger.Enabled)
-			end
-		end
-	})
-end)
-
-runFunction(function()
-	local FullDisabler = {}
-	FullDisabler = GuiLibrary.ObjectsThatCanBeSaved.BlatantWindow.Api.CreateOptionsButton({
-		Name = 'FullDisabler',
-		HoverText = 'Disables float check and allows infinite speed and teleporting.',
-		Function = function(calling)
-			if calling then 
-				repeat 
-					bedwars.ClientHandler:Get('RocketImpulse').instance:InvokeServer({velocity = Vector3.new(math.huge, math.huge, math.huge)})
-					task.wait()
-				until (not FullDisabler.Enabled)
 			end
 		end
 	})
