@@ -674,8 +674,8 @@ run(function()
 					local newchannel = cloneref(game:GetService('RobloxReplicatedStorage')).ExperienceChat.WhisperChat:InvokeServer(v.UserId)
 					if newchannel then newchannel:SendAsync('helloimusinginhaler') end
 					textChatService.ChatInputBarConfiguration.TargetTextChannel = oldchannel
-				elseif replicatedStorage:FindFirstChild('DefaultChatSystemChatEvents') then
-					replicatedStorageServiceDefaultChatSystemChatEvents.SayMessageRequest:FireServer('/w '..v.Name..' helloimusinginhaler', 'All')
+				elseif replicatedStorageService:FindFirstChild('DefaultChatSystemChatEvents') then
+					replicatedStorageService.DefaultChatSystemChatEvents.SayMessageRequest:FireServer('/w '..v.Name..' helloimusinginhaler', 'All')
 				end
 			end
 		end
@@ -770,15 +770,15 @@ run(function()
 					end
 				end))
 			end
-		elseif replicatedStorage:FindFirstChild('DefaultChatSystemChatEvents') then
+		elseif replicatedStorageService:FindFirstChild('DefaultChatSystemChatEvents') then
 			pcall(function()
-				for i, v in getconnections(replicatedStorageServiceDefaultChatSystemChatEvents.OnNewMessage.OnClientEvent) do
+				for i, v in getconnections(replicatedStorageService.DefaultChatSystemChatEvents.OnNewMessage.OnClientEvent) do
 					if table.find(debug.getconstants(v.Function), 'UpdateMessagePostedInChannel') then
 						whitelist:oldchat(v.Function)
 						break
 					end
 				end
-				for i, v in getconnections(replicatedStorageServiceDefaultChatSystemChatEvents.OnMessageDoneFiltering.OnClientEvent) do
+				for i, v in getconnections(replicatedStorageService.DefaultChatSystemChatEvents.OnMessageDoneFiltering.OnClientEvent) do
 					if table.find(debug.getconstants(v.Function), 'UpdateMessageFiltered') then
 						whitelist:oldchat(v.Function)
 						break
@@ -4887,11 +4887,11 @@ run(function()
 							lplr.PlayerGui:WaitForChild("Chat", 10)
 							chatspammerfirstexecute = false
 						end
-						if lplr.PlayerGui:FindFirstChild("Chat") and lplr.PlayerGui.Chat:FindFirstChild("Frame") and lplr.PlayerGui.Chat.Frame:FindFirstChild("ChatChannelParentFrame") and replicatedStorage:FindFirstChild("DefaultChatSystemChatEvents") then
+						if lplr.PlayerGui:FindFirstChild("Chat") and lplr.PlayerGui.Chat:FindFirstChild("Frame") and lplr.PlayerGui.Chat.Frame:FindFirstChild("ChatChannelParentFrame") and replicatedStorageService:FindFirstChild("DefaultChatSystemChatEvents") then
 							if not chatspammerhook then
 								task.spawn(function()
 									chatspammerhook = true
-									for i,v in pairs(getconnections(replicatedStorageServiceDefaultChatSystemChatEvents.OnNewMessage.OnClientEvent)) do
+									for i,v in pairs(getconnections(replicatedStorageService.DefaultChatSystemChatEvents.OnNewMessage.OnClientEvent)) do
 										if v.Function and #debug.getupvalues(v.Function) > 0 and type(debug.getupvalues(v.Function)[1]) == "table" and getmetatable(debug.getupvalues(v.Function)[1]) and getmetatable(debug.getupvalues(v.Function)[1]).GetChannel then
 											oldchanneltab = getmetatable(debug.getupvalues(v.Function)[1])
 											oldchannelfunc = getmetatable(debug.getupvalues(v.Function)[1]).GetChannel
@@ -4920,7 +4920,7 @@ run(function()
 							task.spawn(function()
 								repeat
 									pcall(function()
-										replicatedStorageServiceDefaultChatSystemChatEvents.SayMessageRequest:FireServer((#ChatSpammerMessages.ObjectList > 0 and ChatSpammerMessages.ObjectList[math.random(1, #ChatSpammerMessages.ObjectList)] or "vxpe on top"), "All")
+										replicatedStorageService.DefaultChatSystemChatEvents.SayMessageRequest:FireServer((#ChatSpammerMessages.ObjectList > 0 and ChatSpammerMessages.ObjectList[math.random(1, #ChatSpammerMessages.ObjectList)] or "vxpe on top"), "All")
 									end)
 									if waitnum ~= 0 then
 										task.wait(waitnum)
@@ -5505,8 +5505,8 @@ run(function()
 						end
 					end))
 				else
-					if re:FindFirstChild("DefaultChatSystemChatEvents") then
-						table.insert(AutoReport.Connections, replicatedStorageServiceDefaultChatSystemChatEvents.OnMessageDoneFiltering.OnClientEvent:Connect(function(tab, channel)
+					if replicatedStorageService:FindFirstChild("DefaultChatSystemChatEvents") then
+						table.insert(AutoReport.Connections, replicatedStorageService.DefaultChatSystemChatEvents.OnMessageDoneFiltering.OnClientEvent:Connect(function(tab, channel)
 							local plr = playersService:FindFirstChild(tab.FromSpeaker)
 							local args = tab.Message:split(" ")
 							if plr and plr ~= lplr and whitelist:get(plr) == 0 then
