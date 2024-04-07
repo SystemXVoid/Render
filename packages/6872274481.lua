@@ -13500,7 +13500,7 @@ runFunction(function()
 	end
 	local function staffDetectorFunction(player)
 		task.spawn(function()
-			local tags = player:WaitForChild('Tags')
+			local tags = player:WaitForChild('Tags', 9e9)
 			local addconnection
 			for i,v in next, tags:GetChildren() do 
 				if v:IsA('StringValue') and (v.Value:lower():find('mod') or v.Value:lower():find('dev') or v.Value:lower():find('owner')) then 
