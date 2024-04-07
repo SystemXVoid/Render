@@ -12049,9 +12049,6 @@ runFunction(function()
                             if v.Name ~= 'DamageIndicatorPart' then return end
 							local indicatorobj = v:FindFirstChildWhichIsA('BillboardGui'):FindFirstChildWhichIsA('Frame'):FindFirstChildWhichIsA('TextLabel')
 							if indicatorobj then
-								local e = indicatorobj.Parent.Parent:Clone()
-								indicatorobj.Visible = false
-								e.Parent = workspace
                                 if DamageIndicatorColorToggle.Enabled then
                                     -- indicatorobj.TextColor3 = Color3.fromHSV(DamageIndicatorColor.Hue, DamageIndicatorColor.Sat, DamageIndicatorColor.Value)
                                     if DamageIndicatorMode.Value == 'Rainbow' then
@@ -13667,6 +13664,56 @@ runFunction(function()
 	})
 end)
 
+
+runFunction(function()
+	local AttackDodger = {}
+	local AttackDodgerRange = {Value = 18}
+	local function getdodgeside(root) 
+		local range = (AttackDodgerRange.Value - 0.1)
+		local sides = {}
+		local vecs = {Vector3.new(range, 0, 0), Vector3.new(-range, 0, 0), Vector3.new(0, 0, range), Vector3.new(0, 0, -range)}
+		local side = workspace:Raycast(root.Position, Vector3.new(range, 0, 0), bedwarsStore.blockRaycast)
+		if side == nil then 
+			table.insert(sides, side)
+		end
+		local side2 = workspace:Raycast(root.Position, Vector3.new(-range, 0, 0), bedwarsStore.blockRaycast)
+		if side2 == nil then 
+			table.insert(sides, side2)
+		end
+		local side3 = workspace:Raycast(root.Position, Vector3.new(0, 0, range), bedwarsStore.blockRaycast)
+		if side3 == nil then 
+			table.insert(sides, side3)
+		end
+		local side4 = workspace:Raycast(root.Position, Vector3.new(0, 0, -range), bedwarsStore.blockRaycast)
+		if side4 == nil then 
+			table.insert(sides, side4)
+		end
+		if #sides > 0 then 
+			return vecs[math.random(1, #sides)]
+		end
+	end
+	AttackDodger = GuiLibrary.ObjectsThatCanBeSaved.BlatantWindow.Api.CreateOptionsButton({
+		Name = 'AttackDodger',	
+		HoverText = 'Automatically tries to dodge attacks.',
+		Function = function(calling)
+			if calling then 
+				repeat 
+					local target = GetTarget(18, nil, true)
+					if isAlive(lplr, true) and target.RootPart then 
+						local vec = getdodgeside(target.RootPart)
+						if vec then 
+							local distance = (RenderStore.LocalPosition - target.RootPart.Position).Magnitude
+							local targetTween = tweenService:Create(lplr.Character.HumanoidRootPart, TweenInfo.new(distance >= 13 and 0.3 or getSpeed() >= 40 and 0.12 or 1), {CFrame = (target.RootPart.CFrame + vec)})
+							targetTween:Play()
+						end
+					end
+					task.wait(0)
+				until (not AttackDodger.Enabled)
+			end
+		end
+	})
+end)
+
 runFunction(function()
 	local FullDisabler = {}
 	FullDisabler = GuiLibrary.ObjectsThatCanBeSaved.BlatantWindow.Api.CreateOptionsButton({
@@ -13683,3 +13730,45 @@ runFunction(function()
 	})
 end)
 
+runFunction(function()
+	local MotionBlur = {}
+	local MotionBlurTarget = {}
+	local MotionBlurIntensity = {Value = 8.5}
+	local blur = {}
+	MotionBlur = GuiLibrary.ObjectsThatCanBeSaved.RenderWindow.Api.CreateOptionsButton({
+		Name = 'MotionBlur',
+		HoverText = 'Adds background blur when you\'re moving.',
+		Function = function(calling)
+			if calling then 
+				repeat task.wait() until (isAlive(lplr, true) or not MotionBlur.Enabled)
+				table.insert(MotionBlur.Connections, lplr.Character.HumanoidRootPart:GetPropertyChangedSignal('CFrame'):Connect(function()
+					if MotionBlurTarget.Enabled and vapeTargetInfo.Targets.Killaura == nil then 
+						return 
+					end
+					if blur.Parent == nil then 
+						blur = Instance.new('BlurEffect', lightingService)
+						debris:AddItem(blur, 0)
+					end
+					blur.Size = MotionBlurIntensity.Value
+				end))
+				table.insert(MotionBlur.Connections, lplr.CharacterAdded:Connect(function()
+					MotionBlur.ToggleButton()
+					MotionBlur.ToggleButton()
+				end))
+			end
+		end
+	})
+	MotionBlurTarget = MotionBlur.CreateToggle({
+		Name = 'Killaura Only',
+		HoverText = 'Only works when killaura is active.',
+		Default = true,
+		Function = function() end
+	})
+	MotionBlurIntensity = MotionBlur.CreateSlider({
+		Name = 'Intensity',
+		Min = 2,
+		Max = 10,
+		Default = 8.5,
+		Function = function() end
+	})
+end)
