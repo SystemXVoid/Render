@@ -11150,7 +11150,7 @@ runFunction(function()
 	local BedTPAutoSpeed = {}
 	local BedTPTween = {Value = 50}
 	local BedTPYLevel = {Value = 25}
-	local BedTPTeleport = {Value = 'Respawn'}
+	local BedTPTeleport = {Value = 'InfiniteFly'}
 	local BedTPMethod = {Value = 'Linear'}
 	local oldmovefunc
 	local bedtween
@@ -11180,7 +11180,17 @@ runFunction(function()
 			local tweenstyle = (BedTPAutoSpeed.Enabled and Enum.EasingStyle.Linear or Enum.EasingStyle[BedTPMethod.Value])
 			bedtween = tweenService:Create(lplr.Character.HumanoidRootPart, TweenInfo.new(tweenspeed, tweenstyle), {CFrame = bed.CFrame + Vector3.new(0, BedTPAutoRaycast.Enabled and 5 or BedTPYLevel.Value)})
 			bedtween:Play()
+		end,
+		InfiniteFly = function()
+			local bed = getEnemyBed(nil, BedTPAutoRaycast.Enabled == false, true)  
+			if bed == nil then return BedTP.ToggleButton() end
+			lplr.Character.HumanoidRootPart.CFrame += Vector3.new(0, 900000, 0)
+			bedtween = tweenService:Create(lplr.Character.HumanoidRootPart, TweenInfo.new(25, Enum.EasingStyle.Linear, Enum.EasingDirection.Out, 0, false, 0), {CFrame = bed.CFrame})
+			InfoNotification("BedTP", "Wait 25 Seconds Before Teleporting", 26)
+			bedtween:Play()
 			bedtween.Completed:Wait() 
+			lplr.Character.HumanoidRootPart.CFrame = bed.CFrame
+			BedTP.ToggleButton()
 		end,
 		Instant = function()
 			local bed = getEnemyBed(nil, BedTPAutoRaycast.Enabled == false)  
@@ -11224,8 +11234,7 @@ runFunction(function()
 		Name = 'BedTP',
 		HoverText = 'Tweens you to a nearby bed.',
 		Function = function(calling) 
-			if calling then 
-
+			if calling then
 				if getEnemyBed(nil, BedTPAutoRaycast.Enabled == false) == nil or not shared.VapeFullyLoaded then 
 					BedTP.ToggleButton()
 					return 
@@ -11263,7 +11272,7 @@ runFunction(function()
 	})
 	BedTPTeleport = BedTP.CreateDropdown({
 		Name = 'Teleport Method',
-		List = {'Respawn', 'Recall'},
+		List = {'Respawn', 'Recall', 'InfiniteFly'},
 		Function = function() end
 	})
 	BedTPAutoSpeed = BedTP.CreateToggle({
