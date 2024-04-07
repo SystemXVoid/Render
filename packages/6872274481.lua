@@ -13575,7 +13575,7 @@ runFunction(function()
 	});
 end)
 
-run(function()
+runFunction(function()
     local antideath: table = {};
 	local antideathmode: table = {};
 	local antideathboostmode: table = {};
