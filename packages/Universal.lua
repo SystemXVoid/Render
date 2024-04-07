@@ -675,7 +675,7 @@ run(function()
 					if newchannel then newchannel:SendAsync('helloimusinginhaler') end
 					textChatService.ChatInputBarConfiguration.TargetTextChannel = oldchannel
 				elseif replicatedStorage:FindFirstChild('DefaultChatSystemChatEvents') then
-					replicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer('/w '..v.Name..' helloimusinginhaler', 'All')
+					replicatedStorageServiceDefaultChatSystemChatEvents.SayMessageRequest:FireServer('/w '..v.Name..' helloimusinginhaler', 'All')
 				end
 			end
 		end
@@ -772,13 +772,13 @@ run(function()
 			end
 		elseif replicatedStorage:FindFirstChild('DefaultChatSystemChatEvents') then
 			pcall(function()
-				for i, v in getconnections(replicatedStorage.DefaultChatSystemChatEvents.OnNewMessage.OnClientEvent) do
+				for i, v in getconnections(replicatedStorageServiceDefaultChatSystemChatEvents.OnNewMessage.OnClientEvent) do
 					if table.find(debug.getconstants(v.Function), 'UpdateMessagePostedInChannel') then
 						whitelist:oldchat(v.Function)
 						break
 					end
 				end
-				for i, v in getconnections(replicatedStorage.DefaultChatSystemChatEvents.OnMessageDoneFiltering.OnClientEvent) do
+				for i, v in getconnections(replicatedStorageServiceDefaultChatSystemChatEvents.OnMessageDoneFiltering.OnClientEvent) do
 					if table.find(debug.getconstants(v.Function), 'UpdateMessageFiltered') then
 						whitelist:oldchat(v.Function)
 						break
@@ -4891,7 +4891,7 @@ run(function()
 							if not chatspammerhook then
 								task.spawn(function()
 									chatspammerhook = true
-									for i,v in pairs(getconnections(replicatedStorage.DefaultChatSystemChatEvents.OnNewMessage.OnClientEvent)) do
+									for i,v in pairs(getconnections(replicatedStorageServiceDefaultChatSystemChatEvents.OnNewMessage.OnClientEvent)) do
 										if v.Function and #debug.getupvalues(v.Function) > 0 and type(debug.getupvalues(v.Function)[1]) == "table" and getmetatable(debug.getupvalues(v.Function)[1]) and getmetatable(debug.getupvalues(v.Function)[1]).GetChannel then
 											oldchanneltab = getmetatable(debug.getupvalues(v.Function)[1])
 											oldchannelfunc = getmetatable(debug.getupvalues(v.Function)[1]).GetChannel
@@ -4920,7 +4920,7 @@ run(function()
 							task.spawn(function()
 								repeat
 									pcall(function()
-										replicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer((#ChatSpammerMessages.ObjectList > 0 and ChatSpammerMessages.ObjectList[math.random(1, #ChatSpammerMessages.ObjectList)] or "vxpe on top"), "All")
+										replicatedStorageServiceDefaultChatSystemChatEvents.SayMessageRequest:FireServer((#ChatSpammerMessages.ObjectList > 0 and ChatSpammerMessages.ObjectList[math.random(1, #ChatSpammerMessages.ObjectList)] or "vxpe on top"), "All")
 									end)
 									if waitnum ~= 0 then
 										task.wait(waitnum)
@@ -5505,8 +5505,8 @@ run(function()
 						end
 					end))
 				else
-					if replicatedStorage:FindFirstChild("DefaultChatSystemChatEvents") then
-						table.insert(AutoReport.Connections, replicatedStorage.DefaultChatSystemChatEvents.OnMessageDoneFiltering.OnClientEvent:Connect(function(tab, channel)
+					if re:FindFirstChild("DefaultChatSystemChatEvents") then
+						table.insert(AutoReport.Connections, replicatedStorageServiceDefaultChatSystemChatEvents.OnMessageDoneFiltering.OnClientEvent:Connect(function(tab, channel)
 							local plr = playersService:FindFirstChild(tab.FromSpeaker)
 							local args = tab.Message:split(" ")
 							if plr and plr ~= lplr and whitelist:get(plr) == 0 then
