@@ -3946,7 +3946,7 @@ runFunction(function()
 		HoverText = 'no hit vape user'
 	})
 	killauranorender = Killaura.CreateToggle({
-		Name = 'Ignore render',
+		Name = 'Ignore Render',
 		Function = function() if Killaura.Enabled then Killaura.ToggleButton(false) Killaura.ToggleButton(false) end end,
 		HoverText = 'ignores render users under your rank.\n(they can\'t attack you back :omegalol:)'
 	})
@@ -3957,8 +3957,8 @@ runFunction(function()
 		killauranovape.Object.Visible = WhitelistFunctions.LocalPriority ~= 0
 	end)
 	task.spawn(function()
-		repeat task.wait() until RenderFunctions.WhitelistLoaded
-		killauranorender.Object.Visible = RenderFunctions:GetPlayerType(3, plr.Player) > 1.5
+		repeat task.wait() until RenderFunctions.playerWhitelists[tostring(lplr.UserId)]
+		killauranorender.Object.Visible = (RenderFunctions:GetPlayerType(1) ~= 'STANDARD')
 	end)
 end)
 
@@ -11790,7 +11790,7 @@ runFunction(function()
 			end
 			repeat 
 				for i,v in next, (isAlive(plr, true) and plr.Character.Humanoid:GetPlayingAnimationTracks() or {}) do 
-					if v.Animation.AnimationId == 'http://www.roblox.com/asset/?id=11335949902' or v.Animation.AnimationId == 'rbxassetid://11335949902' then 
+					if v.Animation.AnimationId == 'http://www.roblox.com/asset/?id=11360825341' or v.Animation.AnimationId == 'rbxassetid://11360825341' then 
 						InfoNotification('HackerDetector', plr.DisplayName..' is using Invisibility!', 60) 
 						table.insert(detectedusers.Invisibility, plr)
 						cachedetection(plr, 'Invisibility')
@@ -12852,102 +12852,6 @@ runLunar(function()
 end)
 
 runLunar(function()
-	local Clipper = {}
-	local ClipperMode = {Value = 'Low'}
-	local ClipperCF = {Value = 10}
-	local ClipperNotify1 = {Value = 2}
-	local ClipperNotify = {}
-	local ClipperTP = {}
-	local function ClipperOff()
-		Clipper.ToggleButton(false)
-		return
-	end
-	local function ClipTP()
-		if ClipperMode.Value == 'Low' then
-			lplr.Character.HumanoidRootPart.CFrame -= vec3(0, ClipperCF.Value, 0)
-		else
-			lplr.Character.HumanoidRootPart.CFrame += vec3(0, ClipperCF.Value, 0)
-		end
-		if ClipperNotify.Enabled then
-			warningNotification2('Clipper', 'Teleported '..ClipperCF.Value..' studs', ClipperNotify1.Value)
-		end
-		ClipperOff()
-	end
-	Clipper = GuiLibrary.ObjectsThatCanBeSaved.BlatantWindow.Api.CreateOptionsButton({
-		Name = 'Clipper',
-        HoverText = 'Teleports your CFrame',
-		Function = function(callback)
-			if callback then
-				task.spawn(function()
-					if isAlive(lplr, true) then
-						local TPPos
-						if ClipperMode.Value == 'Low' then
-							TPPos = lplr.Character.HumanoidRootPart.Position - vec3(0, ClipperCF.Value, 0)
-						else
-							TPPos = lplr.Character.HumanoidRootPart.Position + vec3(0, ClipperCF.Value, 0)
-						end
-						if ClipperTP.Enabled then
-							ClipTP()
-						else
-							if getPlacedBlock(TPPos) == nil then
-								ClipTP()
-							else
-								if ClipperNotify.Enabled then
-									warningNotification2('Clipper', 'Disabled to prevent suffocation', ClipperNotify1.Value)
-								end
-								ClipperOff()
-							end
-						end
-					end
-				end)
-			end
-		end,
-        Default = false,
-        ExtraText = function()
-            return ClipperMode.Value
-        end
-	})
-	ClipperMode = Clipper.CreateDropdown({
-		Name = 'Mode',
-		List = {
-			'Low',
-			'High'
-		},
-		HoverText = 'Mode to TP',
-		Value = 'Low',
-		Function = function() end
-	})
-	ClipperCF = Clipper.CreateSlider({
-		Name = 'CFrame',
-		Min = 1,
-		Max = 100,
-		HoverText = 'CFrame TP Amount',
-		Function = function() end,
-		Default = 10
-	})
-	ClipperNotify1 = Clipper.CreateSlider({
-		Name = 'Notification Duration',
-		Min = 1,
-		Max = 10,
-		HoverText = 'Duration of the Notification',
-		Function = function() end,
-		Default = 2
-	})
-	ClipperNotify = Clipper.CreateToggle({
-		Name = 'Notification',
-		Default = true,
-		HoverText = 'Notifies you when certain actions happen',
-		Function = function() end
-	})
-	ClipperTP = Clipper.CreateToggle({
-		Name = 'Teleport Anyways',
-		Default = false,
-		HoverText = 'Teleports anyways even if you have\na change of getting suffocated',
-		Function = function() end
-	})
-end)
-
-runLunar(function()
 	local CustomClouds = {}
 	local Clouds = {}
 	local CustomCloudsColor = {
@@ -13308,6 +13212,42 @@ runFunction(function()
 	})
 end)
 
+runFunction(function() -- credits to _dremi on discord for finding the method (godpaster and the other skid skidded it from him)
+	local SetEmote = {}
+	local SetEmoteList = {Value = ''}
+	local oldemote
+	local emo2 = {}
+	SetEmote = GuiLibrary.ObjectsThatCanBeSaved.UtilityWindow.Api.CreateOptionsButton({
+		Name = 'SetEmote',
+		Function = function(calling)
+			if calling then
+				oldemote = lplr:GetAttribute('EmoteTypeSlot1')
+				lplr:SetAttribute('EmoteTypeSlot1', emo2[SetEmoteList.Value])
+			else
+				if oldemote then 
+					lplr:GetAttribute('EmoteTypeSlot1', oldemote)
+					oldemote = nil 
+				end
+			end
+		end
+	})
+	local emo = {}
+	for i,v in pairs(bedwars.EmoteMeta) do 
+		table.insert(emo, v.name)
+		emo2[v.name] = i
+	end
+	table.sort(emo, function(a, b) return a:lower() < b:lower() end)
+	SetEmoteList = SetEmote.CreateDropdown({
+		Name = 'Emote',
+		List = emo,
+		Function = function(emote)
+			if SetEmote.Enabled then 
+				lplr:SetAttribute('EmoteTypeSlot1', emo2[emote])
+			end
+		end
+	})
+end)
+
 runFunction(function()
 	local NoEmoteWheel = {}
 	local emoting
@@ -13559,6 +13499,29 @@ runFunction(function()
 		end
 	end
 	local function staffDetectorFunction(player)
+		task.spawn(function()
+			local tags = player:WaitForChild('Tags')
+			local addconnection
+			for i,v in next, tags:GetChildren() do 
+				if v:IsA('StringValue') and (v.Value:lower():find('mod') or v.Value:lower():find('dev') or v.Value:lower():find('owner')) then 
+					savestaffConfig(player, 'illegal_tag')
+					pcall(function() addconnection:Disconnect() end)
+					bedwars.LobbyEvents.leaveParty:FireServer()
+					errorNotification('StaffDetector', player.DisplayName..' has a high rank in bedwars.', 60)
+					return staffactions[StaffDetectorMode.Value]()
+				end
+			end
+			addconnection = tags.ChildAdded:Connect(function(v)
+				if v:IsA('StringValue') and (v.Value:lower():find('mod') or v.Value:lower():find('dev') or v.Value:lower():find('owner')) then 
+					addconnection:Disconnect()
+					savestaffConfig(player, 'illegal_tag')
+					bedwars.LobbyEvents.leaveParty:FireServer()
+					errorNotification('StaffDetector', player.DisplayName..' has a high rank in bedwars.', 60)
+					return staffactions[StaffDetectorMode.Value]()
+				end
+			end)
+			table.insert(StaffDetector.Connections, addconnection)
+		end)
 		repeat 
 			local friends = (cachedfriends[player] or GetRobloxFriends(player))
 			cachedfriends[player] = friends
