@@ -1,13 +1,32 @@
 --[[
 
+    _________                     __                   _________      .__          __  .__                      
+   /   _____/_____   ____   _____/  |_  ___________   /   _____/ ____ |  |  __ ___/  |_|__| ____   ____   ______
+   \_____  \\____ \_/ __ \_/ ___\   __\/ __ \_  __ \  \_____  \ /  _ \|  | |  |  \   __\  |/  _ \ /    \ /  ___/
+   /        \  |_> >  ___/\  \___|  | \  ___/|  | \/  /        (  <_> )  |_|  |  /|  | |  (  <_> )   |  \\___ \ 
+  /_______  /   __/ \___  >\___  >__|  \___  >__|    /_______  /\____/|____/____/ |__| |__|\____/|___|  /____  >
+          \/|__|        \/     \/          \/                \/                                       \/     \/ 
+
     Render Intents | Bedwars
     The #1 vape mod you'll ever see.
 
-    Version: 1.9
+    Version: 1.9.1
     discord.gg/render
+
+	Made by:
+	- render devs
+	- specter solutions
 
 ]]
 
+local vec2: vector2 = Vector3.new;
+local vec3: vector3 = Vector3.new;
+local cf: cframe = CFrame.new;
+local twinfo: void = TweenInfo.new;
+-- me when hovertext isn't long enough (sometimes)
+btext = function(text: string): string
+	return text .. ' ';
+end;
 local GuiLibrary = shared.GuiLibrary
 local httpService = game:GetService('HttpService')
 local teleportService = game:GetService('TeleportService')
@@ -12634,99 +12653,7 @@ runFunction(function()
 		List = {'Position', 'Target'},
 		Function = function() end
 	})
-end) 
-
---[[runFunction(function()
-	local ConfettiExploit = {}
-	local ConfettiDelay = {Value = 10}
-	local confettiTick = tick()
-	ConfettiExploit = GuiLibrary.ObjectsThatCanBeSaved.WorldWindow.Api.CreateOptionsButton({
-		Name = 'ConfettiExploit',
-		HoverText = 'annoying ong',
-		Function = function(calling)
-			if calling then 
-				repeat 
-					local allowed = (isEnabled('Lobby Check', 'Toggle') and bedwarsStore.matchState ~= 0 or not isEnabled('Lobby Check', 'Toggle'))
-					if tick() > confettiTick and bedwars.AbilityController:canUseAbility('PARTY_POPPER') and allowed and isAlive() and RenderStore.ping < 800 then 
-						bedwars.AbilityController:useAbility('PARTY_POPPER')
-						confettiTick = tick() + (ConfettiDelay.Value / 15)
-					end
-					task.wait()
-				until not ConfettiExploit.Enabled
-			end
-		end
-	})
-	ConfettiDelay = ConfettiExploit.CreateSlider({
-		Name = 'Delay',
-		Min = 10,
-		Max = 300,
-		Function = function()
-			confettiTick = tick()
-		end
-	})
-end)]]
-
---[[runFunction(function()
-	local DragonExploit = {}
-	local DragonBreatheDelay = {Value = 10}
-	local breatheTick = tick()
-	DragonExploit = GuiLibrary.ObjectsThatCanBeSaved.WorldWindow.Api.CreateOptionsButton({
-		Name = 'DragonExploit',
-		HoverText = 'Yet another "useful" module.',
-		Function = function(calling)
-			if calling then 
-				repeat 
-					local allowed = (isEnabled('Lobby Check', 'Toggle') and bedwarsStore.matchState ~= 0 or not isEnabled('Lobby Check', 'Toggle'))
-					if tick() > breatheTick and allowed and isAlive() and RenderStore.ping < 800 then 
-						bedwars.ClientHandler:Get('DragonBreath'):SendToServer({player = lplr}) 
-						breatheTick = (tick() + ((DragonBreatheDelay.Value / 15) + 1))
-					end
-					task.wait()
-				until not DragonExploit.Enabled
-			end
-		end
-	})
-	DragonBreatheDelay = DragonExploit.CreateSlider({
-		Name = 'Delay',
-		Min = 10,
-		Max = 300,
-		Function = function()
-			breatheTick = tick()
-		end
-	})
-end)]]
-
---[[runFunction(function()
-	local TerraExploit = {}
-	local TerraDelay = {Value = 10}
-	local TerraTick = tick()
-	TerraExploit = GuiLibrary.ObjectsThatCanBeSaved.WorldWindow.Api.CreateOptionsButton({
-		Name = 'TerraExploit',
-		HoverText = 'annoying ong',
-		Function = function(calling)
-			if calling then 
-				repeat 
-					local allowed = (isEnabled('Lobby Check', 'Toggle') and bedwarsStore.matchState ~= 0 or not isEnabled('Lobby Check', 'Toggle'))
-					if tick() > TerraTick and bedwars.AbilityController:canUseAbility('BLOCK_KICK') and allowed and isAlive() and RenderStore.ping < 800 and not isEnabled('BedTP') then 
-						bedwars.AbilityController:useAbility('BLOCK_KICK')
-						TerraTick = tick() + (TerraDelay.Value / 15)
-					end
-					task.wait()
-				until not TerraExploit.Enabled
-			end
-		end
-	})
-	TerraDelay = TerraExploit.CreateSlider({
-		Name = 'Delay',
-		Min = 1,
-		Max = 300,
-		Function = function()
-			TerraTick = tick()
-		end
-	})
-end)]]
-
-
+end)
 
 runFunction(function() 
 	local JoinQueue = {}
@@ -13591,7 +13518,6 @@ runFunction(function()
 	})
 end)
 
-
 runFunction(function()
 	local AttackDodger = {}
 	local AttackDodgerRange = {Value = 18}
@@ -13625,7 +13551,7 @@ runFunction(function()
 		Function = function(calling)
 			if calling then 
 				repeat 
-					local target = GetTarget(18, nil, true)
+					local target = GetTarget(AttackDodgerRange.Value, nil, true)
 					if isAlive(lplr, true) and target.RootPart then 
 						local vec = getdodgeside(target.RootPart)
 						if vec then 
@@ -13639,4 +13565,277 @@ runFunction(function()
 			end
 		end
 	})
+	AttackDodgerRange = AttackDodger.CreateSlider({
+		Name = 'Range',
+		Min = 1,
+		Max = 18,
+		HoverText = btext('Range to detect the player.'),
+		Function = function() end,
+		Default = 18;
+	});
 end)
+
+run(function()
+    local antideath: table = {};
+	local antideathmode: table = {};
+	local antideathboostmode: table = {};
+	local antideathid: table = {};
+	local antideathhealth: table = {};
+	local antideathvelo: table = {};
+	local antideathcf: table = {};
+	local antideathtw: table = {};
+	local antideathtwd: table = {};
+	local antideathsky: table = {};
+	local antideathauto: table = {};
+	local antideathsound: table = {};
+	local antideathnotify: table = {};
+	local antideathhandler: table = {};
+	health = function(plr: player): number
+		plr = plr or lplr;
+		return plr.Character.Humanoid.Health;
+	end;
+	function antideathhandler.new()
+		local obj = {
+			boost = false,
+			inf = false,
+			notify = false,
+			id = false,
+			hrp = entityLibrary.character.HumanoidRootPart;
+		};
+		setmetatable(obj,{
+			__index = antideathhandler
+		});
+		return obj;
+	end;
+	function antideathhandler:enabled()
+		RunLoops:BindToHeartbeat('antideath', function()
+			if isAlive(lplr, true) then
+				if health() <= antideathhealth.Value then
+					if not self.boost then
+						if antideathmode.Value == 'Infinite' then
+							if not GuiLibrary.ObjectsThatCanBeSaved.InfiniteFlyOptionsButton.Api.Enabled then
+								if GuiLibrary.ObjectsThatCanBeSaved.InfiniteFlyOptionsButton.Api.Enabled then
+									return;
+								end;
+								if not self.inf then
+									GuiLibrary.ObjectsThatCanBeSaved.InfiniteFlyOptionsButton.Api.ToggleButton(true);
+									self.inf = true;
+								end;
+							end;
+						elseif antideathmode.Value == 'Boost' then
+							if antideathboostmode.Value == 'Velocity' then
+								self.hrp.Velocity += vec3(0, antideathvelo.Value, 0);
+							elseif antideathboostmode.Value == 'CFrame' then
+								self.hrp.CFrame += vec3(0, antideathcf.Value, 0);
+							else
+								tweenService:Create(self.hrp, twinfo(antideathtwd.Value / 10), {
+									CFrame = self.hrp.CFrame + vec3(0, antideathtw.Value, 0)
+								}):Play();
+							end;
+						else
+							self.hrp.CFrame += vec3(0, antideathsky.Value, 0);
+							self.hrp.Anchored = true;
+						end;
+						if health() < antideathhealth.Value then
+							self.notify = 'lower than';
+						else
+							self.notify = 'equal to';
+						end;
+						if antideathnotify.Enabled then
+							InfoNotification('AntiDeath', 'Prevented death. Health is ' .. self.notify .. ' ' .. antideathhealth.Value .. '. (Current health: ' .. math.floor(health() + 0.5) .. ')', 5);
+						end;
+						if antideathsound.Enabled then
+							self.id = antideathid.Value ~= '' and antideathid.Value;
+							playSound(self.id or '7396762708', false, true);
+						end;
+						self.boost = true;
+					end;
+				else
+					if self.inf then
+						if antideathauto.Enabled then
+							if GuiLibrary.ObjectsThatCanBeSaved.InfiniteFlyOptionsButton.Api.Enabled then
+								if not GuiLibrary.ObjectsThatCanBeSaved.InfiniteFlyOptionsButton.Api.Enabled then
+									return;
+								end;
+								GuiLibrary.ObjectsThatCanBeSaved.InfiniteFlyOptionsButton.Api.ToggleButton(false);
+							end;
+						end;
+						self.inf = false;
+					end;
+					self.hrp.Anchored = false;
+					self.boost = false;
+				end;
+			end;
+		end);
+	end
+	function antideathhandler:disabled()
+		RunLoops:UnbindFromHeartbeat('antideath');
+	end;
+	local antideathstatus: void = antideathhandler.new();
+	antideath = GuiLibrary.ObjectsThatCanBeSaved.VelocityWindow.Api.CreateOptionsButton({
+		Name = 'AntiDeath',
+		Function = function(callback)
+			if callback then
+				coroutine.wrap(function()
+					antideathstatus:enabled();
+				end)();
+			else
+				pcall(function()
+					antideathstatus:disabled();
+				end);
+			end
+		end,
+        Default = false,
+		HoverText = btext('Prevents you from dying.'),
+        ExtraText = function()
+            return antideathmode.Value;
+        end;
+	});
+	antideathmode = antideath.CreateDropdown({
+		Name = 'Mode',
+		List = {
+			'Infinite',
+			'Boost',
+			'Sky'
+		},
+		Default = 'Infinite',
+		HoverText = btext('Mode to prevent death.'),
+		Function = function(val)
+			if val == 'Boost' then
+				antideathboostmode.Object.Visible = true;
+				antideathsky.Object.Visible = false;
+				antideathauto.Object.Visible = false;
+			elseif val == 'Infinite' then
+				antideathauto.Object.Visible = true;
+				antideathboostmode.Object.Visible = false;
+				antideathvelo.Object.Visible = false;
+				antideathcf.Object.Visible = false;
+				antideathtw.Object.Visible = false;
+				antideathtwd.Object.Visible = false;
+				antideathsky.Object.Visible = false;
+			else
+				antideathauto.Object.Visible = false;
+				antideathvelo.Object.Visible = false;
+				antideathcf.Object.Visible = false;
+				antideathtw.Object.Visible = false;
+				antideathtwd.Object.Visible = false;
+				antideathsky.Object.Visible = true;
+			end;
+		end;
+	});
+	antideathboostmode = antideath.CreateDropdown({
+		Name = 'Boost',
+		List = {
+			'Velocity',
+			'CFrame',
+			'Tween'
+		},
+		Default = 'Velocity',
+		HoverText = btext('Mode to boost your character.'),
+		Function = function(val)
+			if val == 'Velocity' then
+				antideathvelo.Object.Visible = true;
+				antideathcf.Object.Visible = false;
+				antideathtw.Object.Visible = false;
+				antideathtwd.Object.Visible = false;
+			elseif val == 'CFrame' then
+				antideathcf.Object.Visible = true;
+				antideathvelo.Object.Visible = false;
+				antideathtw.Object.Visible = false;
+				antideathtwd.Object.Visible = false;
+			else
+				antideathtw.Object.Visible = true;
+				antideathtwd.Object.Visible = true;
+				antideathvelo.Object.Visible = false;
+				antideathcf.Object.Visible = false;
+			end;
+		end;
+	});
+	antideathboostmode.Object.Visible = false;
+	antideathid = antideath.CreateTextBox({
+		Name = 'SongID',
+		TempText = 'Song ID',
+		HoverText = 'ID to play the song.',
+		FocusLost = function(enter)
+			if antideath.Enabled then
+				antideath.ToggleButton();
+				antideath.ToggleButton();
+			end;
+		end;
+	});
+	antideathid.Object.Visible = false;
+	antideathhealth = antideath.CreateSlider({
+		Name = 'Health Trigger',
+		Min = 10,
+		Max = 90,
+		HoverText = btext('Health at which AntiDeath will perform its actions.'),
+		Function = function() end,
+		Default = 50;
+	});
+	antideathvelo = antideath.CreateSlider({
+		Name = 'Velocity Boost',
+		Min = 100,
+		Max = 600,
+		HoverText = btext('Power to get boosted in the air.'),
+		Function = function() end,
+		Default = 600;
+	});
+	antideathvelo.Object.Visible = false;
+	antideathcf = antideath.CreateSlider({
+		Name = 'CFrame Boost',
+		Min = 100,
+		Max = 1000,
+		HoverText = btext('Power to get boosted in the air.'),
+		Function = function() end,
+		Default = 1000;
+	});
+	antideathcf.Object.Visible = false;
+	antideathtw = antideath.CreateSlider({
+		Name = 'Tween Boost',
+		Min = 100,
+		Max = 1300,
+		HoverText = btext('Power to get boosted in the air.'),
+		Function = function() end,
+		Default = 1000;
+	});
+	antideathtw.Object.Visible = false;
+	antideathtwd = antideath.CreateSlider({
+		Name = 'Tween Duration',
+		Min = 1,
+		Max = 10,
+		HoverText = btext('Duration of the tweening process.'),
+		Function = function() end,
+		Default = 4;
+	});
+	antideathtwd.Object.Visible = false;
+	antideathsky = antideath.CreateSlider({
+		Name = 'Sky Position',
+		Min = 100,
+		Max = 1000,
+		HoverText = btext('Position to TP in the sky.'),
+		Function = function() end,
+		Default = 1000;
+	});
+	antideathsky.Object.Visible = false;
+	antideathauto = antideath.CreateToggle({
+		Name = 'Auto Disable',
+		HoverText = btext('Automatically disables InfinteFly after healing.'),
+		Function = function() end,
+		Default = true;
+	});
+	antideathauto.Object.Visible = false;
+	antideathsound = antideath.CreateToggle({
+		Name = 'Sound',
+		HoverText = btext('Plays a sound after preventing death.'),
+		Function = function(callback)
+			antideathid.Object.Visible = callback;
+		end,
+		Default = true;
+	});
+	antideathnotify = antideath.CreateToggle({
+		Name = 'Notification',
+		HoverText = btext('Notifies you when AntiDeath actioned.'),
+		Function = function() end,
+		Default = true;
+	});
+end);
