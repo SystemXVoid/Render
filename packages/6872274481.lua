@@ -13672,7 +13672,7 @@ runFunction(function()
 		RunLoops:UnbindFromHeartbeat('antideath');
 	end;
 	local antideathstatus: void = antideathhandler.new();
-	antideath = GuiLibrary.ObjectsThatCanBeSaved.VelocityWindow.Api.CreateOptionsButton({
+	antideath = GuiLibrary.ObjectsThatCanBeSaved.BlatantWindow.Api.CreateOptionsButton({
 		Name = 'AntiDeath',
 		Function = function(callback)
 			if callback then
