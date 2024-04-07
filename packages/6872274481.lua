@@ -13308,42 +13308,6 @@ runFunction(function()
 	})
 end)
 
-runFunction(function() -- credits to _dremi on discord for finding the method (godpaster and the other skid skidded it from him)
-	local SetEmote = {}
-	local SetEmoteList = {Value = ''}
-	local oldemote
-	local emo2 = {}
-	SetEmote = GuiLibrary.ObjectsThatCanBeSaved.UtilityWindow.Api.CreateOptionsButton({
-		Name = 'SetEmote',
-		Function = function(calling)
-			if calling then
-				oldemote = lplr:GetAttribute('EmoteTypeSlot1')
-				lplr:SetAttribute('EmoteTypeSlot1', emo2[SetEmoteList.Value])
-			else
-				if oldemote then 
-					lplr:GetAttribute('EmoteTypeSlot1', oldemote)
-					oldemote = nil 
-				end
-			end
-		end
-	})
-	local emo = {}
-	for i,v in pairs(bedwars.EmoteMeta) do 
-		table.insert(emo, v.name)
-		emo2[v.name] = i
-	end
-	table.sort(emo, function(a, b) return a:lower() < b:lower() end)
-	SetEmoteList = SetEmote.CreateDropdown({
-		Name = 'Emote',
-		List = emo,
-		Function = function(emote)
-			if SetEmote.Enabled then 
-				lplr:SetAttribute('EmoteTypeSlot1', emo2[emote])
-			end
-		end
-	})
-end)
-
 runFunction(function()
 	local NoEmoteWheel = {}
 	local emoting
