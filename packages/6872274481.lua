@@ -13686,7 +13686,7 @@ run(function()
 			end
 		end,
         Default = false,
-		HoverText = btext('Prevents you from dying.'),
+		HoverText = btext('Prevents you from dying.\nMade by Specter Solutions.'),
         ExtraText = function()
             return antideathmode.Value;
         end;
