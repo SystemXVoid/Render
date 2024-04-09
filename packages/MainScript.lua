@@ -13,7 +13,6 @@ local playersService = game:GetService("Players")
 local inputService = game:GetService("UserInputService")
 local httpService = game:GetService("HttpService")
 local httprequest = (request or http and http.request or http_request or fluxus and fluxus.request or function() end)
-local executor = (idenityexecutor and idenityexecutor() or getexecutename and getexecutename() or 'Unknown')
 local isfile = isfile or function(file)
 	local suc, res = pcall(function() return readfile(file) end)
 	return suc and res ~= nil
@@ -1586,9 +1585,6 @@ local teleportConnection = playersService.LocalPlayer.OnTeleport:Connect(functio
 		if RenderDeveloper then 
 			teleportScript = ("getgenv().RenderDeveloper = true\n"..teleportScript)  
 		end
-        if executor == 'Wave' then 
-            teleportScript = ('repeat task.wait() until vapeconfig\n'..teleportScript)
-        end
 		GuiLibrary.SaveSettings()
 		queueonteleport(teleportScript)
     end
