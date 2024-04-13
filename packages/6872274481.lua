@@ -109,7 +109,6 @@ bedwarsStore.blockRaycast.FilterType = Enum.RaycastFilterType.Include
 
 local AutoLeave = {}
 local isAlive = function() return false end
-local fireability = function() end;
 local findchild = function() end;
 local playSound = function() end
 local dumptable = function() return {} end
@@ -10221,10 +10220,6 @@ isAlive = function(plr, nohealth)
 	return alive
 end
 
-fireability = function(ability: string): void
-	replicatedStorageService['events-@easy-games/game-core:shared/game-core-networking@getEvents.Events'].useAbility:FireServer(ability);
-end;
-
 findchild = function(parent: instance, child: string): boolean
     return parent:FindFirstChild(child);
 end;
@@ -11251,7 +11246,7 @@ runFunction(function()
 				task.wait(BedTPAnchor.Value);
 				lplr.Character.HumanoidRootPart.Anchored = false;
 				task.wait(BedTPAnchor.Value);
-				fireability('ELECTRIC_DASH');
+				bedwars.AbilityController:useAbility('ELECTRIC_DASH');
 				replicatedStorageService.rbxts_include.node_modules['@rbxts'].net.out._NetManaged.ElectricDash:InvokeServer({
 					bed.CFrame + vec3(0, BedTPYLevel.Value / 10 or 10, 0),
 					lplr.Character,
@@ -11443,7 +11438,7 @@ runFunction(function()
 			end;
 			if bedwars.AbilityController:canUseAbility('ELECTRIC_DASH') then
 				PlayerTP.ToggleButton();
-				fireability('ELECTRIC_DASH');
+				bedwars.AbilityController:useAbility('ELECTRIC_DASH');
 				replicatedStorageService.rbxts_include.node_modules['@rbxts'].net.out._NetManaged.ElectricDash:InvokeServer({
 					target.Character.HumanoidRootPart.CFrame,
 					lplr.Character,
@@ -13940,7 +13935,7 @@ runFunction(function()
 			if target and target.Character and findchild(target.Character, 'HumanoidRootPart') then
 				if bedwars.AbilityController:canUseAbility(self.dash) then
 					instantkill.ToggleButton();
-					fireability(self.dash);
+					bedwars.AbilityController:useAbility(self.dash);
 					self.remote:InvokeServer({
 						cf(9e9, -9e9, 9e9),
 						target.Character,
@@ -14021,7 +14016,7 @@ runFunction(function()
 			if target and target.Character and findchild(target.Character, 'HumanoidRootPart') then
 				if bedwars.AbilityController:canUseAbility(self.dash) then
 					bringplr.ToggleButton();
-					fireability(self.dash);
+					bedwars.AbilityController:useAbility(self.dash);
 					self.remote:InvokeServer({
 						cf(lplr.Character.HumanoidRootPart.Position),
 						target.Character,
