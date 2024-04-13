@@ -11162,6 +11162,7 @@ runFunction(function()
 	local BedTPYLevel = {Value = 25}
 	local BedTPTeleport = {Value = 'InfiniteFly'}
 	local BedTPMethod = {Value = 'Linear'}
+	local BedTPAnchor: table = {};
 	local oldmovefunc
 	local bedtween
 	local bypassmethods = {
@@ -11241,18 +11242,15 @@ runFunction(function()
 		end,
 		-- made by Specter Solutions
 		Elektra = function(): void
-			anchorplr = function(anchor: boolean, delay: number): void
-				lplr.Character.HumanoidRootPart.Anchored = anchor;
-				task.wait(delay);
-			end;
 			local bed = getEnemyBed(nil, true, true);
 			if bed == nil or not BedTP.Enabled or not isAlive(lplr, true) then
 				return BedTP.ToggleButton();
 			end;
 			if bedwars.AbilityController:canUseAbility('ELECTRIC_DASH') then
-				anchorplr(true, 0.2);
-				anchorplr(false, 0.2);
-				BedTP.ToggleButton();
+				lplr.Character.HumanoidRootPart.Anchored = true;
+				task.wait(BedTPAnchor.Value);
+				lplr.Character.HumanoidRootPart.Anchored = false;
+				task.wait(BedTPAnchor.Value);
 				fireability('ELECTRIC_DASH');
 				replicatedStorageService.rbxts_include.node_modules['@rbxts'].net.out._NetManaged.ElectricDash:InvokeServer({
 					bed.CFrame + vec3(0, BedTPYLevel.Value / 10 or 10, 0),
@@ -11294,6 +11292,17 @@ runFunction(function()
 			end
 		end
 	})
+	BedTPTeleport = BedTP.CreateDropdown({
+		Name = 'Teleport Method',
+		List = {'Respawn', 'Recall', 'InfiniteFly', 'Elektra'},
+		Function = function(val)
+			if val == 'Elektra' then
+				pcall(function() BedTPAnchor.Object.Visible = false end) 
+			else 
+				pcall(function() BedTPAnchor.Object.Visible = true end) 
+			end
+		end
+	})
 	BedTPAutoRaycast = BedTP.CreateToggle({
 		Name = 'Highest Block',
 		HoverText = 'Gets the highest block from the bed\n(useful for bed defenses).',
@@ -11305,11 +11314,6 @@ runFunction(function()
 				pcall(function() BedTPYLevel.Object.Visible = true end) 
 			end
 		end
-	})
-	BedTPTeleport = BedTP.CreateDropdown({
-		Name = 'Teleport Method',
-		List = {'Respawn', 'Recall', 'InfiniteFly'},
-		Function = function() end
 	})
 	BedTPAutoSpeed = BedTP.CreateToggle({
 		Name = 'Auto Speed',
@@ -11337,6 +11341,15 @@ runFunction(function()
 		Default = 200,
 		Function = function() end
 	})
+	BedTPAnchor = BedTP.CreateSlider({
+		Name = 'Anchor Delay',
+		Min = 1,
+		Max = 100,
+		HoverText = btext('Delay between anchoring, unanchoring & teleporting.'),
+		Function = function() end,
+		Double = 100,
+		Default = 20;
+	});
 	BedTPMethod = BedTP.CreateDropdown({
 		Name = 'Tween Method',
 		List = GetEnumItems('EasingStyle'),
@@ -11344,6 +11357,7 @@ runFunction(function()
 	})
 	BedTPTween.Object.Visible = false
 	BedTPYLevel.Object.Visible = false
+	BedTPAnchor.Object.Visible = false
 end)
 
 runFunction(function()
@@ -11470,7 +11484,7 @@ runFunction(function()
 	})
 	PlayerTPTeleport = PlayerTP.CreateDropdown({
 		Name = 'Teleport Method',
-		List = {'Respawn', 'Recall'},
+		List = {'Respawn', 'Recall', 'Instant', 'Elektra'},
 		Function = function() end
 	})
 	PlayerTPAutoSpeed = PlayerTP.CreateToggle({
