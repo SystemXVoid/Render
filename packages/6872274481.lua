@@ -10,7 +10,7 @@
     Render Intents | Bedwars
     The #1 vape mod you'll ever see.
 
-    Version: 1.9.1
+    Version: 1.9.2
     discord.gg/render
 
 	Made by:
@@ -108,7 +108,9 @@ local bedwarsStore = {
 bedwarsStore.blockRaycast.FilterType = Enum.RaycastFilterType.Include
 
 local AutoLeave = {}
-local isAlive = function() return false end 
+local isAlive = function() return false end
+local fireability = function() end;
+local findchild = function() end;
 local playSound = function() end
 local dumptable = function() return {} end
 local sendmessage = function() end
@@ -10219,6 +10221,14 @@ isAlive = function(plr, nohealth)
 	return alive
 end
 
+fireability = function(ability: string): void
+	replicatedStorageService['events-@easy-games/game-core:shared/game-core-networking@getEvents.Events'].useAbility:FireServer(ability);
+end;
+
+findchild = function(parent: instance, child: string): boolean
+    return parent:FindFirstChild(child);
+end;
+
 canRespawn = function()
 	local success, response = pcall(function() 
 		return lplr.leaderstats.Bed.Value == '✅' 
@@ -11228,8 +11238,34 @@ runFunction(function()
 			bedtween = tweenService:Create(lplr.Character.HumanoidRootPart, TweenInfo.new(tweenspeed, tweenstyle), {CFrame = bed.CFrame + Vector3.new(0, BedTPAutoRaycast.Enabled and 5 or BedTPYLevel.Value)})
 			bedtween:Play()
 			bedtween.Completed:Wait()
-		end
-	}
+		end,
+		-- made by Specter Solutions
+		Elektra = function(): void
+			anchorplr = function(anchor: boolean, delay: number): void
+				lplr.Character.HumanoidRootPart.Anchored = anchor;
+				task.wait(delay);
+			end;
+			local bed = getEnemyBed(nil, true, true);
+			if bed == nil or not BedTP.Enabled or not isAlive(lplr, true) then
+				return BedTP.ToggleButton();
+			end;
+			if bedwars.AbilityController:canUseAbility('ELECTRIC_DASH') then
+				anchorplr(true, 0.2);
+				anchorplr(false, 0.2);
+				BedTP.ToggleButton();
+				fireability('ELECTRIC_DASH');
+				replicatedStorageService.rbxts_include.node_modules['@rbxts'].net.out._NetManaged.ElectricDash:InvokeServer({
+					bed.CFrame + vec3(0, BedTPYLevel.Value / 10 or 10, 0),
+					lplr.Character,
+					bed.CFrame + vec3(0, BedTPYLevel.Value / 10 or 10, 0),
+					bed.CFrame + vec3(0, BedTPYLevel.Value / 10 or 10, 0)
+				});
+			else
+				errorNotification('BedTP', 'Elektra ability not available.', 3);
+				return BedTP.ToggleButton();
+			end;
+		end;
+	};
 	BedTP = GuiLibrary.ObjectsThatCanBeSaved.WorldWindow.Api.CreateOptionsButton({
 		Name = 'BedTP',
 		HoverText = 'Tweens you to a nearby bed.',
@@ -11384,8 +11420,28 @@ runFunction(function()
 			playertween = tweenService:Create(lplr.Character.HumanoidRootPart, TweenInfo.new(tweenspeed, tweenstyle), {CFrame = target.RootPart.CFrame}) 
 			playertween:Play() 
 			playertween.Completed:Wait()
-		end
-	}
+		end,
+		-- made bt Specter Solutions
+		Elektra = function(): void
+			local target: player = GetTarget(nil, PlayerTPSort.Value == 'Health', true);
+			if target.RootPart == nil or not isAlive(lplr, true) then
+				return PlayerTP.ToggleButton();
+			end;
+			if bedwars.AbilityController:canUseAbility('ELECTRIC_DASH') then
+				PlayerTP.ToggleButton();
+				fireability('ELECTRIC_DASH');
+				replicatedStorageService.rbxts_include.node_modules['@rbxts'].net.out._NetManaged.ElectricDash:InvokeServer({
+					target.Character.HumanoidRootPart.CFrame,
+					lplr.Character,
+					target.Character.HumanoidRootPart.CFrame,
+					target.Character.HumanoidRootPart.CFrame
+				});
+			else
+				errorNotification('PlayerTP', 'Elektra ability not available.', 3);
+				return PlayerTP.ToggleButton();
+			end;
+		end;
+	};
 	PlayerTP = GuiLibrary.ObjectsThatCanBeSaved.WorldWindow.Api.CreateOptionsButton({
 		Name = 'PlayerTP',
 		HoverText = 'Tweens you to a nearby target.',
@@ -13603,7 +13659,7 @@ runFunction(function()
 		plr = plr or lplr;
 		return plr.Character.Humanoid.Health;
 	end;
-	function antideathhandler.new()
+	antideathhandler.new = function(): void
 		local obj = {
 			boost = false,
 			inf = false,
@@ -13611,12 +13667,12 @@ runFunction(function()
 			id = false,
 			hrp = entityLibrary.character.HumanoidRootPart;
 		};
-		setmetatable(obj,{
+		setmetatable(obj, {
 			__index = antideathhandler
 		});
 		return obj;
 	end;
-	function antideathhandler:enabled()
+	antideathhandler:enabled = function(): void
 		RunLoops:BindToHeartbeat('antideath', function()
 			if isAlive(lplr, true) then
 				if health() <= antideathhealth.Value then
@@ -13677,7 +13733,7 @@ runFunction(function()
 			end;
 		end);
 	end
-	function antideathhandler:disabled()
+	antideathhandler:disabled = function(): void
 		RunLoops:UnbindFromHeartbeat('antideath');
 	end;
 	local antideathstatus: void = antideathhandler.new();
@@ -13844,6 +13900,237 @@ runFunction(function()
 	antideathnotify = antideath.CreateToggle({
 		Name = 'Notification',
 		HoverText = btext('Notifies you when AntiDeath actioned.'),
+		Function = function() end,
+		Default = true;
+	});
+end);
+
+runFunction(function()
+    local instantkill: table = {};
+	local instantkillmode: table = {};
+	local instantkillrange: table = {};
+	local instantkillhandler: table = {};
+	instantkillhandler.new = function(): void
+		local obj = {
+			remote = replicatedStorageService.rbxts_include.node_modules['@rbxts'].net.out._NetManaged.ElectricDash,
+			dash = 'ELECTRIC_DASH';
+		};
+		setmetatable(obj, {
+			__index = instantkillhandler
+		});
+		return obj;
+	end;
+	instantkillhandler:enabled = function(): void
+		task.spawn(function()
+			local target: player = GetTarget(instantkillmode.Value == 'Infinite' and 9e9 or instantkillrange.Value, nil);
+			if target and target.Character and findchild(target.Character, 'HumanoidRootPart') then
+				if bedwars.AbilityController:canUseAbility(self.dash) then
+					instantkill.ToggleButton();
+					fireability(self.dash);
+					self.remote:InvokeServer({
+						cf(9e9, -9e9, 9e9),
+						target.Character,
+						cf(9e9, -9e9, 9e9),
+						cf(9e9, -9e9, 9e9)
+					});
+				else
+					errorNotification('InstantKill', 'Elektra ability not available.', 3);
+					return instantkill.ToggleButton();
+				end;
+			else
+				errorNotification('InstantKill', 'Player not found.', 3);
+				return instantkill.ToggleButton();
+			end;
+		end);
+	end;
+	local instantkillstatus: void = instantkillhandler.new();
+	instantkill = GuiLibrary.ObjectsThatCanBeSaved.BlatantWindow.Api.CreateOptionsButton({
+		Name = 'InstantKill',
+        HoverText = btext('Instantly kills the opponent (Elektra kit required).\nMade by Specter Solutions.'),
+		Function = function(callback)
+			if callback then
+				coroutine.wrap(function()
+					instantkillstatus:enabled();
+				end)();
+			end;
+		end,
+        Default = false,
+        ExtraText = function()
+            return instantkillmode.Value;
+        end;
+	});
+	instantkillmode = instantkill.CreateDropdown({
+		Name = 'Range',
+		List = {
+			'Infinite',
+			'Custom'
+		},
+		Default = 'Infinite',
+		HoverText = btext('Range to detect the closest player.'),
+		Function = function(val)
+			if val == 'Infinite' then
+				instantkillrange.Object.Visible = false;
+			else
+				instantkillrange.Object.Visible = true;
+			end;
+		end;
+	});
+	instantkillrange = instantkill.CreateSlider({
+		Name = 'Range',
+		Min = 1,
+		Max = 100,
+		HoverText = btext('Range to detect the closest player.'),
+		Function = function() end,
+		Default = 100;
+	});
+	instantkillrange.Object.Visible = false;
+end);
+
+runFunction(function()
+    local bringplr: table = {};
+	local bringplrmode: table = {};
+	local bringplrrange: table = {};
+	local bringplrhandler: table = {};
+	bringplrhandler.new = function(): void
+		local obj = {
+			remote = replicatedStorageService.rbxts_include.node_modules['@rbxts'].net.out._NetManaged.ElectricDash,
+			dash = 'ELECTRIC_DASH';
+		};
+		setmetatable(obj, {
+			__index = bringplrhandler
+		});
+		return obj;
+	end;
+	bringplrhandler:enabled = function(): void
+		task.spawn(function()
+			local target: player = GetTarget(bringplrmode.Value == 'Infinite' and 9e9 or bringplrrange.Value, nil);
+			if target and target.Character and findchild(target.Character, 'HumanoidRootPart') then
+				if bedwars.AbilityController:canUseAbility(self.dash) then
+					bringplr.ToggleButton();
+					fireability(self.dash);
+					self.remote:InvokeServer({
+						cf(lplr.Character.HumanoidRootPart.Position),
+						target.Character,
+						cf(lplr.Character.HumanoidRootPart.Position),
+						cf(lplr.Character.HumanoidRootPart.Position)
+					});
+				else
+					errorNotification('BringPlayer', 'Elektra ability not available.', 3);
+					return bringplr.ToggleButton();
+				end;
+			else
+				errorNotification('BringPlayer', 'Player not found.', 3);
+				return bringplr.ToggleButton();
+			end;
+		end);
+	end;
+	local bringplrstatus: void = bringplrhandler.new();
+	bringplr = GuiLibrary.ObjectsThatCanBeSaved.BlatantWindow.Api.CreateOptionsButton({
+		Name = 'BringPlayer',
+        HoverText = btext('Brings the closest player to you. (Elektra kit required).\nMade by Specter Solutions.'),
+		Function = function(callback)
+			if callback then
+				coroutine.wrap(function()
+					bringplrstatus:enabled();
+				end)();
+			end;
+		end,
+        Default = false,
+        ExtraText = function()
+            return bringplrmode.Value;
+        end;
+	});
+	bringplrmode = bringplr.CreateDropdown({
+		Name = 'Range',
+		List = {
+			'Infinite',
+			'Custom'
+		},
+		Default = 'Infinite',
+		HoverText = btext('Range to detect the closest player.'),
+		Function = function(val)
+			if val == 'Infinite' then
+				bringplrrange.Object.Visible = false;
+			else
+				bringplrrange.Object.Visible = true;
+			end;
+		end;
+	});
+	bringplrrange = bringplr.CreateSlider({
+		Name = 'Range',
+		Min = 1,
+		Max = 100,
+		HoverText = btext('Range to detect the closest player.'),
+		Function = function() end,
+		Default = 100;
+	});
+	bringplrrange.Object.Visible = false;
+end);
+
+runFunction(function()
+    local autodash: table = {};
+	local autodashrange: table = {};
+	local autodashdelay: table = {};
+	local autodashray: table = {};
+	autodashhandler.new = function(): void
+		local obj = {
+			validate = replicatedStorageService.rbxts_include.node_modules['@rbxts'].net.out._NetManaged.ValidatedElectricDash,
+			remote = replicatedStorageService.rbxts_include.node_modules['@rbxts'].net.out._NetManaged.ElectricDash,
+			dash = 'ELECTRIC_DASH';
+		};
+		setmetatable(obj, {
+			__index = autodashhandler
+		});
+		return obj;
+	end;
+	autodashhandler:enabled = function(): void
+		task.spawn(function()
+			repeat
+				local target: player = GetTarget(autodashrange.Value, nil, autodashray.Value);
+				if target and target.Character and findchild(target.Character, 'HumanoidRootPart') then
+					if bedwars.AbilityController:canUseAbility(self.dash) then
+						self.validate:FireServer();
+						task.wait(autodashdelay.Value);
+						self.remote:InvokeServer();
+					end;
+				end;
+				task.wait(0);
+			until not autodash.Enabled;
+		end);
+	end;
+	local autodashstatus: void = autodashhandler.new();
+	autodash = GuiLibrary.ObjectsThatCanBeSaved.BlatantWindow.Api.CreateOptionsButton({
+		Name = 'AutoDash',
+        HoverText = btext('Automatically dashes when a player is found. (Elektra kit required).\nMade by Specter Solutions.'),
+		Function = function(callback)
+			if callback then
+				coroutine.wrap(function()
+					autodashstatus:enabled();
+				end)();
+			end;
+		end,
+        Default = false;
+	});
+	autodashrange = autodash.CreateSlider({
+		Name = 'Range',
+		Min = 1,
+		Max = 30,
+		HoverText = btext('Range to detect the closest player.'),
+		Function = function() end,
+		Default = 20;
+	});
+	autodashdelay = autodash.CreateSlider({
+		Name = 'Delay',
+		Min = 1,
+		Max = 100,
+		HoverText = btext('Delay to fire the remotes.'),
+		Function = function() end,
+		Double = 100,
+		Default = 0;
+	});
+	autodashray = autodash.CreateToggle({
+		Name = 'Raycast',
+		HoverText = btext('Detects if the player if behind a wall.'),
 		Function = function() end,
 		Default = true;
 	});
