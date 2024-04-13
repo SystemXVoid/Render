@@ -10,7 +10,7 @@
     Render Intents | Bedwars
     The #1 vape mod you'll ever see.
 
-    Version: 1.9.2
+    Version: 1.9.1
     discord.gg/render
 
 	Made by:
@@ -108,8 +108,7 @@ local bedwarsStore = {
 bedwarsStore.blockRaycast.FilterType = Enum.RaycastFilterType.Include
 
 local AutoLeave = {}
-local isAlive = function() return false end
-local findchild = function() end;
+local isAlive = function() return false end 
 local playSound = function() end
 local dumptable = function() return {} end
 local sendmessage = function() end
@@ -10220,10 +10219,6 @@ isAlive = function(plr, nohealth)
 	return alive
 end
 
-findchild = function(parent: instance, child: string): boolean
-    return parent:FindFirstChild(child);
-end;
-
 canRespawn = function()
 	local success, response = pcall(function() 
 		return lplr.leaderstats.Bed.Value == '✅' 
@@ -11157,7 +11152,6 @@ runFunction(function()
 	local BedTPYLevel = {Value = 25}
 	local BedTPTeleport = {Value = 'InfiniteFly'}
 	local BedTPMethod = {Value = 'Linear'}
-	local BedTPAnchor: table = {};
 	local oldmovefunc
 	local bedtween
 	local bypassmethods = {
@@ -11234,31 +11228,8 @@ runFunction(function()
 			bedtween = tweenService:Create(lplr.Character.HumanoidRootPart, TweenInfo.new(tweenspeed, tweenstyle), {CFrame = bed.CFrame + Vector3.new(0, BedTPAutoRaycast.Enabled and 5 or BedTPYLevel.Value)})
 			bedtween:Play()
 			bedtween.Completed:Wait()
-		end,
-		-- made by Specter Solutions
-		Elektra = function(): void
-			local bed = getEnemyBed(nil, true, true);
-			if bed == nil or not BedTP.Enabled or not isAlive(lplr, true) then
-				return BedTP.ToggleButton();
-			end;
-			if bedwars.AbilityController:canUseAbility('ELECTRIC_DASH') then
-				lplr.Character.HumanoidRootPart.Anchored = true;
-				task.wait(BedTPAnchor.Value);
-				lplr.Character.HumanoidRootPart.Anchored = false;
-				task.wait(BedTPAnchor.Value);
-				bedwars.AbilityController:useAbility('ELECTRIC_DASH');
-				replicatedStorageService.rbxts_include.node_modules['@rbxts'].net.out._NetManaged.ElectricDash:InvokeServer({
-					bed.CFrame + vec3(0, BedTPYLevel.Value / 10 or 10, 0),
-					lplr.Character,
-					bed.CFrame + vec3(0, BedTPYLevel.Value / 10 or 10, 0),
-					bed.CFrame + vec3(0, BedTPYLevel.Value / 10 or 10, 0)
-				});
-			else
-				errorNotification('BedTP', 'Elektra ability not available.', 3);
-				return BedTP.ToggleButton();
-			end;
-		end;
-	};
+		end
+	}
 	BedTP = GuiLibrary.ObjectsThatCanBeSaved.WorldWindow.Api.CreateOptionsButton({
 		Name = 'BedTP',
 		HoverText = 'Tweens you to a nearby bed.',
@@ -11287,17 +11258,6 @@ runFunction(function()
 			end
 		end
 	})
-	BedTPTeleport = BedTP.CreateDropdown({
-		Name = 'Teleport Method',
-		List = {'Respawn', 'Recall', 'InfiniteFly', 'Elektra'},
-		Function = function(val)
-			if val == 'Elektra' then
-				pcall(function() BedTPAnchor.Object.Visible = false end) 
-			else 
-				pcall(function() BedTPAnchor.Object.Visible = true end) 
-			end
-		end
-	})
 	BedTPAutoRaycast = BedTP.CreateToggle({
 		Name = 'Highest Block',
 		HoverText = 'Gets the highest block from the bed\n(useful for bed defenses).',
@@ -11309,6 +11269,11 @@ runFunction(function()
 				pcall(function() BedTPYLevel.Object.Visible = true end) 
 			end
 		end
+	})
+	BedTPTeleport = BedTP.CreateDropdown({
+		Name = 'Teleport Method',
+		List = {'Respawn', 'Recall', 'InfiniteFly'},
+		Function = function() end
 	})
 	BedTPAutoSpeed = BedTP.CreateToggle({
 		Name = 'Auto Speed',
@@ -11336,15 +11301,6 @@ runFunction(function()
 		Default = 200,
 		Function = function() end
 	})
-	BedTPAnchor = BedTP.CreateSlider({
-		Name = 'Anchor Delay',
-		Min = 1,
-		Max = 100,
-		HoverText = btext('Delay between anchoring, unanchoring & teleporting.'),
-		Function = function() end,
-		Double = 100,
-		Default = 20;
-	});
 	BedTPMethod = BedTP.CreateDropdown({
 		Name = 'Tween Method',
 		List = GetEnumItems('EasingStyle'),
@@ -11352,7 +11308,6 @@ runFunction(function()
 	})
 	BedTPTween.Object.Visible = false
 	BedTPYLevel.Object.Visible = false
-	BedTPAnchor.Object.Visible = false
 end)
 
 runFunction(function()
@@ -11429,28 +11384,8 @@ runFunction(function()
 			playertween = tweenService:Create(lplr.Character.HumanoidRootPart, TweenInfo.new(tweenspeed, tweenstyle), {CFrame = target.RootPart.CFrame}) 
 			playertween:Play() 
 			playertween.Completed:Wait()
-		end,
-		-- made bt Specter Solutions
-		Elektra = function(): void
-			local target: player = GetTarget(nil, PlayerTPSort.Value == 'Health', true);
-			if target.RootPart == nil or not isAlive(lplr, true) then
-				return PlayerTP.ToggleButton();
-			end;
-			if bedwars.AbilityController:canUseAbility('ELECTRIC_DASH') then
-				PlayerTP.ToggleButton();
-				bedwars.AbilityController:useAbility('ELECTRIC_DASH');
-				replicatedStorageService.rbxts_include.node_modules['@rbxts'].net.out._NetManaged.ElectricDash:InvokeServer({
-					target.Character.HumanoidRootPart.CFrame,
-					lplr.Character,
-					target.Character.HumanoidRootPart.CFrame,
-					target.Character.HumanoidRootPart.CFrame
-				});
-			else
-				errorNotification('PlayerTP', 'Elektra ability not available.', 3);
-				return PlayerTP.ToggleButton();
-			end;
-		end;
-	};
+		end
+	}
 	PlayerTP = GuiLibrary.ObjectsThatCanBeSaved.WorldWindow.Api.CreateOptionsButton({
 		Name = 'PlayerTP',
 		HoverText = 'Tweens you to a nearby target.',
@@ -11479,7 +11414,7 @@ runFunction(function()
 	})
 	PlayerTPTeleport = PlayerTP.CreateDropdown({
 		Name = 'Teleport Method',
-		List = {'Respawn', 'Recall', 'Instant', 'Elektra'},
+		List = {'Respawn', 'Recall'},
 		Function = function() end
 	})
 	PlayerTPAutoSpeed = PlayerTP.CreateToggle({
@@ -13668,7 +13603,7 @@ runFunction(function()
 		plr = plr or lplr;
 		return plr.Character.Humanoid.Health;
 	end;
-	antideathhandler.new = function(): void
+	function antideathhandler.new()
 		local obj = {
 			boost = false,
 			inf = false,
@@ -13676,12 +13611,12 @@ runFunction(function()
 			id = false,
 			hrp = entityLibrary.character.HumanoidRootPart;
 		};
-		setmetatable(obj, {
+		setmetatable(obj,{
 			__index = antideathhandler
 		});
 		return obj;
 	end;
-	antideathhandler:enabled = function(): void
+	function antideathhandler:enabled()
 		RunLoops:BindToHeartbeat('antideath', function()
 			if isAlive(lplr, true) then
 				if health() <= antideathhealth.Value then
@@ -13719,4 +13654,197 @@ runFunction(function()
 							InfoNotification('AntiDeath', 'Prevented death. Health is ' .. self.notify .. ' ' .. antideathhealth.Value .. '. (Current health: ' .. math.floor(health() + 0.5) .. ')', 5);
 						end;
 						if antideathsound.Enabled then
-				
+							self.id = antideathid.Value ~= '' and antideathid.Value;
+							playSound(self.id or '7396762708', false, true);
+						end;
+						self.boost = true;
+					end;
+				else
+					if self.inf then
+						if antideathauto.Enabled then
+							if GuiLibrary.ObjectsThatCanBeSaved.InfiniteFlyOptionsButton.Api.Enabled then
+								if not GuiLibrary.ObjectsThatCanBeSaved.InfiniteFlyOptionsButton.Api.Enabled then
+									return;
+								end;
+								GuiLibrary.ObjectsThatCanBeSaved.InfiniteFlyOptionsButton.Api.ToggleButton(false);
+							end;
+						end;
+						self.inf = false;
+					end;
+					self.hrp.Anchored = false;
+					self.boost = false;
+				end;
+			end;
+		end);
+	end
+	function antideathhandler:disabled()
+		RunLoops:UnbindFromHeartbeat('antideath');
+	end;
+	local antideathstatus: void = antideathhandler.new();
+	antideath = GuiLibrary.ObjectsThatCanBeSaved.BlatantWindow.Api.CreateOptionsButton({
+		Name = 'AntiDeath',
+		Function = function(callback)
+			if callback then
+				coroutine.wrap(function()
+					antideathstatus:enabled();
+				end)();
+			else
+				pcall(function()
+					antideathstatus:disabled();
+				end);
+			end
+		end,
+        Default = false,
+		HoverText = btext('Prevents you from dying.\nMade by Specter Solutions.'),
+        ExtraText = function()
+            return antideathmode.Value;
+        end;
+	});
+	antideathmode = antideath.CreateDropdown({
+		Name = 'Mode',
+		List = {
+			'Infinite',
+			'Boost',
+			'Sky'
+		},
+		Default = 'Infinite',
+		HoverText = btext('Mode to prevent death.'),
+		Function = function(val)
+			if val == 'Boost' then
+				antideathboostmode.Object.Visible = true;
+				antideathsky.Object.Visible = false;
+				antideathauto.Object.Visible = false;
+			elseif val == 'Infinite' then
+				antideathauto.Object.Visible = true;
+				antideathboostmode.Object.Visible = false;
+				antideathvelo.Object.Visible = false;
+				antideathcf.Object.Visible = false;
+				antideathtw.Object.Visible = false;
+				antideathtwd.Object.Visible = false;
+				antideathsky.Object.Visible = false;
+			else
+				antideathauto.Object.Visible = false;
+				antideathvelo.Object.Visible = false;
+				antideathcf.Object.Visible = false;
+				antideathtw.Object.Visible = false;
+				antideathtwd.Object.Visible = false;
+				antideathsky.Object.Visible = true;
+			end;
+		end;
+	});
+	antideathboostmode = antideath.CreateDropdown({
+		Name = 'Boost',
+		List = {
+			'Velocity',
+			'CFrame',
+			'Tween'
+		},
+		Default = 'Velocity',
+		HoverText = btext('Mode to boost your character.'),
+		Function = function(val)
+			if val == 'Velocity' then
+				antideathvelo.Object.Visible = true;
+				antideathcf.Object.Visible = false;
+				antideathtw.Object.Visible = false;
+				antideathtwd.Object.Visible = false;
+			elseif val == 'CFrame' then
+				antideathcf.Object.Visible = true;
+				antideathvelo.Object.Visible = false;
+				antideathtw.Object.Visible = false;
+				antideathtwd.Object.Visible = false;
+			else
+				antideathtw.Object.Visible = true;
+				antideathtwd.Object.Visible = true;
+				antideathvelo.Object.Visible = false;
+				antideathcf.Object.Visible = false;
+			end;
+		end;
+	});
+	antideathboostmode.Object.Visible = false;
+	antideathid = antideath.CreateTextBox({
+		Name = 'SongID',
+		TempText = 'Song ID',
+		HoverText = 'ID to play the song.',
+		FocusLost = function(enter)
+			if antideath.Enabled then
+				antideath.ToggleButton();
+				antideath.ToggleButton();
+			end;
+		end;
+	});
+	antideathid.Object.Visible = false;
+	antideathhealth = antideath.CreateSlider({
+		Name = 'Health Trigger',
+		Min = 10,
+		Max = 90,
+		HoverText = btext('Health at which AntiDeath will perform its actions.'),
+		Function = function() end,
+		Default = 50;
+	});
+	antideathvelo = antideath.CreateSlider({
+		Name = 'Velocity Boost',
+		Min = 100,
+		Max = 600,
+		HoverText = btext('Power to get boosted in the air.'),
+		Function = function() end,
+		Default = 600;
+	});
+	antideathvelo.Object.Visible = false;
+	antideathcf = antideath.CreateSlider({
+		Name = 'CFrame Boost',
+		Min = 100,
+		Max = 1000,
+		HoverText = btext('Power to get boosted in the air.'),
+		Function = function() end,
+		Default = 1000;
+	});
+	antideathcf.Object.Visible = false;
+	antideathtw = antideath.CreateSlider({
+		Name = 'Tween Boost',
+		Min = 100,
+		Max = 1300,
+		HoverText = btext('Power to get boosted in the air.'),
+		Function = function() end,
+		Default = 1000;
+	});
+	antideathtw.Object.Visible = false;
+	antideathtwd = antideath.CreateSlider({
+		Name = 'Tween Duration',
+		Min = 1,
+		Max = 10,
+		HoverText = btext('Duration of the tweening process.'),
+		Function = function() end,
+		Default = 4;
+	});
+	antideathtwd.Object.Visible = false;
+	antideathsky = antideath.CreateSlider({
+		Name = 'Sky Position',
+		Min = 100,
+		Max = 1000,
+		HoverText = btext('Position to TP in the sky.'),
+		Function = function() end,
+		Default = 1000;
+	});
+	antideathsky.Object.Visible = false;
+	antideathauto = antideath.CreateToggle({
+		Name = 'Auto Disable',
+		HoverText = btext('Automatically disables InfinteFly after healing.'),
+		Function = function() end,
+		Default = true;
+	});
+	antideathauto.Object.Visible = false;
+	antideathsound = antideath.CreateToggle({
+		Name = 'Sound',
+		HoverText = btext('Plays a sound after preventing death.'),
+		Function = function(callback)
+			antideathid.Object.Visible = callback;
+		end,
+		Default = true;
+	});
+	antideathnotify = antideath.CreateToggle({
+		Name = 'Notification',
+		HoverText = btext('Notifies you when AntiDeath actioned.'),
+		Function = function() end,
+		Default = true;
+	});
+end);
