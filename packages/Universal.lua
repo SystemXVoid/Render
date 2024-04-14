@@ -7781,7 +7781,7 @@ runFunction(function()
 	--sessionui.BackgroundTransparency = 0.250
 	sessionui.BorderColor3 = Color3.fromRGB(0, 0, 0)
 	sessionui.BorderSizePixel = 0
-	sessionui.Position = UDim2.new(0, 14, 0, 338)
+	sessionui.Position = UDim2.new(0, 0, 0, 0)
 	sessionui.Size = UDim2.new(0, 218, 0, 174) 
 	sessionui.Visible = false	
 	sessiongradient.Color = ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromRGB(130, 0, 182)), ColorSequenceKeypoint.new(0.52, Color3.fromRGB(135, 0, 188)), ColorSequenceKeypoint.new(1, Color3.fromRGB(95, 0, 121))})
