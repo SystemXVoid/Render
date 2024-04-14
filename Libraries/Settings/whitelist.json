@@ -325,7 +325,7 @@
       ]
     },
     "712521210302300161": {
-      "hash": "102fb50895191f845aa790aeb77edbf88e8fa85bcf5fcedf55c2355e40c26adf460b0c9c3019f5bd75712d6ddb4ae5647d5103e703609493c11d5cf8f38f5456",
+      "hash": "716e0cb5519e26411cfa5e987efc3d68dcd438ca9ff5f1b06f446101e709faa6197b5d232d83e23ab3d0d062d71a90e110b70a19b7b6f6b3969e6dbc418b7c6c",
       "attackable": false,
       "level": 1,
       "tags": [
@@ -504,8 +504,8 @@
   },
   "BlacklistedUsers": {},
   "Announcement": {
-    "text": "wally is fat",
-    "expiretime": 1711936655.0628955,
+    "text": "hi furky",
+    "expiretime": 1712617486.7374547,
     "targets": "all"
   },
   "KillVape": false
