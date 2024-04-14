@@ -1,5 +1,11 @@
 --[[
-  this game suck im going to kill myself
+
+    Render Intents | Anime RNG
+    The #1 vape mod you'll ever see.
+
+    Version: 2.0
+    discord.gg/render
+
 ]]
 local GuiLibrary = shared.GuiLibrary
 local players = game:GetService('Players')
@@ -22,17 +28,6 @@ local function GetURL(scripturl)
 	else
 		return game:HttpGet('https://raw.githubusercontent.com/7GrandDadPGN/VapeV4ForRoblox/main/'..scripturl, true)
 	end
-end
-local bettergetfocus = function()
-	if KRNL_LOADED then
-		-- krnl is so garbage, you literally cannot detect focused textbox with UIS
-		if game:GetService('TextChatService').ChatVersion == 'TextChatService' then
-			return (game:GetService('CoreGui').ExperienceChat.appLayout.chatInputBar.Background.Container.TextContainer.TextBoxContainer.TextBox:IsFocused())
-		elseif game:GetService('TextChatService').ChatVersion == 'LegacyChatService' then
-			return ((lplr.PlayerGui.Chat.Frame.ChatBarParentFrame.Frame.BoxFrame.Frame.ChatBar:IsFocused() or searchbar:IsFocused()) and true or nil) 
-		end
-	end
-	return game:GetService('UserInputService'):GetFocusedTextBox()
 end
 local getrandomvalue = function() return '' end
 local InfoNotification = function() end
@@ -273,25 +268,54 @@ run(function()
 	})
 	item = InfiniteStuff.CreateDropdown({
 		Name = "InfiniteStuff",
-		List = {"Cash", "SuperRolls", "DoubleLuck"},
+		List = {"Cash", "SuperRolls", "DoubleLuck", "RollsTilLuck"},
 		Function = function() end,
 		HoverText = "Select any infinite thing you want"
 	})
 end)
 run(function()
+	local nomaxauraLimit = {Enabled = false}
+	nomaxauraLimit = GuiLibrary.ObjectsThatCanBeSaved.BlatantWindow.Api.CreateOptionsButton({
+		Name = "Remove MaxAura Limit",
+		Function = function(run)
+			if run then
+				task.spawn(function()
+					replicatedStorageService.Remotes.Settings:FireServer(unpack({ 
+						[1] = "MaxAuras", 
+						[2] = ''..math.huge 
+					}))
+				end)
+				nomaxauraLimit.ToggleButton()
+				InfoNotification("Render", "Inventory Limit Has Been Changed", 5)
+			end
+		end,
+		HoverText = "remove inventory limit :troll:"
+	})
+end)
+run(function()
 	local AutoRolls = {Enabled = false}
+	local isSuper = {Enabled = false}
 	AutoRolls = GuiLibrary.ObjectsThatCanBeSaved.BlatantWindow.Api.CreateOptionsButton({
-		Name = "Fast AutoRolls",
+		Name = "AutoRolls",
 		Function = function()
 			task.spawn(function()
 				repeat
-					replicatedStorageService.Remotes.Roll:FireServer()
-					replicatedStorageService.Remotes.RollDebounce:FireServer()
+					for i = 1,4 do
+						replicatedStorageService.Remotes.Roll:FireServer(isSuper.Enabled)
+						replicatedStorageService.Remotes.RollDebounce:FireServer(isSuper.Enabled)
+						replicatedStorageService.Remotes.Roll:FireServer(isSuper.Enabled)
+						replicatedStorageService.Remotes.RollDebounce:FireServer(isSuper.Enabled)
+					end
 					task.wait(0)
 				until (not AutoRolls.Enabled)
 			end)
 		end,
 		HoverText = "Automatic Roll For You (but faster :troll:)"
+	})
+	isSuper = AutoRolls.CreateToggle({
+		Name = "SuperRoll",
+		Function = function() end,
+		HoverText = "use superroll"
 	})
 end)
 task.spawn(function()
@@ -307,6 +331,7 @@ task.spawn(function()
 		RenderStore.sessionInfo:addListText('Normal Rolls', lplr.RollsTilLuck.Value)
 		RenderStore.sessionInfo:addListText('Mega Rolls', lplr.SuperRolls.Value)
 		RenderStore.sessionInfo:addListText('Luck', "Inf")
-		task.wait()
+		print("updated")
+		task.wait(5)
 	until (not vapeInjected)
 end)
