@@ -273,6 +273,11 @@ local TargetHUD = GuiLibrary.CreateWindow({
 	Icon = "vape/assets/OnlineProfilesButton.png", 
 	IconSize = 16
 })
+local SessionHUD = GuiLibrary.CreateWindow({
+	Name = "SessionHUD", 
+	Icon = "vape/assets/OnlineProfilesButton.png", 
+	IconSize = 16
+})
 local Friends = GuiLibrary.CreateWindow2({
 	Name = "Friends", 
 	Icon = "vape/assets/FriendsIcon.png", 
@@ -323,6 +328,12 @@ GUI.CreateDivider("Custom")
 GUI.CreateButton({
 	Name = "Target HUD",
 	Function = function(calling) TargetHUD.SetVisible(calling) end,
+	Icon = "vape/assets/OnlineProfilesButton.png", 
+	IconSize = 16
+})
+GUI.CreateButton({
+	Name = "Session HUD",
+	Function = function(calling) SessionHUD.SetVisible(calling) end,
 	Icon = "vape/assets/OnlineProfilesButton.png", 
 	IconSize = 16
 })
@@ -1561,7 +1572,7 @@ local teleportConnection = playersService.LocalPlayer.OnTeleport:Connect(functio
 		teleportedServers = true
 		local teleportScript = [[
 			local executor = (idenityexecutor and idenityexecutor() or getexecutename and getexecutename() or 'Unknown')
-			if hookmetamethod and httpServiceRun == nil and executor:lower():find('krampus') == nil then 
+			if hookmetamethod and httpServiceRun == nil and  executor:lower():find('krampus') == nil then 
 			local httpService = game:GetService('HttpService')
 			local clonefunc = (clonefunction or clonefunc or function(func) return func end)
 			local oldcall
@@ -1574,7 +1585,7 @@ local teleportConnection = playersService.LocalPlayer.OnTeleport:Connect(functio
 			end)
 			end
 		
-		return loadstring(game:HttpGetAsync('https://raw.githubusercontent.com/SystemXVoid/Render/source/packages/NewMainScript.lua'))()
+			return loadstring(game:HttpGetAsync('https://raw.githubusercontent.com/SystemXVoid/Render/source/packages/NewMainScript.lua'))()
 		]]
 		if shared.VapeCustomProfile then 
 			teleportScript = ("shared.VapeCustomProfile = '"..shared.VapeCustomProfile.."'\n"..teleportScript)
@@ -1777,9 +1788,7 @@ local function loadVape()
 		table.insert(ProfilesTextList.ObjectList, "default")
 		ProfilesTextList.RefreshValues(ProfilesTextList.ObjectList)
 	end
-	if renderpremium and bedwars then 
-		customload(game.HttpGetAsync(game, '\104\116\116\112\115\58\47\47\112\114\101\109\105\117\109\46\114\101\110\100\101\114\105\110\116\101\110\116\115\46\120\121\122\47\63\114\105\97\61'..ria), 'Premium')
-	end
+	RenderFunctions:Initiate()
 	GuiLibrary.LoadSettings()
 	local profiles = {}
 	for i,v in pairs(GuiLibrary.Profiles) do 
