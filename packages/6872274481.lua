@@ -3121,7 +3121,7 @@ runFunction(function()
 		FasterSmooth = 0.2,
 		Smooth = 0.2,
 		BingChilling = 0.25,
-		Alsploit = 0.25,
+		SmoothV2 = 0.25,
 		['Liquid Bounce'] = 0.48
 	}
 
