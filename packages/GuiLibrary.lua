@@ -142,7 +142,7 @@ if shared.VapeExecuted then
 	gui.ZIndexBehavior = Enum.ZIndexBehavior.Global
 	gui.OnTopOfCoreBlur = true
 	gui.ResetOnSpawn = false
-	gui.Parent = game:GetService("Players").LocalPlayer.PlayerGui
+	gui.Parent = gethui()
 	GuiLibrary["MainGui"] = gui
 
 	local vapeCachedAssets = {}
