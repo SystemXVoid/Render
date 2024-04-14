@@ -60,7 +60,7 @@ if shared.VapeExecuted then
 		["vape/assets/ToggleArrow.png"] = "rbxassetid://13350792786",
 		["vape/assets/UpArrow.png"] = "rbxassetid://13350793386",
 		["vape/assets/UtilityIcon.png"] = "rbxassetid://13350793918",
-		["vape/assets/WarningNotification.png"] = "rbxassetid://13350794868",
+		["vape/assets/WarningNotification.png"] = "rbxassetid://17047753431",
 		["vape/assets/WindowBlur.png"] = "rbxassetid://13350795660",
 		["vape/assets/WorldIcon.png"] = "rbxassetid://13350796199",
 		["vape/assets/VapeIcon.png"] = "rbxassetid://13350808582",
@@ -70,7 +70,7 @@ if shared.VapeExecuted then
 		["vape/assets/VapeLogo2.png"] = "rbxassetid://13350876307",
 		["vape/assets/VapeLogo4.png"] = "rbxassetid://13350877564"
 	}
-	local getcustomasset = getsynasset or getcustomasset or function(location) return vapeAssetTable[location] or "" end
+	local getcustomasset = function(location) return vapeAssetTable[location] or "" end
 	local executor = (identifyexecutor and identifyexecutor() or getexecutorname and getexecutorname() or 'your executor')
 	local customassetcheck = (getsynasset or getcustomasset) and true
 	local requestfunc = syn and syn.request or http and http.request or http_request or fluxus and fluxus.request or request or function() end 
@@ -142,7 +142,7 @@ if shared.VapeExecuted then
 	gui.ZIndexBehavior = Enum.ZIndexBehavior.Global
 	gui.OnTopOfCoreBlur = true
 	gui.ResetOnSpawn = false
-	gui.Parent = gethui()
+	gui.Parent = game:GetService("Players").LocalPlayer.PlayerGui
 	GuiLibrary["MainGui"] = gui
 
 	local vapeCachedAssets = {}
@@ -6923,8 +6923,6 @@ if shared.VapeExecuted then
 		button.Transparency = 0.1
 		button.Visible = (RenderDeveloper and true or false)
 		button.Image = ''
-		button.Active = true
-		button.Draggable = true
 		local stroke = Instance.new('UIStroke', button)
 		stroke.Thickness = 2.63
 		stroke.Color = Color3.fromRGB(255, 0, 242)
@@ -6939,11 +6937,11 @@ if shared.VapeExecuted then
 			colortween:Play()
 			colortween.Completed:Wait()
 			tweenService:Create(button, TweenInfo.new(0.1, Enum.EasingStyle.Quad), {BackgroundColor3 = oldcolor}):Play()
-		end)
+		end)	
 		button.MouseButton1Click:Connect(function()
 			clickgui.Visible = not clickgui.Visible
 			legitgui.Visible = not clickgui.Visible
-			inputService.OverrideMouseIconBehavior = (clickgui.Visible and Enum.OverrideMouseIconBehavior.ForceShow or game:GetService("VRService").VREnabled and Enum.OverrideMouseIconBehavior.ForceHide or Enum.OverrideMouseIconBehavior.None)
+			pcall(function() inputService.OverrideMouseIconBehavior = (clickgui.Visible and Enum.OverrideMouseIconBehavior.ForceShow or game:GetService("VRService").VREnabled and Enum.OverrideMouseIconBehavior.ForceHide or Enum.OverrideMouseIconBehavior.None) end)
 			pcall(function() game:GetService("RunService"):SetRobloxGuiFocused(clickgui.Visible and GuiLibrary["MainBlur"].Size ~= 0 or guiService:GetErrorType() ~= Enum.ConnectionError.OK) end)
 			for _, mobileButton in pairs(GuiLibrary.MobileButtons) do mobileButton.Visible = not clickgui.Visible end	
 			if OnlineProfilesBigFrame.Visible then
@@ -6973,7 +6971,7 @@ if shared.VapeExecuted then
 			if input1.KeyCode == Enum.KeyCode[GuiLibrary["GUIKeybind"]] and GuiLibrary["KeybindCaptured"] == false then
 				clickgui.Visible = not clickgui.Visible
 				legitgui.Visible = not clickgui.Visible
-				inputService.OverrideMouseIconBehavior = (clickgui.Visible and Enum.OverrideMouseIconBehavior.ForceShow or game:GetService("VRService").VREnabled and Enum.OverrideMouseIconBehavior.ForceHide or Enum.OverrideMouseIconBehavior.None)
+				pcall(function() inputService.OverrideMouseIconBehavior = (clickgui.Visible and Enum.OverrideMouseIconBehavior.ForceShow or game:GetService("VRService").VREnabled and Enum.OverrideMouseIconBehavior.ForceHide or Enum.OverrideMouseIconBehavior.None) end)
 				pcall(function() game:GetService("RunService"):SetRobloxGuiFocused(clickgui.Visible and GuiLibrary["MainBlur"].Size ~= 0 or guiService:GetErrorType() ~= Enum.ConnectionError.OK) end)
 				for _, mobileButton in pairs(GuiLibrary.MobileButtons) do mobileButton.Visible = not clickgui.Visible end	
 				if OnlineProfilesBigFrame.Visible then
