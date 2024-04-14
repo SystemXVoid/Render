@@ -3,7 +3,7 @@
     Render Intents | Universal
     The #1 vape mod you'll ever see.
 
-    Version: 1.9
+    Version: 2.0
     discord.gg/render
 	
 ]]
@@ -35,7 +35,7 @@ local vapeTargetInfo = shared.VapeTargetInfo
 local vapeInjected = true
 local RenderFunctions = {}
 local httprequest = (http and http.request or http_request or fluxus and fluxus.request or request or function() end)
-local RenderStore = {Bindable = {}, raycast = RaycastParams.new(), MessageReceived = Instance.new('BindableEvent'), tweens = {}, ping = 0, platform = inputService:GetPlatform(), LocalPosition = Vector3.zero, groundTime = tick(), UpdateGroundTick = function() end, clonedata = {}}
+local RenderStore = {Bindable = {}, raycast = RaycastParams.new(), MessageReceived = Instance.new('BindableEvent'), tweens = {}, ping = 0, platform = inputService:GetPlatform(), LocalPosition = Vector3.zero, groundTime = tick(), UpdateGroundTick = function() end, sessionInfo = {labelInstances = {}}, clonedata = {}}
 getgenv().RenderStore = RenderStore
 local vec3 = Vector3.new
 local vec2 = Vector2.new
@@ -71,6 +71,7 @@ end
 table.insert(vapeConnections, workspace:GetPropertyChangedSignal("CurrentCamera"):Connect(function()
 	gameCamera = workspace.CurrentCamera or workspace:FindFirstChildWhichIsA("Camera")
 end))
+
 local isfile = isfile or function(file)
 	local suc, res = pcall(function() return readfile(file) end)
 	return suc and res ~= nil
@@ -94,6 +95,7 @@ local getTablePosition = function() return 1 end
 local warningNotification = function() end 
 local InfoNotification = function() end
 local errorNotification = function() end
+local newcolor = function() return {Hue = 0, Sat = 0, Value = 0} end
 
 local networkownerswitch = tick()
 local isnetworkowner = function(part)
@@ -161,10 +163,12 @@ local function downloadVapeAsset(path)
 	return vapeCachedAssets[path]
 end
 
-local function warningNotification(title, text, delay)
+warningNotification = function(title, text, delay)
 	local suc, res = pcall(function()
-		local frame = GuiLibrary.CreateNotification(title, text, delay, "assets/WarningNotification.png")
-		frame.Frame.Frame.ImageColor3 = Color3.fromRGB(236, 129, 44)
+		local color = GuiLibrary.ObjectsThatCanBeSaved['Gui ColorSliderColor'].Api
+		local frame = GuiLibrary.CreateNotification(title, text, delay, 'assets/WarningNotification.png')
+		frame.Frame.Frame.ImageColor3 = Color3.fromHSV(color.Hue, color.Sat, color.Value)
+		frame.IconLabel.ImageColor3 = Color3.fromHSV(color.Hue, color.Sat, color.Value)
 		return frame
 	end)
 	return (suc and res)
@@ -992,6 +996,8 @@ run(function()
 		table.clear(whitelist)
 	end})
 end)
+
+whitelist.GetWhitelist = whitelist.get
 shared.vapewhitelist = whitelist
 
 local RunLoops = {RenderStepTable = {}, StepTable = {}, HeartTable = {}}
@@ -5160,7 +5166,7 @@ run(function()
 							local chinahatmesh = Instance.new("SpecialMesh")
 							chinahatmesh.Parent = chinahattrail
 							chinahatmesh.MeshType = "FileMesh"
-							chinahatmesh.MeshId = "http://www.roblox.com/asset/?id=1778999"
+							chinahatmesh.MeshId = "rbxassetid://1778999"
 							chinahatmesh.Scale = Vector3.new(3, 0.6, 3)
 							chinahattrail.Parent = workspace.Camera
 						end
@@ -5980,7 +5986,7 @@ run(function()
 					attachment2.Position = v + Vector3.new(0, 0, 0.18)
 					attachment2.Parent = chairlegs
 					local trail = Instance.new("Trail")
-					trail.Texture = "http://www.roblox.com/asset/?id=13005168530"
+					trail.Texture = "rbxassetid://13005168530"
 					trail.TextureMode = Enum.TextureMode.Static
 					trail.Transparency = NumberSequence.new(0.5)
 					trail.Color = ColorSequence.new(Color3.new(0.5, 0.5, 0.5))
@@ -6002,7 +6008,7 @@ run(function()
 						if entityLibrary.isAlive and entityLibrary.character.Humanoid.Health > 0 then
 							if not chairanim.IsPlaying then
 								local temp2 = Instance.new("Animation")
-								temp2.AnimationId = entityLibrary.character.Humanoid.RigType == Enum.HumanoidRigType.R15 and "http://www.roblox.com/asset/?id=2506281703" or "http://www.roblox.com/asset/?id=178130996"
+								temp2.AnimationId = entityLibrary.character.Humanoid.RigType == Enum.HumanoidRigType.R15 and "rbxassetid://2506281703" or "rbxassetid://178130996"
 								chairanim = entityLibrary.character.Humanoid:LoadAnimation(temp2)
 								chairanim.Priority = Enum.AnimationPriority.Movement
 								chairanim.Looped = true
@@ -6471,14 +6477,25 @@ runFunction(function()
 		skyobj.SunAngularSize = 0
 		skyobj.StarCount = 0
 	end,
-	PitchDark = function()
-		skyobj.StarCount = 0
-		oldtime = lightingService.TimeOfDay
-		lightingService.TimeOfDay = '00:00:00'
-		table.insert(Atmosphere.Connections, lightingService:GetPropertyChangedSignal('TimeOfDay'):Connect(function()
-			skyobj.StarCount = 0
-			lightingService.TimeOfDay = '00:00:00'
-		end))
+	FPSBoost = function()
+		skyobj.SkyboxBk = 'rbxassetid://11457548274'
+		skyobj.SkyboxDn = 'rbxassetid://11457548274'
+		skyobj.SkyboxFt = 'rbxassetid://11457548274'
+		skyobj.SkyboxLf = 'rbxassetid://11457548274'
+		skyobj.SkyboxRt = 'rbxassetid://11457548274'
+		skyobj.SkyboxUp = 'rbxassetid://11457548274'
+		skyobj.SunAngularSize = 0
+		skyobj.StarCount = 3000
+	end,
+	PurplePlanet = function()
+		skyobj.SkyboxBk = 'rbxassetid://16262356578'
+		skyobj.SkyboxDn = 'rbxassetid://16262358026'
+		skyobj.SkyboxFt = 'rbxassetid://16262360469'
+		skyobj.SkyboxLf = 'rbxassetid://16262362003'
+		skyobj.SkyboxRt = 'rbxassetid://16262363873'
+		skyobj.SkyboxUp = 'rbxassetid://16262366016'
+		skyobj.SunAngularSize = 21
+		skyobj.StarCount = 3000
 	end
 }
 
@@ -7462,6 +7479,7 @@ runFunction(function()
 	targetinfohealthinfo.Text = '100/100%'
 	targetinfoprofilepictureround.Parent = targetinfoprofilepicture
 
+
 	local function bestOffsetX(num, min)
 		local newnum = num
 		for i = 1, 9e9, 0.1 do 
@@ -7615,7 +7633,7 @@ runFunction(function()
 		end
 	})
 
-	local rendercolor1 = {Hue = 0, Sat = 0, Value = 0}
+	local rendercolor1 = newcolor()
 	local renderogcolor = RenderOG.CreateColorSlider({
 		Name = 'Outline Color 1',
 		Function = function(h, s, v)
@@ -7623,7 +7641,7 @@ runFunction(function()
 		end
 	})
 
-	local rendercolor2 = {Hue = 0, Sat = 0, Value = 0}
+	local rendercolor2 = newcolor()
 	renderogcolor2 = RenderOG.CreateColorSlider({
 		Name = 'Outline Color 2',
 		Function = function()
@@ -7632,7 +7650,7 @@ runFunction(function()
 	})
 
 	
-	local newrendercolor2 = {Hue = 0, Sat = 0, Value = 0}
+	local newrendercolor2 = newcolor()
 	local newrendercolor = NewRender.CreateColorSlider({
 		Name = 'Outline Color 1',
 		Function = function(h, s, v) 
@@ -7648,7 +7666,7 @@ runFunction(function()
 	})
 	
 
-	local newrenderhealthbarcolor2 = {Hue = 0, Sat = 0, Value = 0}
+	local newrenderhealthbarcolor2 = newcolor()
 	local renderhealthbarcolor = NewRender.CreateColorSlider({
 		Name = 'Healthbar Color 1',
 		Function = function(h, s, v) 
@@ -7685,7 +7703,7 @@ runFunction(function()
 		end
 	})
 
-	local voidwareuicolor2 = {Hue = 0, Sat = 0, Value = 0}
+	local voidwareuicolor2 = newcolor()
 	local voidwareuicolor = VoidwareHUD.CreateColorSlider({
 		Name = 'Background Color 1',
 		Function = function(h, s, v) 
@@ -7751,6 +7769,90 @@ runFunction(function()
 			targethealthbar.Size = UDim2.new(0, 205, 0, 15)
 		end
 	end))
+end)
+
+runFunction(function()
+	local sessionui = Instance.new('Frame')
+	local sessiongradient = Instance.new('UIGradient', sessionui)
+	local sessiontitle = Instance.new('TextLabel', sessionui)
+	local sessionlayoutframe = Instance.new('Frame', sessionui)
+	local sessionlayout = Instance.new('UIListLayout', sessionlayoutframe)
+	sessionui.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	--sessionui.BackgroundTransparency = 0.250
+	sessionui.BorderColor3 = Color3.fromRGB(0, 0, 0)
+	sessionui.BorderSizePixel = 0
+	sessionui.Position = UDim2.new(0, 14, 0, 338)
+	sessionui.Size = UDim2.new(0, 218, 0, 174) 
+	sessionui.Visible = false	
+	sessiongradient.Color = ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromRGB(130, 0, 182)), ColorSequenceKeypoint.new(0.52, Color3.fromRGB(135, 0, 188)), ColorSequenceKeypoint.new(1, Color3.fromRGB(95, 0, 121))})
+	sessiongradient.Rotation = 122
+	sessiontitle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	sessiontitle.BackgroundTransparency = 1
+	sessiontitle.BorderColor3 = Color3.fromRGB(255, 255, 255)
+	sessiontitle.BorderSizePixel = 0
+	sessiontitle.Position = UDim2.new(0, 13, 0, 10)
+	sessiontitle.Size = UDim2.new(0, 205, 0, 23)
+	sessiontitle.Font = Enum.Font.GothamBold
+	sessiontitle.Text = 'Session Info'
+	sessiontitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+	sessiontitle.TextScaled = true
+	sessiontitle.TextSize = 14
+	sessiontitle.TextXAlignment = Enum.TextXAlignment.Left
+	sessiontitle.TextYAlignment = Enum.TextYAlignment.Top
+	sessionlayout.SortOrder = Enum.SortOrder.LayoutOrder
+	sessionlayout.Padding = UDim.new(0, 3)
+	sessionlayoutframe.BackgroundTransparency = 1
+	sessionlayoutframe.Position = UDim2.new(0.0523809493, 0, 0.236077666, 0)
+	sessionlayoutframe.Size = UDim2.new(0, 194, 0, 132)
+	Instance.new('UICorner', sessionui).CornerRadius = UDim.new(0, 13)
+	RenderStore.sessionInfo.Instance = sessionui
+	RenderStore.sessionInfo.addListText = function(self, name, value)
+		local object = RenderStore.sessionInfo.labelInstances[name]
+		if object == nil then 
+			local listText = Instance.new('TextLabel', sessionlayoutframe)
+			listText.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			listText.BackgroundTransparency = 1
+			listText.Position = UDim2.new(0, 12, 0, 61)
+			listText.Size = UDim2.new(0, 208, 0, 15)
+			listText.Font = Enum.Font.GothamMedium
+			listText.TextColor3 = Color3.fromRGB(255, 255, 255)
+			listText.TextScaled = true
+			listText.TextSize = 14
+			listText.TextXAlignment = Enum.TextXAlignment.Left
+			object = listText
+		end
+		object.Text = (name..': '..value)
+		RenderStore.sessionInfo.labelInstances[name] = object
+	end
+	local sessioncolor1 = newcolor()
+	local sessioncolor2 = newcolor()
+	local SessionInfo = GuiLibrary.CreateCustomWindow({
+		Name = 'Overlay',
+		Icon = 'vape/assets/TargetIcon3.png',
+		IconSize = 16
+	})
+	local sessionInfoToggle = GuiLibrary.ObjectsThatCanBeSaved.SessionHUDWindow.Api.CreateOptionsButton({
+		Name = 'Main',
+		Function = function(calling)	
+			sessionui.Visible = calling	
+			SessionInfo.SetVisible(calling)
+		end
+	})
+	sessioncolor1 = sessionInfoToggle.CreateColorSlider({
+		Name = 'Background Color',
+		Function = function(h, s, v) 
+			sessiongradient.Color = ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromHSV(h, s, v)), ColorSequenceKeypoint.new(1, Color3.fromHSV(sessioncolor2.Hue, sessioncolor2.Sat, sessioncolor2.Value))})
+		end
+	})
+
+	sessioncolor2 = sessionInfoToggle.CreateColorSlider({
+		Name = 'Background Color 2',
+		Function = function(h, s, v) 
+			sessiongradient.Color = ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromHSV(sessioncolor1.Hue, sessioncolor1.Sat, sessioncolor1.Value)), ColorSequenceKeypoint.new(1, Color3.fromHSV(h, s, v))})
+		end
+	})
+	
+	sessionui.Parent = SessionInfo.GetCustomChildren()
 end)
 
 RenderStore.UpdateGroundTick = function()
@@ -8248,8 +8350,8 @@ runFunction(function()
 	local FireEffect = {}
 	local FirePosition = {Value = 'Head'}
 	local FireFlame = {Value = 25}
-	local FireColor1 = {Hue = 0, Sat = 0, Value = 0}
-	local FireColor2 = {Hue = 0, Sat = 0, Value = 0}
+	local FireColor1 = newcolor()
+	local FireColor2 = newcolor()
 	local ishidden
 	local fireobject = {}
 	local createfire
@@ -8539,72 +8641,154 @@ runFunction(function()
 end)
 
 runFunction(function()
-	local RichShader = {}
-	local ShaderColor = {Hue = 0, Sat = 0, Value = 0}
-	local ShaderBlur
-	local ShaderTint
-	local oldlightingsettings = {}
-	local function refreshsettings()
-		oldlightingsettings = {
-			Brightness = lightingService.Brightness,
-			ColorShift_Top = lightingService.ColorShift_Top,
-			ColorShift_Bottom = lightingService.ColorShift_Bottom,
-			OutdoorAmbient = lightingService.OutdoorAmbient,
-			ClockTime = lightingService.ClockTime,
-			FogColor = lightingService.FogColor,
-			FogStart = lightingService.FogStart,
-			FogEnd = lightingService.FogEnd,
-			ExposureCompensation = lightingService.ExposureCompensation,
-			ShadowSoftness = lightingService.ShadowSoftness,
-			Ambient = lightingService.Ambient
-		}
+	local LightingMods = {}
+	local LightingAmbient = newcolor()
+	local LightingShiftBottom = newcolor()
+	local LightingOutdoor = newcolor()
+	local LightingFogColor = newcolor()
+	local LightingBlur = {Value = 0}
+	local LightingShiftTop = newcolor()
+	local LightingBrightness = {Value = 0}
+	local LightingShadowSoft = {Value = 0}
+	local LightingTimeOfDay = {Value = 14}
+	local LightingEnvDiffuse = {Value = 1}
+	local LightingEnvSpecular = {Value = 1}
+	local LightingBlurSize = {Value = 7.8}
+	local LightingFogStart = {Value = 1}
+	local LightingFogEnd = {Value = 1}
+	local LightingTechnology = {Value = 'ShadowMap'}
+	local LightingGlobal = {Enabled = false}
+	local LightingBlur = {}
+	local oldlighting = {}
+	local blur = {}
+	local function lightingUpdateFunc()
+		lightingService.Ambient = Color3.fromHSV(LightingAmbient.Hue, LightingAmbient.Sat, LightingAmbient.Value)
+		lightingService.OutdoorAmbient = Color3.fromHSV(LightingOutdoor.Hue, LightingOutdoor.Sat, LightingOutdoor.Value)
+		lightingService.Brightness = LightingBrightness.Value 
+		lightingService.ColorShift_Bottom = Color3.fromHSV(LightingShiftBottom.Hue, LightingShiftBottom.Sat, LightingShiftBottom.Value)
+		lightingService.ColorShift_Top = Color3.fromHSV(LightingShiftTop.Hue, LightingShiftTop.Sat, LightingShiftTop.Value)
+		lightingService.EnvironmentDiffuseScale = LightingEnvDiffuse.Value  
+		lightingService.EnvironmentDiffuseScale = LightingEnvSpecular.Value 
+		lightingService.GlobalShadows = LightingGlobal.Enabled
+		lightingService.ShadowSoftness = LightingShadowSoft.Value
+		lightingService.TimeOfDay = tostring(LightingTimeOfDay.Value)
+		lightingService.FogEnd = LightingFogEnd.Value
+		lightingService.FogStart = LightingFogStart.Value
+		blur.Size = LightingBlurSize.Value  
+		blur.Enabled = (LightingBlurSize.Value > 0)
+		if sethiddenproperty then 
+			sethiddenproperty(lightingService, 'Technology', LightingTechnology.Value) 
+		end
 	end
-	RichShader = GuiLibrary.ObjectsThatCanBeSaved.WorldWindow.Api.CreateOptionsButton({
-		Name = 'RichShader',
-		HoverText = 'cool shader mhm.',
-		Function = function(callback)
-			if callback then
-				refreshsettings()
-				ShaderBlur = Instance.new('BlurEffect')
-				ShaderBlur.Parent = lightingService
-				ShaderBlur.Size = 5
-				ShaderTint = Instance.new('ColorCorrectionEffect')
-				ShaderTint.Parent = lightingService
-				ShaderTint.Saturation = -0.2
-				ShaderTint.TintColor = Color3.fromRGB(255, 224, 219)
-				lightingService.ColorShift_Bottom = Color3.fromHSV(ShaderColor.Hue, ShaderColor.Sat, ShaderColor.Value)
-				lightingService.ColorShift_Top = Color3.fromHSV(ShaderColor.Hue, ShaderColor.Sat, ShaderColor.Value)
-				lightingService.OutdoorAmbient = Color3.fromHSV(ShaderColor.Hue, ShaderColor.Sat, ShaderColor.Value)
-				lightingService.ClockTime = 8.7
-				lightingService.FogColor = Color3.fromHSV(ShaderColor.Hue, ShaderColor.Sat, ShaderColor.Value)
-				lightingService.FogEnd = 1000
-				lightingService.FogStart = 0
-				lightingService.ExposureCompensation = 0.30
-				lightingService.ShadowSoftness = 0
-				lightingService.Ambient = Color3.fromRGB(59, 33, 27)
-			else
-				for i,v in oldlightingsettings do 
-					lightingService[i] = v 
-				end 
-				if ShaderTint and ShaderTint.Parent then 
-					ShaderTint:Destroy() 
+	LightingMods = GuiLibrary.ObjectsThatCanBeSaved.RenderWindow.Api.CreateOptionsButton({
+		Name = 'LightingMods',
+		HoverText = 'Mods settings in lightingService',
+		Function = function(calling) 
+			if calling then 
+				oldlighting.Ambient = lightingService.Ambient
+				oldlighting.Brightness = lightingService.Brightness
+				oldlighting.ColorShift_Bottom = lightingService.ColorShift_Bottom
+				oldlighting.ColorShift_Top = lightingService.ColorShift_Top
+				oldlighting.OutdoorAmbient = lightingService.OutdoorAmbient
+				oldlighting.EnvironmentDiffuseScale = lightingService.EnvironmentDiffuseScale
+				oldlighting.EnvironmentSpecularScale = lightingService.EnvironmentSpecularScale
+				oldlighting.GlobalShadows = lightingService.GlobalShadows
+				oldlighting.ShadowSoftness = lightingService.ShadowSoftness	
+				oldlighting.TimeOfDay = lightingService.TimeOfDay
+				oldlighting.FogEnd = lightingService.FogEnd
+				oldlighting.FogStart = lightingService.FogStart
+				if gethiddenproperty then 
+					oldlighting.Technology = gethiddenproperty(lightingService, 'Technology')
 				end
-				if ShaderBlur and ShaderBlur.Parent then 
-					ShaderBlur:Destroy()
+				if blur.Parent == nil then 
+					blur = Instance.new('BlurEffect', lightingService) 
 				end
+				table.insert(LightingMods.Connections, runService.Heartbeat:Connect(lightingUpdateFunc))
+		   else
+			if blur.Parent then 
+				blur:Remove()
+			end
+			   for i,v in next, oldlighting do 
+				  pcall(function() lightingService[i] = v end)
+				  if i == 'Technology' then 
+					 sethiddenproperty(lightingService, i, v)
+				  end 
+			   end
 			end
 		end
 	})
-	ShaderColor = RichShader.CreateColorSlider({
-		Name = 'Main Color',
-		Function = function()
-			if RichShader.Enabled then 
-				lightingService.ColorShift_Bottom = Color3.fromHSV(ShaderColor.Hue, ShaderColor.Sat, ShaderColor.Value)
-				lightingService.ColorShift_Top = Color3.fromHSV(ShaderColor.Hue, ShaderColor.Sat, ShaderColor.Value)
-				lightingService.OutdoorAmbient = Color3.fromHSV(ShaderColor.Hue, ShaderColor.Sat, ShaderColor.Value)
-				lightingService.FogColor = Color3.fromHSV(ShaderColor.Hue, ShaderColor.Sat, ShaderColor.Value)
-			end
-		end
+	LightingAmbient = LightingMods.CreateColorSlider({
+		Name = 'Ambient',
+		Function = function() end
+	})
+	LightingOutdoor = LightingMods.CreateColorSlider({
+		Name = 'Outdoor Ambient',
+		Function = function() end
+	})
+	LightingShiftTop = LightingMods.CreateColorSlider({
+		Name = 'ColorShift Top',
+		Function = function() end
+	})
+	LightingShiftBottom = LightingMods.CreateColorSlider({
+		Name = 'ColorShift Bottom',
+		Function = function() end
+	})
+	LightingBrightness = LightingMods.CreateSlider({
+		Name = 'Brightness',
+		Min = 0,
+		Max = 2,
+		Default = 1,
+		Function = function() end
+	})
+	LightingEnvDiffuse = LightingMods.CreateSlider({
+		Name = 'EnvironmentDiffuseScale',
+		Min = 0,
+		Max = 100,
+		Function = function() end
+	})
+	LightingEnvSpecular = LightingMods.CreateSlider({
+		Name = 'EnvironmentSpecularScale',
+		Min = 0,
+		Max = 100,
+		Function = function() end
+	})
+	LightingShadowSoft = LightingMods.CreateSlider({
+		Name = 'ShadowSoftness',
+		Min = 0,
+		Max = 1,
+		Function = function() end
+	})
+	LightingBlur = LightingMods.CreateSlider({
+		Name = 'Blur',
+		Min = 0, 
+		Max = 10,
+		Function = function() end 
+	})
+	LightingTimeOfDay = LightingMods.CreateSlider({
+		Name = 'Time',
+		Min = 0,
+		Max = 24,
+		Default = 8,
+		Function = function() end
+	})
+	LightingFogStart = LightingMods.CreateSlider({
+		Name = 'FogStart',
+		Min = 0,
+		Max = 1000,
+		Default = 1000,
+		Function = function() end 
+	})
+	LightingFogEnd = LightingMods.CreateSlider({
+		Name = 'FogEnd',
+		Min = 0,
+		Max = 1000,
+		Default = 1000,
+		Function = function() end 
+	})
+	LightingTechnology = LightingMods.CreateDropdown({
+		Name = 'Technology',
+		List = GetEnumItems('Technology'),
+		Function = function() end 
 	})
 end)
 
@@ -8712,6 +8896,10 @@ runFunction(function()
 		HoverText = 'Jump on air without limitations (unless ac lol)',
 		Function = function(calling)
 			if calling then 
+				repeat task.wait() until (isAlive(lplr, true) or not InfiniteJump.Enabled)
+				if not InfiniteJump.Enabled then
+					return 
+				end
 				oldpower = lplr.Character.Humanoid.JumpPower
 				table.insert(InfiniteJump.Connections, inputService.JumpRequest:Connect(function()
 					if isAlive(lplr, true) then 
@@ -8747,43 +8935,6 @@ runFunction(function()
 		Max = 15,
 		Default = 1,
 		Function = function() end
-	})
-end)
-
-runFunction(function()
-	local TimeChanger = {Enabled = false}
-	local TimeChangerTime = {Value = 0}
-	local TimeChangerElseEndTime = {Enabled = true}
-	local TimeSettings = {
-		Main = TimeChangerTime.Value,
-		CurrentTime = lightingService.TimeOfDay
-	}
-	TimeChanger = GuiLibrary["ObjectsThatCanBeSaved"]["RenderWindow"]["Api"]["CreateOptionsButton"]({
-		Name = "TimeAdjuster",
-        HoverText = "Changes the time",
-		Function = function(callback)
-			if callback then
-				repeat task.wait() until shared.VapeFullyLoaded
-				lightingService.TimeOfDay = TimeSettings.Main
-			else
-				if TimeChangerElseEndTime.Enabled then
-					lightingService.TimeOfDay = 13
-				else
-					lightingService.TimeOfDay = TimeSettings.CurrentTime
-				end
-			end
-		end
-	})
-	TimeChangerTime = TimeChanger.CreateSlider({
-		Name = "Time",
-		Min = 0,
-		Max = 24,
-		Function = function() end,
-		Default = 0
-	})
-	TimeChangerElseEndTime = TimeChanger.CreateToggle({
-		Name = "ElseEndTime",
-		Function = function() end,
 	})
 end)
 
@@ -9021,7 +9172,9 @@ runFunction(function()
 		Function = function(callback) 
 			if callback then
 				task.spawn(function()
-					-- vape gametheme code
+					if RenderPerformance then 
+						return 
+					end
 					local snowpart = Instance.new("Part")
 					snowpart.Size = Vector3.new(240,0.5,240)
 					snowpart.Name = "SnowParticle"
@@ -9352,8 +9505,8 @@ runFunction(function()
 	local BubbleModsTextSizeToggle = {}
 	local BubbleModsTextColorToggle = {}
 	local BubbleModsTextSize = {Value = 16}
-	local BubbleModsTextColor = {Hue = 0, Sat = 0, Value = 0}
-	local BubbleModsColor = {Hue = 0, Sat = 0, Value = 0}
+	local BubbleModsTextColor = newcolor()
+	local BubbleModsColor = newcolor()
 	local chatbubbles = {}
 	local function bubbleFunction(bubble)
 		pcall(function() 
@@ -9522,4 +9675,117 @@ runFunction(function()
 		Function = function() end
 	})
 end) 
+
+runFunction(function()
+	local MotionBlur = {}
+	local MotionBlurTarget = {}
+	local MotionBlurIntensity = {Value = 8.5}
+	local blur = {}
+	MotionBlur = GuiLibrary.ObjectsThatCanBeSaved.RenderWindow.Api.CreateOptionsButton({
+		Name = 'MotionBlur',
+		HoverText = 'Adds background blur when you\'re moving.',
+		Function = function(calling)
+			if calling then 
+				repeat task.wait() until (isAlive(lplr, true) or not MotionBlur.Enabled)
+				table.insert(MotionBlur.Connections, lplr.Character.HumanoidRootPart:GetPropertyChangedSignal('CFrame'):Connect(function()
+					if MotionBlurTarget.Enabled and vapeTargetInfo.Targets.Killaura == nil then 
+						return 
+					end
+					if blur.Parent == nil then 
+						blur = Instance.new('BlurEffect', lightingService)
+						debris:AddItem(blur, 0)
+					end
+					blur.Size = MotionBlurIntensity.Value
+				end))
+				table.insert(MotionBlur.Connections, lplr.CharacterAdded:Connect(function()
+					MotionBlur.ToggleButton()
+					MotionBlur.ToggleButton()
+				end))
+			end
+		end
+	})
+	MotionBlurTarget = MotionBlur.CreateToggle({
+		Name = 'Killaura Only',
+		HoverText = 'Only works when killaura is active.',
+		Default = true,
+		Function = function() end
+	})
+	MotionBlurIntensity = MotionBlur.CreateSlider({
+		Name = 'Intensity',
+		Min = 2,
+		Max = 10,
+		Default = 8.5,
+		Function = function() end
+	})
+end)
+
+runFunction(function()
+	local RichShader = {}
+	local ShaderColor = {Hue = 0, Sat = 0, Value = 0}
+	local ShaderBlur
+	local ShaderTint
+	local oldlightingsettings = {}
+	local function refreshsettings()
+		oldlightingsettings = {
+			Brightness = lightingService.Brightness,
+			ColorShift_Top = lightingService.ColorShift_Top,
+			ColorShift_Bottom = lightingService.ColorShift_Bottom,
+			OutdoorAmbient = lightingService.OutdoorAmbient,
+			ClockTime = lightingService.ClockTime,
+			FogColor = lightingService.FogColor,
+			FogStart = lightingService.FogStart,
+			FogEnd = lightingService.FogEnd,
+			ExposureCompensation = lightingService.ExposureCompensation,
+			ShadowSoftness = lightingService.ShadowSoftness,
+			Ambient = lightingService.Ambient
+		}
+	end
+	RichShader = GuiLibrary.ObjectsThatCanBeSaved.WorldWindow.Api.CreateOptionsButton({
+		Name = 'RichShader',
+		HoverText = 'cool shader mhm.',
+		Function = function(callback)
+			if callback then
+				refreshsettings()
+				ShaderBlur = Instance.new('BlurEffect')
+				ShaderBlur.Parent = lightingService
+				ShaderBlur.Size = 5
+				ShaderTint = Instance.new('ColorCorrectionEffect')
+				ShaderTint.Parent = lightingService
+				ShaderTint.Saturation = -0.2
+				ShaderTint.TintColor = Color3.fromRGB(255, 224, 219)
+				lightingService.ColorShift_Bottom = Color3.fromHSV(ShaderColor.Hue, ShaderColor.Sat, ShaderColor.Value)
+				lightingService.ColorShift_Top = Color3.fromHSV(ShaderColor.Hue, ShaderColor.Sat, ShaderColor.Value)
+				lightingService.OutdoorAmbient = Color3.fromHSV(ShaderColor.Hue, ShaderColor.Sat, ShaderColor.Value)
+				lightingService.ClockTime = 8.7
+				lightingService.FogColor = Color3.fromHSV(ShaderColor.Hue, ShaderColor.Sat, ShaderColor.Value)
+				lightingService.FogEnd = 1000
+				lightingService.FogStart = 0
+				lightingService.ExposureCompensation = 0.30
+				lightingService.ShadowSoftness = 0
+				lightingService.Ambient = Color3.fromRGB(59, 33, 27)
+			else
+				for i,v in oldlightingsettings do 
+					lightingService[i] = v 
+				end 
+				if ShaderTint and ShaderTint.Parent then 
+					ShaderTint:Destroy() 
+				end
+				if ShaderBlur and ShaderBlur.Parent then 
+					ShaderBlur:Destroy()
+				end
+			end
+		end
+	})
+	ShaderColor = RichShader.CreateColorSlider({
+		Name = 'Main Color',
+		Function = function()
+			if RichShader.Enabled then 
+				lightingService.ColorShift_Bottom = Color3.fromHSV(ShaderColor.Hue, ShaderColor.Sat, ShaderColor.Value)
+				lightingService.ColorShift_Top = Color3.fromHSV(ShaderColor.Hue, ShaderColor.Sat, ShaderColor.Value)
+				lightingService.OutdoorAmbient = Color3.fromHSV(ShaderColor.Hue, ShaderColor.Sat, ShaderColor.Value)
+				lightingService.FogColor = Color3.fromHSV(ShaderColor.Hue, ShaderColor.Sat, ShaderColor.Value)
+			end
+		end
+	})
+end)
 
