@@ -1784,10 +1784,12 @@ local function loadVape()
 			end
 		end
 	end
-	if #ProfilesTextList.ObjectList == 0 then
-		table.insert(ProfilesTextList.ObjectList, "default")
-		ProfilesTextList.RefreshValues(ProfilesTextList.ObjectList)
-	end
+	pcall(function()
+		if #ProfilesTextList.ObjectList == 0 then
+			table.insert(ProfilesTextList.ObjectList, "default")
+			ProfilesTextList.RefreshValues(ProfilesTextList.ObjectList)
+		end
+	end)
 	RenderFunctions:Initiate()
 	GuiLibrary.LoadSettings()
 	local profiles = {}
