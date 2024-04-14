@@ -1,16 +1,6 @@
 --[[
   this game suck im going to kill myself
 ]]
---[[
-
-    Render Intents | Bedwars lobby
-    The #1 vape mod you'll ever see.
-
-    Version: 2.0
-    discord.gg/render
-
-]]
-
 local GuiLibrary = shared.GuiLibrary
 local players = game:GetService('Players')
 local textservice = game:GetService('TextService')
@@ -175,8 +165,8 @@ do
 	end
 end
 
-local function runFunction(func)
-	func()
+local function run(v)
+	v()
 end
 
 local function betterfind(tab, obj)
@@ -264,16 +254,59 @@ teleportfunc = lplr.OnTeleport:Connect(function(State)
     end
 end)
 
-local e = {['Enabled'] = false}
-e = GuiLibrary.ObjectsThatCanBeSaved.BlatantWindow.Api.CreateOptionsButton({
-	Name = 'Inf Money',
-	Function = function(calling)
-        
-      replicatedStorageService.Remotes.Settings:FireServer(unpack({ 
-          [1] = "Cash", 
-          [2] = ''..math.huge 
-      }))
+run(function() 
+	local InfiniteStuff = {Enabled = false}
+	local item = {Value = ""}
+	InfiniteStuff = GuiLibrary.ObjectsThatCanBeSaved.BlatantWindow.Api.CreateOptionsButton({
+		Name = 'InfiniteStuff',
+		Function = function()
+			task.spawn(function()
+				repeat
+					replicatedStorageService.Remotes.Settings:FireServer(unpack({ 
+						[1] = item.Value, 
+						[2] = ''..math.huge 
+					}))
+					task.wait()
+				until (not InfiniteStuff.Enabled)
+			end)
 		end
-	end, 
-	HoverText = 'garbage ahh game inf money crazy'
-})
+	})
+	item = InfiniteStuff.CreateDropdown({
+		Name = "InfiniteStuff",
+		List = {"Cash", "SuperRolls", "DoubleLuck"},
+		Function = function() end,
+		HoverText = "Select any infinite thing you want"
+	})
+end)
+run(function()
+	local AutoRolls = {Enabled = false}
+	AutoRolls = GuiLibrary.ObjectsThatCanBeSaved.BlatantWindow.Api.CreateOptionsButton({
+		Name = "Fast AutoRolls",
+		Function = function()
+			task.spawn(function()
+				repeat
+					replicatedStorageService.Remotes.Roll:FireServer()
+					replicatedStorageService.Remotes.RollDebounce:FireServer()
+					task.wait(0)
+				until (not AutoRolls.Enabled)
+			end)
+		end,
+		HoverText = "Automatic Roll For You (but faster :troll:)"
+	})
+end)
+task.spawn(function()
+	local timeupdate = tick()
+	wait(5)
+	repeat 
+		RenderStore.sessionInfo:addListText('Effect', 'nil')
+		RenderStore.sessionInfo:addListText('Whitelist Rank', RenderFunctions:GetPlayerType(1))
+		RenderStore.sessionInfo:addListText('Cash', lplr.Cash.Value)
+		local time = os.date('*t')
+		local hour = ((time.hour - 1) % 12 + 1)
+		RenderStore.sessionInfo:addListText('Time', tostring(hour)..':'..(time.min < 10 and '0' or '')..tostring(time.min)..(time.hour < 12 and 'AM' or 'PM'))
+		RenderStore.sessionInfo:addListText('Normal Rolls', lplr.RollsTilLuck.Value)
+		RenderStore.sessionInfo:addListText('Mega Rolls', lplr.SuperRolls.Value)
+		RenderStore.sessionInfo:addListText('Luck', "Inf")
+		task.wait()
+	until (not vapeInjected)
+end)
