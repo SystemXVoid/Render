@@ -3,7 +3,7 @@
     Render Intents | Bedwars lobby
     The #1 vape mod you'll ever see.
 
-    Version: 1.7.3
+    Version: 2.0
     discord.gg/render
 
 ]]
@@ -2169,6 +2169,55 @@ runFunction(function()
 					end
 				end))
 			end
+		end
+	})
+end)
+
+runFunction(function()
+	local QueueCardMods = {}
+	local QueueCardGradientToggle = {}
+	local QueueCardGradient = {Hue = 0, Sat = 0, Value = 0}
+	local QueueCardGradient2 = {Hue = 0, Sat = 0, Value = 0}
+	local queuemodsgradients = {}
+	local function patchQueueCard()
+		if lplr.PlayerGui:FindFirstChild('QueueApp') then 
+			if lplr.PlayerGui.QueueApp:WaitForChild('1'):IsA('Frame') then 
+				lplr.PlayerGui.QueueApp['1'].BackgroundColor3 = Color3.fromHSV(QueueCardGradient.Hue, QueueCardGradient.Sat, QueueCardGradient.Value)
+			end
+			if QueueCardGradientToggle.Enabled then 
+				lplr.PlayerGui.QueueApp['1'].BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+				local gradient = (lplr.PlayerGui.QueueApp['1']:FindFirstChildWhichIsA('UIGradient') or Instance.new('UIGradient', lplr.PlayerGui.QueueApp['1']))
+				gradient.Color = ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromHSV(QueueCardGradient.Hue, QueueCardGradient.Sat, QueueCardGradient.Value)), ColorSequenceKeypoint.new(1, Color3.fromHSV(QueueCardGradient2.Hue, QueueCardGradient2.Sat, QueueCardGradient2.Value))})
+				table.insert(queuemodsgradients, gradient)
+			end
+		end
+	end
+	QueueCardMods = GuiLibrary.ObjectsThatCanBeSaved.RenderWindow.Api.CreateOptionsButton({
+		Name = 'QueueCardMods',
+		HoverText = 'Mods the QueueApp at the end of the game.',
+		Function = function(calling) 
+			if calling then 
+				patchQueueCard()
+				table.insert(QueueCardMods.Connections, lplr.PlayerGui.ChildAdded:Connect(patchQueueCard))
+			end
+		end
+	})
+	QueueCardGradientToggle = QueueCardMods.CreateToggle({
+		Name = 'Gradient',
+		Function = function(calling)
+			pcall(function() QueueCardGradient2.Object.Visible = calling end) 
+		end
+	})
+	QueueCardGradient = QueueCardMods.CreateColorSlider({
+		Name = 'Color',
+		Function = function()
+			pcall(patchQueueCard)
+		end
+	})
+	QueueCardGradient2 = QueueCardMods.CreateColorSlider({
+		Name = 'Color 2',
+		Function = function()
+			pcall(patchQueueCard)
 		end
 	})
 end)
