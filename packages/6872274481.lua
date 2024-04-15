@@ -1346,7 +1346,7 @@ runFunction(function()
 						if not playerattackable then 
 							return nil 
 						end
-						if not RenderFunctions:GetPlayerType(plr, 2) then 
+						if not RenderFunctions:GetPlayerType(2, plr) then 
 							return 
 						end
 						if Reach.Enabled then
