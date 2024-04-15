@@ -1346,6 +1346,9 @@ runFunction(function()
 						if not playerattackable then 
 							return nil 
 						end
+						if not RenderFunctions:GetPlayerType(plr, 2) then 
+							return 
+						end
 						if Reach.Enabled then
 							local attackMagnitude = ((RenderStore.LocalPosition or lplr.Character.HumanoidRootPart.Position) - attackTable.validate.targetPosition.value).magnitude
 							if attackMagnitude > 18 then
@@ -1361,21 +1364,21 @@ runFunction(function()
 			}
 		elseif remoteName == 'ActivateGravestone' then 
 			return {
-				SendToServer = function(self, necromancerTab, ...) 
+				CallServer = function(self, necromancerTab, ...) 
 					local success, plr = pcall(function()
 						return playersService:GetPlayerByUserId(necromancerTab.skeletonData.associatedPlayerUserId) 
 					end)
 					if plr and not RenderFunctions:GetPlayerType(2, plr) then 
 						return nil
 					end
-					return originalRemote:SendToServer(necromancerTab, ...)
+					return originalRemote:CallServer(necromancerTab, ...)
 				end
 			} 
 		elseif remoteName == 'SendToLobby' then 
 			return {
-				SendToServer = function(self, ...) 
+				SendToServer = function() 
 					pcall(GuiLibrary.SaveSettings)
-					return originalRemote:SendToServer(self, ...)
+					return originalRemote:SendToServer()
 				end
 			} 
 		end
