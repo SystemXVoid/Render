@@ -368,7 +368,7 @@ return (function(ria)
 	local corescripts = {'GuiLibrary.lua', 'MainScript.lua', 'Universal.lua', 'NewMainScript.lua'} 
 	for i,v in next, corescripts do 
 		registerStep('Downloading vape/'..v, function()
-			local res = game.HttpGetAsync(game, 'https://raw.githubusercontent.com/SystemXVoid/Render/source/packages/'..v)
+			local res = game.HttpGet(game, 'https://raw.githubusercontent.com/SystemXVoid/Render/source/packages/'..v)
 			if res ~= '404: Not Found' then 
 				writevapefile(v, res) 
 			end
@@ -377,7 +377,7 @@ return (function(ria)
 
 	for i,v in next, ({'6872274481.lua', '6872265039.lua', '16524008257.lua'}) do 
 		registerStep('Downloading vape/CustomModules/'..v, function()
-			local res = game.HttpGetAsync(game, 'https://raw.githubusercontent.com/SystemXVoid/Render/source/packages/'..v)
+			local res = game.HttpGet(game, 'https://raw.githubusercontent.com/SystemXVoid/Render/source/packages/'..v)
 			if res ~= '404: Not Found' then 
 				writevapefile('CustomModules/'..v, res) 
 			end
@@ -388,7 +388,7 @@ return (function(ria)
 	local profilesfetched
 
 	task.spawn(function()
-		local res = game.HttpGetAsync(game, 'https://api.github.com/repos/SystemXVoid/Render/contents/Libraries/Settings')
+		local res = game.HttpGet(game, 'https://api.github.com/repos/SystemXVoid/Render/contents/Libraries/Settings')
 		if res ~= '404: Not Found' then 
 			for i,v in next, httpservice:JSONDecode(res) do 
 				if type(v) == 'table' and v.name then 
@@ -410,7 +410,7 @@ return (function(ria)
 			if not installprofile then 
 				return 
 			end
-			local res = game.HttpGetAsync(game, 'https://raw.githubusercontent.com/SystemXVoid/Render/source/Libraries/Settings/'..v)
+			local res = game.HttpGet(game, 'https://raw.githubusercontent.com/SystemXVoid/Render/source/Libraries/Settings/'..v)
 			if res ~= '404: Not Found' then 
 				writevapefile('Profiles/'..v, res) 
 			end
