@@ -184,13 +184,13 @@ end
 runFunction(function()
     local getitem = {Enabled = false}
     local chosenitem = {Value = "M9"}
-    getitem = GuiLibrary.ObjectsThatCanBeSaved.ExploitWindow.Api.CreateOptionsButton({
+    getitem = GuiLibrary.ObjectsThatCanBeSaved.UtilityWindow.Api.CreateOptionsButton({
         Name = "Get item",
         HoverText = "get any item",
         Function = function(callback)
             if callback then
 				local startpos = lplr.Character.HumanoidRootPart.Position
-				lplr.Character:MoveTo(Workspace.Prison_ITEMS.giver[chosenitem.Value]:WaitForChild("ITEMPICKUP").Position)
+				lplr.Character:MoveTo(workspace.Prison_ITEMS.giver[chosenitem.Value]:WaitForChild("ITEMPICKUP").Position)
 				wait(0.2)
                 workspace:WaitForChild("Remote"):WaitForChild("ItemHandler"):InvokeServer(Workspace.Prison_ITEMS.giver[chosenitem.Value]:WaitForChild("ITEMPICKUP"))
 				lplr.Character:MoveTo(startpos)
@@ -228,7 +228,7 @@ runFunction(function()
 		end
 		return returnedplayer
 	end
-	smallkillaura = GuiLibrary.ObjectsThatCanBeSaved.ExploitWindow.Api.CreateOptionsButton({
+	smallkillaura = GuiLibrary.ObjectsThatCanBeSaved.CombatWindow.Api.CreateOptionsButton({
 		Name = "killaura",
 		HoverText = "kill players around you",
 		Function = function(callback)
@@ -251,7 +251,7 @@ end)
 
 runFunction(function()
     local mousekill = {Enabled = false}
-    mousekill = GuiLibrary.ObjectsThatCanBeSaved.ExploitWindow.Api.CreateOptionsButton({
+    mousekill = GuiLibrary.ObjectsThatCanBeSaved.CombatWindow.Api.CreateOptionsButton({
         Name = "Mouse kill",
         HoverText = "kill player under mouse",
         Function = function(callback)
@@ -327,7 +327,7 @@ end)
 --
 runFunction(function()
 	local notoolkill = {Enabled = false}
-	notoolkill = GuiLibrary.ObjectsThatCanBeSaved.ExploitWindow.Api.CreateOptionsButton({
+	notoolkill = GuiLibrary.ObjectsThatCanBeSaved.CombatWindow.Api.CreateOptionsButton({
 		Name = "No tool kill",
 		HoverText = "kill player without tool",
 		Function = function(callback)
@@ -362,7 +362,7 @@ runFunction(function()
 		["Police"] = "Bright blue",
 		["Criminal"] = "Bright red"
 	}
-	setteam = GuiLibrary.ObjectsThatCanBeSaved.ExploitWindow.Api.CreateOptionsButton({
+	setteam = GuiLibrary.ObjectsThatCanBeSaved.UtilityWindow.Api.CreateOptionsButton({
 		Name = "Set team",
 		HoverText = "set your team to inmate, police or criminal",
 		Function = function(callback)
@@ -394,7 +394,7 @@ end)
 runFunction(function()
 	local killall = {Enabled = false}
 	local killallteam = {Value = "Criminals"}
-	killall = GuiLibrary.ObjectsThatCanBeSaved.ExploitWindow.Api.CreateOptionsButton({
+	killall = GuiLibrary.ObjectsThatCanBeSaved.BlatantWindow.Api.CreateOptionsButton({
 		Name = "Kill all",
 		HoverText = "kill all players",
 		Function = function(callback)
@@ -430,7 +430,7 @@ end)
 
 runFunction(function()
 	local arrestaura = {Enabled = false}
-	arrestaura = GuiLibrary.ObjectsThatCanBeSaved.ExploitWindow.Api.CreateOptionsButton({
+	arrestaura = GuiLibrary.ObjectsThatCanBeSaved.UtilityWindow.Api.CreateOptionsButton({
 		Name = "Arrest aura",
 		HoverText = "arrest players around you",
 		Function = function(callback)
@@ -453,7 +453,7 @@ end)
 
 runFunction(function()
     local arrestall = {Enabled = false}
-    arrestall = GuiLibrary.ObjectsThatCanBeSaved.ExploitWindow.Api.CreateOptionsButton({
+    arrestall = GuiLibrary.ObjectsThatCanBeSaved.BlatantWindow.Api.CreateOptionsButton({
         Name = "Arrest all",
         HoverText = "arrest all criminals",
         Function = function(callback)
