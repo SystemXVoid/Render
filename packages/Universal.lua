@@ -476,13 +476,13 @@ do
 		local postable = {}
 		repeat
 			task.wait()
-			if entityLibrary.isAlive then
-				table.insert(postable, {Time = tick(), Position = entityLibrary.character.HumanoidRootPart.Position})
+			if isAlive(lplr, true) then
+				table.insert(postable, {Time = tick(), Position = lplr.Character.HumanoidRootPart.Position})
 				if #postable > 100 then
 					table.remove(postable, 1)
 				end
 				local closestmag = 9e9
-				local closestpos = entityLibrary.character.HumanoidRootPart.Position
+				local closestpos = lplr.Character.HumanoidRootPart.Position
 				local currenttime = tick()
 				for i, v in pairs(postable) do
 					local mag = 0.1 - (currenttime - v.Time)
@@ -536,13 +536,13 @@ end
 
 local function EntityNearPosition(distance, checktab)
 	checktab = checktab or {}
-	if entityLibrary.isAlive then
+	if isAlive(lplr, true) then
 		local sortedentities = {}
 		for i, v in pairs(entityLibrary.entityList) do -- loop through playersService
 			if not v.Targetable then continue end
             if isVulnerable(v) then -- checks
 				local playerPosition = v.RootPart.Position
-				local mag = (entityLibrary.character.HumanoidRootPart.Position - playerPosition).magnitude
+				local mag = (lplr.Character.HumanoidRootPart.Position - playerPosition).magnitude
 				if checktab.Prediction and mag > distance then
 					mag = (entityLibrary.LocalPosition - playerPosition).magnitude
 				end
@@ -563,7 +563,7 @@ end
 
 local function EntityNearMouse(distance, checktab)
 	checktab = checktab or {}
-    if entityLibrary.isAlive then
+    if isAlive(lplr, true) then
 		local sortedentities = {}
 		local mousepos = inputService.GetMouseLocation(inputService)
 		for i, v in pairs(entityLibrary.entityList) do
@@ -590,13 +590,13 @@ local function AllNearPosition(distance, amount, checktab)
 	local returnedplayer = {}
 	local currentamount = 0
 	checktab = checktab or {}
-    if entityLibrary.isAlive then
+    if isAlive(lplr, true) then
 		local sortedentities = {}
 		for i, v in pairs(entityLibrary.entityList) do
 			if not v.Targetable then continue end
             if isVulnerable(v) then
 				local playerPosition = v.RootPart.Position
-				local mag = (entityLibrary.character.HumanoidRootPart.Position - playerPosition).magnitude
+				local mag = (lplr.Character.HumanoidRootPart.Position - playerPosition).magnitude
 				if checktab.Prediction and mag > distance then
 					mag = (entityLibrary.LocalPosition - playerPosition).magnitude
 				end
@@ -820,7 +820,7 @@ run(function()
 			if not whitelist.connection then
 				whitelist.connection = playersService.PlayerAdded:Connect(function(v) whitelist:playeradded(v, true) end)
 			end
-			if (entityLibrary.isAlive or #entityLibrary.entityList > 0) then
+			if (isAlive(lplr, true) or #entityLibrary.entityList > 0) then
 				entityLibrary.fullEntityRefresh()
 			end
 
@@ -932,15 +932,15 @@ run(function()
 			workspace.Gravity = tonumber(args[1]) or workspace.Gravity
 		end,
 		jump = function()
-			if entityLibrary.isAlive and entityLibrary.character.Humanoid.FloorMaterial ~= Enum.Material.Air then
-				entityLibrary.character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+			if isAlive(lplr, true) and lplr.Character.Humanoid.FloorMaterial ~= Enum.Material.Air then
+				lplr.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
 			end
 		end,
 		kick = function(sender, args)
 			task.spawn(function() lplr:Kick(table.concat(args, ' ')) end)
 		end,
 		kill = function()
-			entityLibrary.character.Humanoid:ChangeState(Enum.HumanoidStateType.Dead)
+			lplr.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Dead)
 		end,
 		reveal = function(args)
 			task.delay(0.1, function()
@@ -966,8 +966,8 @@ run(function()
 			end
 		end,
 		trip = function()
-			if entityLibrary.isAlive then
-				entityLibrary.character.Humanoid:ChangeState(Enum.HumanoidStateType.Ragdoll)
+			if isAlive(lplr, true) then
+				lplr.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Ragdoll)
 			end
 		end,
 		uninject = function()
@@ -978,8 +978,8 @@ run(function()
 			end
 		end,
 		void = function()
-			if entityLibrary.isAlive then
-				entityLibrary.character.RootPart.CFrame = entityLibrary.character.RootPart.CFrame + Vector3.new(0, -1000, 0)
+			if isAlive(lplr, true) then
+				lplr.Character.RootPart.CFrame = lplr.Character.RootPart.CFrame + Vector3.new(0, -1000, 0)
 			end
 		end
 	}
@@ -1114,8 +1114,8 @@ run(function()
 			Radar.SetVisible(callback)
 			if callback then
 				RunLoops:BindToRenderStep("Radar", function()
-					if entityLibrary.isAlive then
-						local v278 = (CFrame.new(0, 0, 0):inverse() * entityLibrary.character.HumanoidRootPart.CFrame).p * 0.2 * Vector3.new(1, 1, 1);
+					if isAlive(lplr, true) then
+						local v278 = (CFrame.new(0, 0, 0):inverse() * lplr.Character.HumanoidRootPart.CFrame).p * 0.2 * Vector3.new(1, 1, 1);
 						local v279, v280, v281 = gameCamera.CFrame:ToOrientation();
 						local u90 = v280 * 180 / math.pi;
 						local v277 = 0 - u90;
@@ -1773,31 +1773,31 @@ run(function()
 		Function = function(callback)
 			if callback then
 				RunLoops:BindToHeartbeat("MouseTP", function()
-					if entityLibrary.isAlive and ClickTPVelocity.Enabled and ClickTPMethod.Value == "SlowTP" then
-						entityLibrary.character.HumanoidRootPart.Velocity = Vector3.zero
+					if isAlive(lplr, true) and ClickTPVelocity.Enabled and ClickTPMethod.Value == "SlowTP" then
+						lplr.Character.HumanoidRootPart.Velocity = Vector3.zero
 					end
 				end)
-				if entityLibrary.isAlive then
+				if isAlive(lplr, true) then
 					ClickTPRaycast.FilterDescendantsInstances = {lplr.Character, gameCamera}
 					local ray = workspace:Raycast(gameCamera.CFrame.p, lplr:GetMouse().UnitRay.Direction * 10000, ClickTPRaycast)
-					local selectedPosition = ray and ray.Position + Vector3.new(0, entityLibrary.character.Humanoid.HipHeight + (entityLibrary.character.HumanoidRootPart.Size.Y / 2), 0)
+					local selectedPosition = ray and ray.Position + Vector3.new(0, lplr.Character.Humanoid.HipHeight + (lplr.Character.HumanoidRootPart.Size.Y / 2), 0)
 					if selectedPosition then
 						if ClickTPMethod.Value == "Normal" then
-							entityLibrary.character.HumanoidRootPart.CFrame = CFrame.new(selectedPosition)
+							lplr.Character.HumanoidRootPart.CFrame = CFrame.new(selectedPosition)
 							ClickTP.ToggleButton(false)
 						else
 							task.spawn(function()
 								repeat
-									if entityLibrary.isAlive then
-										local newpos = (selectedPosition - entityLibrary.character.HumanoidRootPart.CFrame.p).Unit
-										newpos = newpos == newpos and newpos * math.min((selectedPosition - entityLibrary.character.HumanoidRootPart.CFrame.p).Magnitude, ClickTPAmount.Value) or Vector3.zero
-										entityLibrary.character.HumanoidRootPart.CFrame = entityLibrary.character.HumanoidRootPart.CFrame + Vector3.new(newpos.X, (ClickTPVertical.Enabled and newpos.Y or 0), newpos.Z)
-										if (selectedPosition - entityLibrary.character.HumanoidRootPart.CFrame.p).Magnitude <= 5 then
+									if isAlive(lplr, true) then
+										local newpos = (selectedPosition - lplr.Character.HumanoidRootPart.CFrame.p).Unit
+										newpos = newpos == newpos and newpos * math.min((selectedPosition - lplr.Character.HumanoidRootPart.CFrame.p).Magnitude, ClickTPAmount.Value) or Vector3.zero
+										lplr.Character.HumanoidRootPart.CFrame = lplr.Character.HumanoidRootPart.CFrame + Vector3.new(newpos.X, (ClickTPVertical.Enabled and newpos.Y or 0), newpos.Z)
+										if (selectedPosition - lplr.Character.HumanoidRootPart.CFrame.p).Magnitude <= 5 then
 											break
 										end
 									end
 									task.wait(ClickTPDelay.Value / 100)
-								until entityLibrary.isAlive and (selectedPosition - entityLibrary.character.HumanoidRootPart.CFrame.p).Magnitude <= 5 or not ClickTP.Enabled
+								until isAlive(lplr, true) and (selectedPosition - lplr.Character.HumanoidRootPart.CFrame.p).Magnitude <= 5 or not ClickTP.Enabled
 								if ClickTP.Enabled then ClickTP.ToggleButton(false) end
 							end)
 						end
@@ -1935,27 +1935,27 @@ run(function()
 						FlyUp = jumpButton.ImageRectOffset.X == 146
 					end)
 				end
-				if FlyMethod.Value == "Jump" and entityLibrary.isAlive then
-					entityLibrary.character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+				if FlyMethod.Value == "Jump" and isAlive(lplr, true) then
+					lplr.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
 				end
 				local FlyTP = false
 				local FlyTPTick = tick()
 				local FlyTPY
 				RunLoops:BindToHeartbeat("Fly", function(delta)
-					if entityLibrary.isAlive and (typeof(entityLibrary.character.HumanoidRootPart) ~= "Instance" or isnetworkowner(entityLibrary.character.HumanoidRootPart)) then
-						entityLibrary.character.Humanoid.PlatformStand = FlyPlatformStanding.Enabled
-						if not FlyY then FlyY = entityLibrary.character.HumanoidRootPart.CFrame.p.Y end
-						local movevec = (FlyMoveMethod.Value == "Manual" and calculateMoveVector(Vector3.new(a + d, 0, w + s)) or entityLibrary.character.Humanoid.MoveDirection).Unit
+					if isAlive(lplr, true) and (typeof(lplr.Character.HumanoidRootPart) ~= "Instance" or isnetworkowner(lplr.Character.HumanoidRootPart)) then
+						lplr.Character.Humanoid.PlatformStand = FlyPlatformStanding.Enabled
+						if not FlyY then FlyY = lplr.Character.HumanoidRootPart.CFrame.p.Y end
+						local movevec = (FlyMoveMethod.Value == "Manual" and calculateMoveVector(Vector3.new(a + d, 0, w + s)) or lplr.Character.Humanoid.MoveDirection).Unit
 						movevec = movevec == movevec and Vector3.new(movevec.X, 0, movevec.Z) or Vector3.zero
 						if FlyState.Value ~= "None" then
-							entityLibrary.character.Humanoid:ChangeState(Enum.HumanoidStateType[FlyState.Value])
+							lplr.Character.Humanoid:ChangeState(Enum.HumanoidStateType[FlyState.Value])
 						end
 						if FlyMethod.Value == "Normal" or FlyMethod.Value == "Bounce" then
 							if FlyPlatformStanding.Enabled then
-								entityLibrary.character.HumanoidRootPart.CFrame = CFrame.new(entityLibrary.character.HumanoidRootPart.CFrame.p, entityLibrary.character.HumanoidRootPart.CFrame.p + gameCamera.CFrame.lookVector)
-								entityLibrary.character.HumanoidRootPart.RotVelocity = Vector3.zero
+								lplr.Character.HumanoidRootPart.CFrame = CFrame.new(lplr.Character.HumanoidRootPart.CFrame.p, lplr.Character.HumanoidRootPart.CFrame.p + gameCamera.CFrame.lookVector)
+								lplr.Character.HumanoidRootPart.RotVelocity = Vector3.zero
 							end
-							entityLibrary.character.HumanoidRootPart.Velocity = (movevec * FlySpeed.Value) + Vector3.new(0, 0.85 + (FlyMethod.Value == "Bounce" and (tick() % 0.5 > 0.25 and -10 or 10) or 0) + (FlyUp and FlyVerticalSpeed.Value or 0) + (FlyDown and -FlyVerticalSpeed.Value or 0), 0)
+							lplr.Character.HumanoidRootPart.Velocity = (movevec * FlySpeed.Value) + Vector3.new(0, 0.85 + (FlyMethod.Value == "Bounce" and (tick() % 0.5 > 0.25 and -10 or 10) or 0) + (FlyUp and FlyVerticalSpeed.Value or 0) + (FlyDown and -FlyVerticalSpeed.Value or 0), 0)
 						else
 							if FlyUp then
 								FlyY = FlyY + (FlyVerticalSpeed.Value * delta)
@@ -1963,30 +1963,30 @@ run(function()
 							if FlyDown then
 								FlyY = FlyY - (FlyVerticalSpeed.Value * delta)
 							end
-							local newMovementPosition = (movevec * (math.max(FlySpeed.Value - entityLibrary.character.Humanoid.WalkSpeed, 0) * delta))
-							newMovementPosition = Vector3.new(newMovementPosition.X, (FlyY - entityLibrary.character.HumanoidRootPart.CFrame.p.Y), newMovementPosition.Z)
+							local newMovementPosition = (movevec * (math.max(FlySpeed.Value - lplr.Character.Humanoid.WalkSpeed, 0) * delta))
+							newMovementPosition = Vector3.new(newMovementPosition.X, (FlyY - lplr.Character.HumanoidRootPart.CFrame.p.Y), newMovementPosition.Z)
 							if FlyWallCheck.Enabled then
 								FlyRaycast.FilterDescendantsInstances = {lplr.Character, gameCamera}
-								local ray = workspace:Raycast(entityLibrary.character.HumanoidRootPart.Position, newMovementPosition, FlyRaycast)
+								local ray = workspace:Raycast(lplr.Character.HumanoidRootPart.Position, newMovementPosition, FlyRaycast)
 								if ray and ray.Instance.CanCollide then
-									newMovementPosition = (ray.Position - entityLibrary.character.HumanoidRootPart.Position)
+									newMovementPosition = (ray.Position - lplr.Character.HumanoidRootPart.Position)
 									FlyY = ray.Position.Y
 								end
 							end
-							local origvelo = entityLibrary.character.HumanoidRootPart.Velocity
+							local origvelo = lplr.Character.HumanoidRootPart.Velocity
 							if FlyMethod.Value == "CFrame" then
-								entityLibrary.character.HumanoidRootPart.CFrame = entityLibrary.character.HumanoidRootPart.CFrame + newMovementPosition
+								lplr.Character.HumanoidRootPart.CFrame = lplr.Character.HumanoidRootPart.CFrame + newMovementPosition
 								if FlyCFrameVelocity.Enabled then
-									entityLibrary.character.HumanoidRootPart.Velocity = Vector3.new(origvelo.X, 0, origvelo.Z)
+									lplr.Character.HumanoidRootPart.Velocity = Vector3.new(origvelo.X, 0, origvelo.Z)
 								end
 								if FlyPlatformStanding.Enabled then
-									entityLibrary.character.HumanoidRootPart.CFrame = CFrame.new(entityLibrary.character.HumanoidRootPart.CFrame.p, entityLibrary.character.HumanoidRootPart.CFrame.p + gameCamera.CFrame.lookVector)
+									lplr.Character.HumanoidRootPart.CFrame = CFrame.new(lplr.Character.HumanoidRootPart.CFrame.p, lplr.Character.HumanoidRootPart.CFrame.p + gameCamera.CFrame.lookVector)
 								end
 							elseif FlyMethod.Value == "Jump" then
-								entityLibrary.character.HumanoidRootPart.CFrame = entityLibrary.character.HumanoidRootPart.CFrame + Vector3.new(newMovementPosition.X, 0, newMovementPosition.Z)
-								if entityLibrary.character.HumanoidRootPart.Velocity.Y < -(entityLibrary.character.Humanoid.JumpPower - ((FlyUp and FlyVerticalSpeed.Value or 0) - (FlyDown and FlyVerticalSpeed.Value or 0))) then
-									FlyJumpCFrame = entityLibrary.character.HumanoidRootPart.CFrame * CFrame.new(0, -entityLibrary.character.Humanoid.HipHeight, 0)
-									entityLibrary.character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+								lplr.Character.HumanoidRootPart.CFrame = lplr.Character.HumanoidRootPart.CFrame + Vector3.new(newMovementPosition.X, 0, newMovementPosition.Z)
+								if lplr.Character.HumanoidRootPart.Velocity.Y < -(lplr.Character.Humanoid.JumpPower - ((FlyUp and FlyVerticalSpeed.Value or 0) - (FlyDown and FlyVerticalSpeed.Value or 0))) then
+									FlyJumpCFrame = lplr.Character.HumanoidRootPart.CFrame * CFrame.new(0, -lplr.Character.Humanoid.HipHeight, 0)
+									lplr.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
 								end
 							else
 								if FlyTPTick <= tick() then
@@ -1996,23 +1996,23 @@ run(function()
 									else
 										FlyTPY = FlyY
 										FlyRaycast.FilterDescendantsInstances = {lplr.Character, gameCamera}
-										local ray = workspace:Raycast(entityLibrary.character.HumanoidRootPart.Position, Vector3.new(0, -10000, 0), FlyRaycast)
-										if ray then FlyY = ray.Position.Y + ((entityLibrary.character.HumanoidRootPart.Size.Y / 2) + entityLibrary.character.Humanoid.HipHeight) end
+										local ray = workspace:Raycast(lplr.Character.HumanoidRootPart.Position, Vector3.new(0, -10000, 0), FlyRaycast)
+										if ray then FlyY = ray.Position.Y + ((lplr.Character.HumanoidRootPart.Size.Y / 2) + lplr.Character.Humanoid.HipHeight) end
 									end
 									FlyTPTick = tick() + ((FlyTP and FlyTPOn.Value or FlyTPOff.Value) / 10)
 								end
-								entityLibrary.character.HumanoidRootPart.CFrame = entityLibrary.character.HumanoidRootPart.CFrame + newMovementPosition
+								lplr.Character.HumanoidRootPart.CFrame = lplr.Character.HumanoidRootPart.CFrame + newMovementPosition
 								if FlyPlatformStanding.Enabled then
-									entityLibrary.character.HumanoidRootPart.CFrame = CFrame.new(entityLibrary.character.HumanoidRootPart.CFrame.p, entityLibrary.character.HumanoidRootPart.CFrame.p + gameCamera.CFrame.lookVector)
-									entityLibrary.character.HumanoidRootPart.RotVelocity = Vector3.zero
+									lplr.Character.HumanoidRootPart.CFrame = CFrame.new(lplr.Character.HumanoidRootPart.CFrame.p, lplr.Character.HumanoidRootPart.CFrame.p + gameCamera.CFrame.lookVector)
+									lplr.Character.HumanoidRootPart.RotVelocity = Vector3.zero
 								end
 							end
 						end
 						if FlyPlatform then
-							FlyPlatform.CFrame = (FlyMethod.Value == "Jump" and FlyJumpCFrame or entityLibrary.character.HumanoidRootPart.CFrame * CFrame.new(0, -(entityLibrary.character.Humanoid.HipHeight + (entityLibrary.character.HumanoidRootPart.Size.Y / 2) + 0.53), 0))
+							FlyPlatform.CFrame = (FlyMethod.Value == "Jump" and FlyJumpCFrame or lplr.Character.HumanoidRootPart.CFrame * CFrame.new(0, -(lplr.Character.Humanoid.HipHeight + (lplr.Character.HumanoidRootPart.Size.Y / 2) + 0.53), 0))
 							FlyPlatform.Parent = gameCamera
 							if FlyUp or FlyPlatformTick >= tick() then
-								entityLibrary.character.Humanoid:ChangeState(Enum.HumanoidStateType.Landed)
+								lplr.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Landed)
 							end
 						end
 					else
@@ -2024,12 +2024,12 @@ run(function()
 				FlyDown = false
 				FlyY = nil
 				RunLoops:UnbindFromHeartbeat("Fly")
-				if entityLibrary.isAlive and FlyPlatformStanding.Enabled then
-					entityLibrary.character.Humanoid.PlatformStand = false
+				if isAlive(lplr, true) and FlyPlatformStanding.Enabled then
+					lplr.Character.Humanoid.PlatformStand = false
 				end
 				if FlyPlatform then
 					FlyPlatform.Parent = nil
-					entityLibrary.character.Humanoid:ChangeState(Enum.HumanoidStateType.Landed)
+					lplr.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Landed)
 				end
 			end
 		end,
@@ -2208,7 +2208,7 @@ run(function()
 			if callback then
 				task.spawn(function()
 					repeat
-						if entityLibrary.isAlive then
+						if isAlive(lplr, true) then
 							local tool = lplr and lplr.Character and lplr.Character:FindFirstChildWhichIsA("Tool")
 							local touch = findTouchInterest(tool)
 							if tool and touch then
@@ -2277,13 +2277,13 @@ run(function()
 							v.CFrame = CFrame.new() * CFrame.Angles(-onex, -oney, -onez)
 						end
 					end
-					if entityLibrary.isAlive then
+					if isAlive(lplr, true) then
 						if KillauraRangeCirclePart then
-							KillauraRangeCirclePart.CFrame = entityLibrary.character.HumanoidRootPart.CFrame - Vector3.new(0, entityLibrary.character.Humanoid.HipHeight + (entityLibrary.character.HumanoidRootPart.Size.Y / 2) - 0.3, 0)
+							KillauraRangeCirclePart.CFrame = lplr.Character.HumanoidRootPart.CFrame - Vector3.new(0, lplr.Character.Humanoid.HipHeight + (lplr.Character.HumanoidRootPart.Size.Y / 2) - 0.3, 0)
 						end
 						if KillauraFakeAngle.Enabled then
-							local Neck = entityLibrary.character.Head:FindFirstChild("Neck")
-							local LowerTorso = entityLibrary.character.HumanoidRootPart.Parent and entityLibrary.character.HumanoidRootPart.Parent:FindFirstChild("LowerTorso")
+							local Neck = lplr.Character.Head:FindFirstChild("Neck")
+							local LowerTorso = lplr.Character.HumanoidRootPart.Parent and lplr.Character.HumanoidRootPart.Parent:FindFirstChild("LowerTorso")
 							local RootC0 = LowerTorso and LowerTorso:FindFirstChild("Root")
 							if Neck and RootC0 then
 								if not OriginalNeckC0 then OriginalNeckC0 = Neck.C0.p end
@@ -2291,7 +2291,7 @@ run(function()
 								if OriginalRootC0 then
 									if targetedplayer ~= nil then
 										local targetPos = targetedplayer.RootPart.Position + Vector3.new(0, targetedplayer.Humanoid.HipHeight + (targetedplayer.RootPart.Size.Y / 2), 0)
-										local lookCFrame = (CFrame.new(Vector3.zero, (Root.CFrame):VectorToObjectSpace((Vector3.new(targetPos.X, targetPos.Y, targetPos.Z) - entityLibrary.character.Head.Position).Unit)))
+										local lookCFrame = (CFrame.new(Vector3.zero, (Root.CFrame):VectorToObjectSpace((Vector3.new(targetPos.X, targetPos.Y, targetPos.Z) - lplr.Character.Head.Position).Unit)))
 										Neck.C0 = CFrame.new(OriginalNeckC0) * CFrame.Angles(lookCFrame.LookVector.Unit.y, 0, 0)
 										RootC0.C0 = (CFrame.new(Vector3.zero, (Root.CFrame):VectorToObjectSpace((Vector3.new(targetPos.X, Root.Position.Y, targetPos.Z) - Root.Position).Unit))) + OriginalRootC0
 									else
@@ -2308,14 +2308,14 @@ run(function()
 						local attackedplayers = {}
 						KillauraNearTarget = false
 						vapeTargetInfo.Targets.Killaura = nil
-						if entityLibrary.isAlive and (not KillauraButtonDown.Enabled or inputService:IsMouseButtonPressed(0)) then
+						if isAlive(lplr, true) and (not KillauraButtonDown.Enabled or inputService:IsMouseButtonPressed(0)) then
 							local plrs = AllNearPosition(KillauraRange.Value, 100, {Prediction = KillauraPrediction.Enabled})
 							if #plrs > 0 then
 								local tool = lplr.Character:FindFirstChildWhichIsA("Tool")
 								local touch = findTouchInterest(tool)
 								if tool and touch then
 									for i,v in pairs(plrs) do
-										if math.acos(entityLibrary.character.HumanoidRootPart.CFrame.lookVector:Dot((v.RootPart.Position - entityLibrary.character.HumanoidRootPart.Position).Unit)) >= (math.rad(KillauraAngle.Value) / 2) then continue end
+										if math.acos(lplr.Character.HumanoidRootPart.CFrame.lookVector:Dot((v.RootPart.Position - lplr.Character.HumanoidRootPart.Position).Unit)) >= (math.rad(KillauraAngle.Value) / 2) then continue end
 										KillauraNearTarget = true
 										if KillauraTarget.Enabled then
 											table.insert(attackedplayers, v)
@@ -2459,16 +2459,16 @@ run(function()
 		Name = "LongJump",
 		Function = function(callback)
 			if callback then
-				if entityLibrary.isAlive and entityLibrary.character.Humanoid.FloorMaterial ~= Enum.Material.Air then
-					entityLibrary.character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+				if isAlive(lplr, true) and lplr.Character.Humanoid.FloorMaterial ~= Enum.Material.Air then
+					lplr.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
 				end
 				RunLoops:BindToHeartbeat("LongJump", function()
-					if entityLibrary.isAlive then
-						if (entityLibrary.character.Humanoid:GetState() == Enum.HumanoidStateType.Freefall or entityLibrary.character.Humanoid:GetState() == Enum.HumanoidStateType.Jumping) and entityLibrary.character.Humanoid.MoveDirection ~= Vector3.zero then
-							local velo = entityLibrary.character.Humanoid.MoveDirection * LongJumpBoost.Value
-							entityLibrary.character.HumanoidRootPart.Velocity = Vector3.new(velo.X, entityLibrary.character.HumanoidRootPart.Velocity.Y, velo.Z)
+					if isAlive(lplr, true) then
+						if (lplr.Character.Humanoid:GetState() == Enum.HumanoidStateType.Freefall or lplr.Character.Humanoid:GetState() == Enum.HumanoidStateType.Jumping) and lplr.Character.Humanoid.MoveDirection ~= Vector3.zero then
+							local velo = lplr.Character.Humanoid.MoveDirection * LongJumpBoost.Value
+							lplr.Character.HumanoidRootPart.Velocity = Vector3.new(velo.X, lplr.Character.HumanoidRootPart.Velocity.Y, velo.Z)
 						end
-						local check = entityLibrary.character.Humanoid.FloorMaterial ~= Enum.Material.Air
+						local check = lplr.Character.Humanoid.FloorMaterial ~= Enum.Material.Air
 						if LongJumpChange ~= check then
 							if check then LongJump.ToggleButton(true) end
 							LongJumpChange = check
@@ -2505,15 +2505,15 @@ run(function()
 						HighJump.ToggleButton(false)
 						return
 					end
-					if entityLibrary.isAlive and entityLibrary.character.Humanoid.FloorMaterial ~= Enum.Material.Air then
+					if isAlive(lplr, true) and lplr.Character.Humanoid.FloorMaterial ~= Enum.Material.Air then
 						HighJumpTick = tick() + (HighJumpDelay.Value / 10)
 						if HighJumpMode.Value == "Normal" then
-							entityLibrary.character.HumanoidRootPart.Velocity = entityLibrary.character.HumanoidRootPart.Velocity + Vector3.new(0, HighJumpBoost.Value, 0)
+							lplr.Character.HumanoidRootPart.Velocity = lplr.Character.HumanoidRootPart.Velocity + Vector3.new(0, HighJumpBoost.Value, 0)
 						else
 							task.spawn(function()
 								local start = HighJumpBoost.Value
 								repeat
-									entityLibrary.character.HumanoidRootPart.CFrame += Vector3.new(0, start * 0.016, 0)
+									lplr.Character.HumanoidRootPart.CFrame += Vector3.new(0, start * 0.016, 0)
 									start = start - (workspace.Gravity * 0.016)
 									task.wait()
 								until start <= 0
@@ -2524,15 +2524,15 @@ run(function()
 				else
 					local debounce = 0
 					RunLoops:BindToRenderStep("HighJump", function()
-						if entityLibrary.isAlive and entityLibrary.character.Humanoid.FloorMaterial ~= Enum.Material.Air and inputService:IsKeyDown(Enum.KeyCode.Space) and (tick() - debounce) > 0.3 then
+						if isAlive(lplr, true) and lplr.Character.Humanoid.FloorMaterial ~= Enum.Material.Air and inputService:IsKeyDown(Enum.KeyCode.Space) and (tick() - debounce) > 0.3 then
 							debounce = tick()
 							if HighJumpMode.Value == "Normal" then
-								entityLibrary.character.HumanoidRootPart.Velocity = entityLibrary.character.HumanoidRootPart.Velocity + Vector3.new(0, HighJumpBoost.Value, 0)
+								lplr.Character.HumanoidRootPart.Velocity = lplr.Character.HumanoidRootPart.Velocity + Vector3.new(0, HighJumpBoost.Value, 0)
 							else
 								task.spawn(function()
 									local start = HighJumpBoost.Value
 									repeat
-										entityLibrary.character.HumanoidRootPart.CFrame += Vector3.new(0, start * 0.016, 0)
+										lplr.Character.HumanoidRootPart.CFrame += Vector3.new(0, start * 0.016, 0)
 										start = start - (workspace.Gravity * 0.016)
 										task.wait()
 									until start <= 0
@@ -2591,10 +2591,10 @@ run(function()
 			local chars = {gameCamera, lplr.Character}
 			for i, v in pairs(entityLibrary.entityList) do table.insert(chars, v.Character) end
 			PhaseOverlap.FilterDescendantsInstances = chars
-			local rootpos = entityLibrary.character.HumanoidRootPart.CFrame.p
+			local rootpos = lplr.Character.HumanoidRootPart.CFrame.p
 			local parts = workspace:GetPartBoundsInRadius(rootpos, 2, PhaseOverlap)
 			for i, v in pairs(parts) do
-				if v.CanCollide and (v.Position.Y + (v.Size.Y / 2)) > (rootpos.Y - entityLibrary.character.Humanoid.HipHeight) and (not Spider.Enabled or spiderHoldingShift) then
+				if v.CanCollide and (v.Position.Y + (v.Size.Y / 2)) > (rootpos.Y - lplr.Character.Humanoid.HipHeight) and (not Spider.Enabled or spiderHoldingShift) then
 					PhaseModifiedParts[v] = true
 					v.CanCollide = false
 				end
@@ -2618,11 +2618,11 @@ run(function()
 			local chars = {gameCamera, lplr.Character}
 			for i, v in pairs(entityLibrary.entityList) do table.insert(chars, v.Character) end
 			PhaseRaycast.FilterDescendantsInstances = chars
-			local phaseRayCheck = workspace:Raycast(entityLibrary.character.Head.CFrame.p, entityLibrary.character.Humanoid.MoveDirection * 1.1, PhaseRaycast)
+			local phaseRayCheck = workspace:Raycast(lplr.Character.Head.CFrame.p, lplr.Character.Humanoid.MoveDirection * 1.1, PhaseRaycast)
 			if phaseRayCheck and (not Spider.Enabled or spiderHoldingShift) then
 				local phaseDirection = phaseRayCheck.Normal.Z ~= 0 and "Z" or "X"
 				if phaseRayCheck.Instance.Size[phaseDirection] <= PhaseStudLimit.Value then
-					entityLibrary.character.HumanoidRootPart.CFrame = entityLibrary.character.HumanoidRootPart.CFrame + (phaseRayCheck.Normal * (-(phaseRayCheck.Instance.Size[phaseDirection]) - (entityLibrary.character.HumanoidRootPart.Size.X / 1.5)))
+					lplr.Character.HumanoidRootPart.CFrame = lplr.Character.HumanoidRootPart.CFrame + (phaseRayCheck.Normal * (-(phaseRayCheck.Instance.Size[phaseDirection]) - (lplr.Character.HumanoidRootPart.Size.X / 1.5)))
 				end
 			end
 		end
@@ -2633,7 +2633,7 @@ run(function()
 		Function = function(callback)
 			if callback then
 				RunLoops:BindToStepped("Phase", function() -- has to be ran on stepped idk why
-					if entityLibrary.isAlive then
+					if isAlive(lplr, true) then
 						PhaseFunctions[PhaseMode.Value]()
 					end
 				end)
@@ -2684,36 +2684,36 @@ run(function()
 			if callback then
 				if SpiderPart then SpiderPart.Parent = gameCamera end
 				RunLoops:BindToHeartbeat("Spider", function(delta)
-					if entityLibrary.isAlive then
+					if isAlive(lplr, true) then
 						local chars = {gameCamera, lplr.Character, SpiderPart}
 						for i, v in pairs(entityLibrary.entityList) do table.insert(chars, v.Character) end
 						SpiderRaycast.FilterDescendantsInstances = chars
 						if SpiderMode.Value ~= "Classic" then
-							local vec = entityLibrary.character.Humanoid.MoveDirection * 2
-							local newray = workspace:Raycast(entityLibrary.character.HumanoidRootPart.Position, vec + Vector3.new(0, 0.1, 0), SpiderRaycast)
-							local newray2 = workspace:Raycast(entityLibrary.character.HumanoidRootPart.Position, vec - Vector3.new(0, entityLibrary.character.Humanoid.HipHeight, 0), SpiderRaycast)
+							local vec = lplr.Character.Humanoid.MoveDirection * 2
+							local newray = workspace:Raycast(lplr.Character.HumanoidRootPart.Position, vec + Vector3.new(0, 0.1, 0), SpiderRaycast)
+							local newray2 = workspace:Raycast(lplr.Character.HumanoidRootPart.Position, vec - Vector3.new(0, lplr.Character.Humanoid.HipHeight, 0), SpiderRaycast)
 							if SpiderActive and not newray and not newray2 then
-								entityLibrary.character.HumanoidRootPart.Velocity = Vector3.new(entityLibrary.character.HumanoidRootPart.Velocity.X, 0, entityLibrary.character.HumanoidRootPart.Velocity.Z)
+								lplr.Character.HumanoidRootPart.Velocity = Vector3.new(lplr.Character.HumanoidRootPart.Velocity.X, 0, lplr.Character.HumanoidRootPart.Velocity.Z)
 							end
 							SpiderActive = ((newray or newray2) and true or false)
 							spiderHoldingShift = inputService:IsKeyDown(Enum.KeyCode.LeftShift)
 							if SpiderActive and (newray or newray2).Normal.Y == 0 then
 								if not Phase.Enabled or not spiderHoldingShift then
-									if SpiderState.Enabled then entityLibrary.character.Humanoid:ChangeState(Enum.HumanoidStateType.Climbing) end
+									if SpiderState.Enabled then lplr.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Climbing) end
 									if SpiderMode.Value == "CFrame" then
-										entityLibrary.character.HumanoidRootPart.CFrame = entityLibrary.character.HumanoidRootPart.CFrame + Vector3.new(-(entityLibrary.character.HumanoidRootPart.CFrame.lookVector.X * 18) * delta, SpiderSpeed.Value * delta, -(entityLibrary.character.HumanoidRootPart.CFrame.lookVector.Z * 18) * delta)
+										lplr.Character.HumanoidRootPart.CFrame = lplr.Character.HumanoidRootPart.CFrame + Vector3.new(-(lplr.Character.HumanoidRootPart.CFrame.lookVector.X * 18) * delta, SpiderSpeed.Value * delta, -(lplr.Character.HumanoidRootPart.CFrame.lookVector.Z * 18) * delta)
 									else
-										entityLibrary.character.HumanoidRootPart.Velocity = Vector3.new(entityLibrary.character.HumanoidRootPart.Velocity.X - (entityLibrary.character.HumanoidRootPart.CFrame.lookVector.X / 2), SpiderSpeed.Value, entityLibrary.character.HumanoidRootPart.Velocity.Z - (entityLibrary.character.HumanoidRootPart.CFrame.lookVector.Z / 2))
+										lplr.Character.HumanoidRootPart.Velocity = Vector3.new(lplr.Character.HumanoidRootPart.Velocity.X - (lplr.Character.HumanoidRootPart.CFrame.lookVector.X / 2), SpiderSpeed.Value, lplr.Character.HumanoidRootPart.Velocity.Z - (lplr.Character.HumanoidRootPart.CFrame.lookVector.Z / 2))
 									end
 								end
 							end
 						else
-							local vec = entityLibrary.character.HumanoidRootPart.CFrame.lookVector * 1.5
-							local newray2 = workspace:Raycast(entityLibrary.character.HumanoidRootPart.Position, (vec - Vector3.new(0, entityLibrary.character.Humanoid.HipHeight, 0)), SpiderRaycast)
+							local vec = lplr.Character.HumanoidRootPart.CFrame.lookVector * 1.5
+							local newray2 = workspace:Raycast(lplr.Character.HumanoidRootPart.Position, (vec - Vector3.new(0, lplr.Character.Humanoid.HipHeight, 0)), SpiderRaycast)
 							spiderHoldingShift = inputService:IsKeyDown(Enum.KeyCode.LeftShift)
 							if newray2 and (not Phase.Enabled or not spiderHoldingShift) then
 								local newray2pos = newray2.Instance.Position
-								local newpos = clampSpiderPosition(entityLibrary.character.HumanoidRootPart.Position, Vector3.new(newray2pos.X, math.min(entityLibrary.character.HumanoidRootPart.Position.Y, newray2pos.Y), newray2pos.Z), newray2.Instance.Size - Vector3.new(1.9, 1.9, 1.9))
+								local newpos = clampSpiderPosition(lplr.Character.HumanoidRootPart.Position, Vector3.new(newray2pos.X, math.min(lplr.Character.HumanoidRootPart.Position.Y, newray2pos.Y), newray2pos.Z), newray2.Instance.Size - Vector3.new(1.9, 1.9, 1.9))
 								SpiderPart.Position = newpos
 							else
 								SpiderPart.Position = Vector3.zero
@@ -2827,53 +2827,53 @@ run(function()
 					until (not Speed.Enabled)
 				end)
 				RunLoops:BindToHeartbeat("Speed", function(delta)
-					if entityLibrary.isAlive and (typeof(entityLibrary.character.HumanoidRootPart) ~= "Instance" or isnetworkowner(entityLibrary.character.HumanoidRootPart)) then
-						local movevec = (SpeedMoveMethod.Value == "Manual" and calculateMoveVector(Vector3.new(a + d, 0, w + s)) or entityLibrary.character.Humanoid.MoveDirection).Unit
+					if isAlive(lplr, true) and (typeof(lplr.Character.HumanoidRootPart) ~= "Instance" or isnetworkowner(lplr.Character.HumanoidRootPart)) then
+						local movevec = (SpeedMoveMethod.Value == "Manual" and calculateMoveVector(Vector3.new(a + d, 0, w + s)) or lplr.Character.Humanoid.MoveDirection).Unit
 						movevec = movevec == movevec and Vector3.new(movevec.X, 0, movevec.Z) or Vector3.zero
 						SpeedRaycast.FilterDescendantsInstances = {lplr.Character, cam}
 						if SpeedMethod.Value == "Velocity" then
 							if SpeedAnimation.Enabled then
-								for i,v in pairs(entityLibrary.character.Humanoid:GetPlayingAnimationTracks()) do
+								for i,v in pairs(lplr.Character.Humanoid:GetPlayingAnimationTracks()) do
 									if v.Name == "WalkAnim" or v.Name == "RunAnim" then
-										v:AdjustSpeed(entityLibrary.character.Humanoid.WalkSpeed / 16)
+										v:AdjustSpeed(lplr.Character.Humanoid.WalkSpeed / 16)
 									end
 								end
 							end
 							local newvelo = movevec * SpeedValue.Value
-							entityLibrary.character.HumanoidRootPart.Velocity = Vector3.new(newvelo.X, entityLibrary.character.HumanoidRootPart.Velocity.Y, newvelo.Z)
+							lplr.Character.HumanoidRootPart.Velocity = Vector3.new(newvelo.X, lplr.Character.HumanoidRootPart.Velocity.Y, newvelo.Z)
 						elseif SpeedMethod.Value == "CFrame" then
-							local newpos = (movevec * (math.max(SpeedValue.Value - entityLibrary.character.Humanoid.WalkSpeed, 0) * delta))
+							local newpos = (movevec * (math.max(SpeedValue.Value - lplr.Character.Humanoid.WalkSpeed, 0) * delta))
 							if SpeedWallCheck.Enabled then
-								local ray = workspace:Raycast(entityLibrary.character.HumanoidRootPart.Position, newpos, SpeedRaycast)
-								if ray then newpos = (ray.Position - entityLibrary.character.HumanoidRootPart.Position) end
+								local ray = workspace:Raycast(lplr.Character.HumanoidRootPart.Position, newpos, SpeedRaycast)
+								if ray then newpos = (ray.Position - lplr.Character.HumanoidRootPart.Position) end
 							end
-							entityLibrary.character.HumanoidRootPart.CFrame = entityLibrary.character.HumanoidRootPart.CFrame + newpos
+							lplr.Character.HumanoidRootPart.CFrame = lplr.Character.HumanoidRootPart.CFrame + newpos
 						elseif SpeedMethod.Value == "TP" then
 							if SpeedDelayTick <= tick() then
 								SpeedDelayTick = tick() + (SpeedDelay.Value / 10)
 								local newpos = (movevec * SpeedValue.Value)
 								if SpeedWallCheck.Enabled then
-									local ray = workspace:Raycast(entityLibrary.character.HumanoidRootPart.Position, newpos, SpeedRaycast)
-									if ray then newpos = (ray.Position - entityLibrary.character.HumanoidRootPart.Position) end
+									local ray = workspace:Raycast(lplr.Character.HumanoidRootPart.Position, newpos, SpeedRaycast)
+									if ray then newpos = (ray.Position - lplr.Character.HumanoidRootPart.Position) end
 								end
-								entityLibrary.character.HumanoidRootPart.CFrame = entityLibrary.character.HumanoidRootPart.CFrame + newpos
+								lplr.Character.HumanoidRootPart.CFrame = lplr.Character.HumanoidRootPart.CFrame + newpos
 							end
 						elseif SpeedMethod.Value == "Pulse" then
 							local pulsenum = (SpeedPulseDuration.Value / 100)
-							local newvelo = movevec * (SpeedValue.Value + (entityLibrary.character.Humanoid.WalkSpeed - SpeedValue.Value) * (1 - (math.max(pulsetick - tick(), 0)) / pulsenum))
-							entityLibrary.character.HumanoidRootPart.Velocity = Vector3.new(newvelo.X, entityLibrary.character.HumanoidRootPart.Velocity.Y, newvelo.Z)
+							local newvelo = movevec * (SpeedValue.Value + (lplr.Character.Humanoid.WalkSpeed - SpeedValue.Value) * (1 - (math.max(pulsetick - tick(), 0)) / pulsenum))
+							lplr.Character.HumanoidRootPart.Velocity = Vector3.new(newvelo.X, lplr.Character.HumanoidRootPart.Velocity.Y, newvelo.Z)
 						elseif SpeedMethod.Value == "WalkSpeed" then
 							if oldWalkSpeed == nil then
-								oldWalkSpeed = entityLibrary.character.Humanoid.WalkSpeed
+								oldWalkSpeed = lplr.Character.Humanoid.WalkSpeed
 							end
-							entityLibrary.character.Humanoid.WalkSpeed = SpeedValue.Value
+							lplr.Character.Humanoid.WalkSpeed = SpeedValue.Value
 						end
 						if SpeedJump.Enabled and (SpeedJumpAlways.Enabled or KillauraNearTarget) then
-							if (entityLibrary.character.Humanoid.FloorMaterial ~= Enum.Material.Air) and entityLibrary.character.Humanoid.MoveDirection ~= Vector3.zero then
+							if (lplr.Character.Humanoid.FloorMaterial ~= Enum.Material.Air) and lplr.Character.Humanoid.MoveDirection ~= Vector3.zero then
 								if SpeedJumpVanilla.Enabled then
-									entityLibrary.character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+									lplr.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
 								else
-									entityLibrary.character.HumanoidRootPart.Velocity = Vector3.new(entityLibrary.character.HumanoidRootPart.Velocity.X, SpeedJumpHeight.Value, entityLibrary.character.HumanoidRootPart.Velocity.Z)
+									lplr.Character.HumanoidRootPart.Velocity = Vector3.new(lplr.Character.HumanoidRootPart.Velocity.X, SpeedJumpHeight.Value, lplr.Character.HumanoidRootPart.Velocity.Z)
 								end
 							end
 						end
@@ -2882,7 +2882,7 @@ run(function()
 			else
 				SpeedDelayTick = 0
 				if oldWalkSpeed then
-					entityLibrary.character.Humanoid.WalkSpeed = oldWalkSpeed
+					lplr.Character.Humanoid.WalkSpeed = oldWalkSpeed
 					oldWalkSpeed = nil
 				end
 				RunLoops:UnbindFromHeartbeat("Speed")
@@ -2900,7 +2900,7 @@ run(function()
 		List = {"Velocity", "CFrame", "TP", "Pulse", "WalkSpeed"},
 		Function = function(val)
 			if oldWalkSpeed then
-				entityLibrary.character.Humanoid.WalkSpeed = oldWalkSpeed
+				lplr.Character.Humanoid.WalkSpeed = oldWalkSpeed
 				oldWalkSpeed = nil
 			end
 			SpeedDelay.Object.Visible = val == "TP" or val == "Pulse"
@@ -2987,9 +2987,9 @@ run(function()
 		Function = function(callback)
 			if callback then
 				RunLoops:BindToHeartbeat("SpinBot", function()
-					if entityLibrary.isAlive then
-						local originalRotVelocity = entityLibrary.character.HumanoidRootPart.RotVelocity
-						entityLibrary.character.HumanoidRootPart.RotVelocity = Vector3.new(SpinBotX.Enabled and SpinBotSpeed.Value or originalRotVelocity.X, SpinBotY.Enabled and SpinBotSpeed.Value or originalRotVelocity.Y, SpinBotZ.Enabled and SpinBotSpeed.Value or originalRotVelocity.Z)
+					if isAlive(lplr, true) then
+						local originalRotVelocity = lplr.Character.HumanoidRootPart.RotVelocity
+						lplr.Character.HumanoidRootPart.RotVelocity = Vector3.new(SpinBotX.Enabled and SpinBotSpeed.Value or originalRotVelocity.X, SpinBotY.Enabled and SpinBotSpeed.Value or originalRotVelocity.Y, SpinBotZ.Enabled and SpinBotSpeed.Value or originalRotVelocity.Z)
 					end
 				end)
 			else
@@ -4031,9 +4031,9 @@ run(function()
 				HealthText.Visible = true
 				task.spawn(function()
 					repeat
-						if entityLibrary.isAlive then
-							HealthText.Text = tostring(math.round(entityLibrary.character.Humanoid.Health)).."HP"
-							HealthText.Color = Color3.fromHSV(math.clamp(entityLibrary.character.Humanoid.Health / entityLibrary.character.Humanoid.MaxHealth, 0, 1) / 2.5, 0.89, 1)
+						if isAlive(lplr, true) then
+							HealthText.Text = tostring(math.round(lplr.Character.Humanoid.Health)).."HP"
+							HealthText.Color = Color3.fromHSV(math.clamp(lplr.Character.Humanoid.Health / lplr.Character.Humanoid.MaxHealth, 0, 1) / 2.5, 0.89, 1)
 						end
 						HealthText.Position = Vector2.new(gameCamera.ViewportSize.X / 2, gameCamera.ViewportSize.Y / 2 + 70)
 						task.wait(0.1)
@@ -4170,7 +4170,7 @@ run(function()
 				end
 				if NameTagsDistance.Enabled then
 					nametagstrs[ent.Player] = '[%s] '..nametagstrs[ent.Player]
-					v.Main.Text.Text = entityLibrary.isAlive and string.format(nametagstrs[ent.Player], math.floor((entityLibrary.character.HumanoidRootPart.Position - ent.RootPart.Position).Magnitude)) or nametagstrs[ent.Player]
+					v.Main.Text.Text = isAlive(lplr, true) and string.format(nametagstrs[ent.Player], math.floor((lplr.Character.HumanoidRootPart.Position - ent.RootPart.Position).Magnitude)) or nametagstrs[ent.Player]
 				else
 					v.Main.Text.Text = nametagstrs[ent.Player]
 				end
@@ -4203,8 +4203,8 @@ run(function()
 					v.Main.Visible = false
 					continue
 				end
-				if NameTagsDistance.Enabled and entityLibrary.isAlive then
-					local mag = math.floor((entityLibrary.character.HumanoidRootPart.Position - v.entity.RootPart.Position).Magnitude)
+				if NameTagsDistance.Enabled and isAlive(lplr, true) then
+					local mag = math.floor((lplr.Character.HumanoidRootPart.Position - v.entity.RootPart.Position).Magnitude)
 					local stringsize = tostring(mag):len()
 					if nametagsizes[v.entity.Player] ~= stringsize then
 						local nametagSize = textService:GetTextSize(removeTags(string.format(nametagstrs[v.entity.Player], mag)), v.Main.TextSize, v.Main.Font, Vector2.new(100000, 100000))
@@ -4225,8 +4225,8 @@ run(function()
 					v.Main.BG.Visible = false
 					continue
 				end
-				if NameTagsDistance.Enabled and entityLibrary.isAlive then
-					local mag = math.floor((entityLibrary.character.HumanoidRootPart.Position - v.entity.RootPart.Position).Magnitude)
+				if NameTagsDistance.Enabled and isAlive(lplr, true) then
+					local mag = math.floor((lplr.Character.HumanoidRootPart.Position - v.entity.RootPart.Position).Magnitude)
 					local stringsize = tostring(mag):len()
 					v.Main.Text.Text = string.format(nametagstrs[v.entity.Player], mag)
 					if nametagsizes[v.entity.Player] ~= stringsize then
@@ -4984,11 +4984,11 @@ run(function()
 				end
 				oldmove = controlmodule.moveFunction
 				controlmodule.moveFunction = function(Self, vec, facecam)
-					if entityLibrary.isAlive then
+					if isAlive(lplr, true) then
 						SafeWalkRaycast.FilterDescendantsInstances = {lplr.Character}
-						local ray = workspace:Raycast(entityLibrary.character.HumanoidRootPart.Position + (vec * 0.5), Vector3.new(0, -1000, 0), SafeWalkRaycast)
+						local ray = workspace:Raycast(lplr.Character.HumanoidRootPart.Position + (vec * 0.5), Vector3.new(0, -1000, 0), SafeWalkRaycast)
 						if not ray then
-							if workspace:Raycast(entityLibrary.character.HumanoidRootPart.Position, Vector3.new(0, -((entityLibrary.character.Humanoid.HipHeight + (entityLibrary.character.HumanoidRootPart.Size.Y / 2)) + 1), 0), SafeWalkRaycast) then
+							if workspace:Raycast(lplr.Character.HumanoidRootPart.Position, Vector3.new(0, -((lplr.Character.Humanoid.HipHeight + (lplr.Character.HumanoidRootPart.Size.Y / 2)) + 1), 0), SafeWalkRaycast) then
 								vec = Vector3.zero
 							end
 						end
@@ -5153,10 +5153,10 @@ run(function()
 		Function = function(callback)
 			if callback then
 				RunLoops:BindToHeartbeat("ChinaHat", function()
-					if entityLibrary.isAlive then
+					if isAlive(lplr, true) then
 						if chinahattrail == nil or chinahattrail.Parent == nil then
 							chinahattrail = Instance.new("Part")
-							chinahattrail.CFrame = entityLibrary.character.Head.CFrame * CFrame.new(0, 1.1, 0)
+							chinahattrail.CFrame = lplr.Character.Head.CFrame * CFrame.new(0, 1.1, 0)
 							chinahattrail.Size = Vector3.new(3, 0.7, 3)
 							chinahattrail.Name = "ChinaHat"
 							chinahattrail.Material = Enum.Material.Neon
@@ -5170,7 +5170,7 @@ run(function()
 							chinahatmesh.Scale = Vector3.new(3, 0.6, 3)
 							chinahattrail.Parent = workspace.Camera
 						end
-						chinahattrail.CFrame = entityLibrary.character.Head.CFrame * CFrame.new(0, 1.1, 0)
+						chinahattrail.CFrame = lplr.Character.Head.CFrame * CFrame.new(0, 1.1, 0)
 						chinahattrail.Velocity = Vector3.zero
 						chinahattrail.LocalTransparencyModifier = ((gameCamera.CFrame.Position - gameCamera.Focus.Position).Magnitude <= 0.6 and 1 or 0)
 					else
@@ -5255,30 +5255,30 @@ run(function()
 		Function = function(callback)
 			if callback then
 				oldgravity = workspace.Gravity
-				if entityLibrary.isAlive then
+				if isAlive(lplr, true) then
 					GravityChangeTick = tick() + 0.1
 					workspace.Gravity = 0
 					local enums = Enum.HumanoidStateType:GetEnumItems()
 					table.remove(enums, table.find(enums, Enum.HumanoidStateType.None))
 					for i,v in pairs(enums) do
-						entityLibrary.character.Humanoid:SetStateEnabled(v, false)
+						lplr.Character.Humanoid:SetStateEnabled(v, false)
 					end
-					entityLibrary.character.Humanoid:ChangeState(Enum.HumanoidStateType.Swimming)
+					lplr.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Swimming)
 					RunLoops:BindToHeartbeat("Swim", function()
-						local rootvelo = entityLibrary.character.HumanoidRootPart.Velocity
-						local moving = entityLibrary.character.Humanoid.MoveDirection ~= Vector3.zero
-						entityLibrary.character.HumanoidRootPart.Velocity = ((moving or inputService:IsKeyDown(Enum.KeyCode.Space)) and Vector3.new(moving and rootvelo.X or 0, inputService:IsKeyDown(Enum.KeyCode.Space) and SwimVertical.Value or rootvelo.Y, moving and rootvelo.Z or 0) or Vector3.zero)
+						local rootvelo = lplr.Character.HumanoidRootPart.Velocity
+						local moving = lplr.Character.Humanoid.MoveDirection ~= Vector3.zero
+						lplr.Character.HumanoidRootPart.Velocity = ((moving or inputService:IsKeyDown(Enum.KeyCode.Space)) and Vector3.new(moving and rootvelo.X or 0, inputService:IsKeyDown(Enum.KeyCode.Space) and SwimVertical.Value or rootvelo.Y, moving and rootvelo.Z or 0) or Vector3.zero)
 					end)
 				end
 			else
 				GravityChangeTick = tick() + 0.1
 				workspace.Gravity = oldgravity
 				RunLoops:UnbindFromHeartbeat("Swim")
-				if entityLibrary.isAlive then
+				if isAlive(lplr, true) then
 					local enums = Enum.HumanoidStateType:GetEnumItems()
 					table.remove(enums, table.find(enums, Enum.HumanoidStateType.None))
 					for i,v in pairs(enums) do
-						entityLibrary.character.Humanoid:SetStateEnabled(v, true)
+						lplr.Character.Humanoid:SetStateEnabled(v, true)
 					end
 				end
 			end
@@ -5309,7 +5309,7 @@ run(function()
 			if callback then
 				task.spawn(function()
 					repeat
-						if entityLibrary.isAlive then
+						if isAlive(lplr, true) then
 							if not breadcrumbtrail then
 								breadcrumbattachment = Instance.new("Attachment")
 								breadcrumbattachment.Position = Vector3.new(0, 0.07 - 2.7, 0)
@@ -5324,8 +5324,8 @@ run(function()
 								breadcrumbtrail.Enabled = true
 							else
 								local suc = pcall(function()
-									breadcrumbattachment.Parent = entityLibrary.character.HumanoidRootPart
-									breadcrumbattachment2.Parent = entityLibrary.character.HumanoidRootPart
+									breadcrumbattachment.Parent = lplr.Character.HumanoidRootPart
+									breadcrumbattachment2.Parent = lplr.Character.HumanoidRootPart
 									breadcrumbtrail.Parent = gameCamera
 								end)
 								if not suc then
@@ -5568,7 +5568,7 @@ run(function()
 				end
 				oldmove = controlmodule.moveFunction
 				controlmodule.moveFunction = function(Self, vec, facecam, ...)
-					if entityLibrary.isAlive then
+					if isAlive(lplr, true) then
 						local plr = EntityNearPosition(targetstraferange.Value, {
 							WallCheck = false,
 							AimPart = "RootPart"
@@ -5577,7 +5577,7 @@ run(function()
 							facecam = false
 							--code stolen from roblox since the way I tried to make it apparently sucks
 							local c, s
-							local plrCFrame = CFrame.lookAt(entityLibrary.character.HumanoidRootPart.Position, Vector3.new(plr.RootPart.Position.X, 0, plr.RootPart.Position.Z))
+							local plrCFrame = CFrame.lookAt(lplr.Character.HumanoidRootPart.Position, Vector3.new(plr.RootPart.Position.X, 0, plr.RootPart.Position.Z))
 							local _, _, _, R00, R01, R02, _, _, R12, _, _, R22 = plrCFrame:GetComponents()
 							if R12 < 1 and R12 > -1 then
 								c = R22
@@ -5760,19 +5760,19 @@ run(function()
 				rayparams.RespectCanCollide = true
 				local lastray
 				RunLoops:BindToHeartbeat("AntiVoid", function()
-					if entityLibrary.isAlive then
+					if isAlive(lplr, true) then
 						rayparams.FilterDescendantsInstances = {gameCamera, lplr.Character}
-						lastray = entityLibrary.character.Humanoid.FloorMaterial ~= Enum.Material.Air and entityLibrary.character.HumanoidRootPart.CFrame or lastray
-						if (entityLibrary.character.HumanoidRootPart.Position.Y + (entityLibrary.character.HumanoidRootPart.Velocity.Y * 0.016)) <= (workspace.FallenPartsDestroyHeight + 5) then
-							local comp = {entityLibrary.character.HumanoidRootPart.CFrame:GetComponents()}
+						lastray = lplr.Character.Humanoid.FloorMaterial ~= Enum.Material.Air and lplr.Character.HumanoidRootPart.CFrame or lastray
+						if (lplr.Character.HumanoidRootPart.Position.Y + (lplr.Character.HumanoidRootPart.Velocity.Y * 0.016)) <= (workspace.FallenPartsDestroyHeight + 5) then
+							local comp = {lplr.Character.HumanoidRootPart.CFrame:GetComponents()}
 							comp[2] = (workspace.FallenPartsDestroyHeight + 20)
 							if lastray then
 								comp[1] = lastray.Position.X
-								comp[2] = lastray.Position.Y + (entityLibrary.character.Humanoid.HipHeight + (entityLibrary.character.HumanoidRootPart.Size.Y / 2))
+								comp[2] = lastray.Position.Y + (lplr.Character.Humanoid.HipHeight + (lplr.Character.HumanoidRootPart.Size.Y / 2))
 								comp[3] = lastray.Position.Z
 							end
-							entityLibrary.character.HumanoidRootPart.CFrame = CFrame.new(unpack(comp))
-							entityLibrary.character.HumanoidRootPart.Velocity = Vector3.new(entityLibrary.character.HumanoidRootPart.Velocity.X, 0, entityLibrary.character.HumanoidRootPart.Velocity.Z)
+							lplr.Character.HumanoidRootPart.CFrame = CFrame.new(unpack(comp))
+							lplr.Character.HumanoidRootPart.Velocity = Vector3.new(lplr.Character.HumanoidRootPart.Velocity.X, 0, lplr.Character.HumanoidRootPart.Velocity.Z)
 						end
 					end
 				end)
@@ -5791,8 +5791,8 @@ run(function()
 			if callback then
 				if sethiddenproperty then
 					RunLoops:BindToHeartbeat("Blink", function()
-						if entityLibrary.isAlive then
-							sethiddenproperty(entityLibrary.character.HumanoidRootPart, "NetworkIsSleeping", true)
+						if isAlive(lplr, true) then
+							sethiddenproperty(lplr.Character.HumanoidRootPart, "NetworkIsSleeping", true)
 						end
 					end)
 				else
@@ -5815,7 +5815,7 @@ run(function()
 		Name = "AnimationPlayer",
 		Function = function(callback)
 			if callback then
-				if entityLibrary.isAlive then
+				if isAlive(lplr, true) then
 					if playedanim then
 						playedanim:Stop()
 						playedanim.Animation:Destroy()
@@ -5827,7 +5827,7 @@ run(function()
                         id = AnimationPlayerBox.Value
                     end
                     anim.AnimationId = "rbxassetid://"..id
-					local suc, res = pcall(function() playedanim = entityLibrary.character.Humanoid.Animator:LoadAnimation(anim) end)
+					local suc, res = pcall(function() playedanim = lplr.Character.Humanoid.Animator:LoadAnimation(anim) end)
 					if suc then
 						playedanim.Priority = Enum.AnimationPriority.Action4
 						playedanim.Looped = true
@@ -5844,7 +5844,7 @@ run(function()
 					end
 				end
 				table.insert(AnimationPlayer.Connections, lplr.CharacterAdded:Connect(function()
-					repeat task.wait() until entityLibrary.isAlive or not AnimationPlayer.Enabled
+					repeat task.wait() until isAlive(lplr, true) or not AnimationPlayer.Enabled
 					task.wait(0.5)
 					if not AnimationPlayer.Enabled then return end
 					if playedanim then
@@ -5858,7 +5858,7 @@ run(function()
                         id = AnimationPlayerBox.Value
                     end
                     anim.AnimationId = "rbxassetid://"..id
-					local suc, res = pcall(function() playedanim = entityLibrary.character.Humanoid.Animator:LoadAnimation(anim) end)
+					local suc, res = pcall(function() playedanim = lplr.Character.Humanoid.Animator:LoadAnimation(anim) end)
 					if suc then
 						playedanim.Priority = Enum.AnimationPriority.Action4
 						playedanim.Looped = true
@@ -5940,9 +5940,9 @@ run(function()
 				local chairweld = Instance.new("WeldConstraint")
 				chairweld.Part0 = chair
 				chairweld.Parent = chair
-				if entityLibrary.isAlive then
-					chair.CFrame = entityLibrary.character.HumanoidRootPart.CFrame * CFrame.Angles(0, math.rad(-90), 0)
-					chairweld.Part1 = entityLibrary.character.HumanoidRootPart
+				if isAlive(lplr, true) then
+					chair.CFrame = lplr.Character.HumanoidRootPart.CFrame * CFrame.Angles(0, math.rad(-90), 0)
+					chairweld.Part1 = lplr.Character.HumanoidRootPart
 				end
 				chairhighlight = Instance.new("Highlight")
 				chairhighlight.FillTransparency = 1
@@ -6005,28 +6005,28 @@ run(function()
 					repeat
 						task.wait()
 						if not GamingChair.Enabled then break end
-						if entityLibrary.isAlive and entityLibrary.character.Humanoid.Health > 0 then
+						if isAlive(lplr, true) and lplr.Character.Humanoid.Health > 0 then
 							if not chairanim.IsPlaying then
 								local temp2 = Instance.new("Animation")
-								temp2.AnimationId = entityLibrary.character.Humanoid.RigType == Enum.HumanoidRigType.R15 and "rbxassetid://2506281703" or "rbxassetid://178130996"
-								chairanim = entityLibrary.character.Humanoid:LoadAnimation(temp2)
+								temp2.AnimationId = lplr.Character.Humanoid.RigType == Enum.HumanoidRigType.R15 and "rbxassetid://2506281703" or "rbxassetid://178130996"
+								chairanim = lplr.Character.Humanoid:LoadAnimation(temp2)
 								chairanim.Priority = Enum.AnimationPriority.Movement
 								chairanim.Looped = true
 								chairanim:Play()
 							end
 							--welds didn't work for these idk why so poop code :troll:
-							chair.CFrame = entityLibrary.character.HumanoidRootPart.CFrame * CFrame.Angles(0, math.rad(-90), 0)
-							chairweld.Part1 = entityLibrary.character.HumanoidRootPart
+							chair.CFrame = lplr.Character.HumanoidRootPart.CFrame * CFrame.Angles(0, math.rad(-90), 0)
+							chairweld.Part1 = lplr.Character.HumanoidRootPart
 							chairlegs.Velocity = Vector3.zero
 							chairlegs.CFrame = chair.CFrame * CFrame.new(0.047, -2.324, 0)
 							chairfan.Velocity = Vector3.zero
 							chairfan.CFrame = chair.CFrame * CFrame.new(0.047, -1.873, 0) * CFrame.Angles(0, math.rad(tick() * 180 % 360), math.rad(180))
-							local moving = entityLibrary.character.Humanoid:GetState() == Enum.HumanoidStateType.Running and entityLibrary.character.Humanoid.MoveDirection ~= Vector3.zero
+							local moving = lplr.Character.Humanoid:GetState() == Enum.HumanoidStateType.Running and lplr.Character.Humanoid.MoveDirection ~= Vector3.zero
 							local flying = GuiLibrary.ObjectsThatCanBeSaved.FlyOptionsButton.Api.Enabled or GuiLibrary.ObjectsThatCanBeSaved.LongJumpOptionsButton and GuiLibrary.ObjectsThatCanBeSaved.LongJumpOptionsButton.Api.Enabled or GuiLibrary.ObjectsThatCanBeSaved.InfiniteFlyOptionsButton and GuiLibrary.ObjectsThatCanBeSaved.InfiniteFlyOptionsButton.Api.Enabled
 							if movingsound.TimePosition > 1.9 then
 								movingsound.TimePosition = 0.2
 							end
-							movingsound.PlaybackSpeed = (entityLibrary.character.HumanoidRootPart.Velocity * Vector3.new(1, 0, 1)).Magnitude / 16
+							movingsound.PlaybackSpeed = (lplr.Character.HumanoidRootPart.Velocity * Vector3.new(1, 0, 1)).Magnitude / 16
 							for i,v in pairs(trails) do
 								v.Enabled = not flying and moving
 								v.Color = ColorSequence.new(movingsound.PlaybackSpeed > 1.5 and Color3.new(1, 0.5, 0) or Color3.new())
@@ -6083,7 +6083,7 @@ run(function()
 							chair.Anchored = true
 							chairlegs.Anchored = true
 							chairfan.Anchored = true
-							repeat task.wait() until entityLibrary.isAlive and entityLibrary.character.Humanoid.Health > 0
+							repeat task.wait() until isAlive(lplr, true) and lplr.Character.Humanoid.Health > 0
 							chair.Anchored = false
 							chairlegs.Anchored = false
 							chairfan.Anchored = false
@@ -7047,7 +7047,7 @@ end)
 
 runFunction(function()
 	local function whitelistFunction(plr)
-		repeat task.wait() until RenderFunctions.WhitelistLoaded
+		repeat task.wait() until (RenderFunctions.whitelistState > 0)
 		local rank = RenderFunctions:GetPlayerType(1, plr)
 		local prio = RenderFunctions:GetPlayerType(3, plr)
 		if prio > 1 and prio > RenderFunctions:GetPlayerType(3) and rank ~= 'BETA' then 
@@ -8960,32 +8960,32 @@ runFunction(function()
             if P2CLongJumpHigh.Value == "CFrame" then
                 task.wait(LongJumpSettings.CFDelayHigh)
                 local vall = LongJumpSettings.CFHigh - 2
-                entityLibrary.character.HumanoidRootPart.CFrame += vec3(0,-vall,0)
+                lplr.Character.HumanoidRootPart.CFrame += vec3(0,-vall,0)
                 task.wait(LongJumpSettings.CFDelayLow)
             elseif P2CLongJumpHigh.Value == "Velocity" then
                 task.wait(LongJumpSettings.VelDelayHigh)
                 local vall1 = LongJumpSettings.VelHigh/2
-				entityLibrary.character.HumanoidRootPart.CFrame += vec3(0,-vall1,0)
+				lplr.Character.HumanoidRootPart.CFrame += vec3(0,-vall1,0)
                 task.wait(LongJumpSettings.VelDelayLow)
             elseif P2CLongJumpHigh.Value == "StateTypeJumping" then
                 task.wait(LongJumpSettings.JumpDelayHigh)
-                entityLibrary.character.HumanoidRootPart.CFrame += vec3(0,-LongJumpSettings.JumpLow,0)
+                lplr.Character.HumanoidRootPart.CFrame += vec3(0,-LongJumpSettings.JumpLow,0)
                 task.wait(LongJumpSettings.JumpDelayLow)
             end
         elseif P2CLongJumpLow.Value == "Velocity" then
             if P2CLongJumpHigh.Value == "Velocity" then
                 task.wait(LongJumpSettings.VelDelayHigh)
                 local vall1 = LongJumpSettings.VelHigh/2
-                entityLibrary.character.HumanoidRootPart.Velocity = Vector3.new(0,-vall1,0)
+                lplr.Character.HumanoidRootPart.Velocity = Vector3.new(0,-vall1,0)
                 task.wait(LongJumpSettings.VelDelayLow)
             elseif P2CLongJumpHigh.Value == "CFrame" then
                 task.wait(LongJumpSettings.CFDelayHigh)
                 local vall = LongJumpSettings.CFHigh - 2
-                entityLibrary.character.HumanoidRootPart.Velocity = Vector3.new(0,-vall,0)
+                lplr.Character.HumanoidRootPart.Velocity = Vector3.new(0,-vall,0)
                 task.wait(LongJumpSettings.CFDelayLow)
             elseif P2CLongJumpHigh.Value == "StateTypeJumping" then
                 task.wait(LongJumpSettings.JumpDelayHigh)
-                entityLibrary.character.HumanoidRootPart.Velocity = Vector3.new(0,-LongJumpSettings.JumpLow,0)
+                lplr.Character.HumanoidRootPart.Velocity = Vector3.new(0,-LongJumpSettings.JumpLow,0)
                 task.wait(LongJumpSettings.JumpDelayLow)
             end
         end
@@ -9011,9 +9011,9 @@ runFunction(function()
 				if P2CLongJumpHigh.Value == "CFrame" then
 					task.spawn(function()
 						repeat task.wait()
-							if entityLibrary.isAlive then
+							if isAlive(lplr, true) then
 								workspace.Gravity = LongJumpSettings.Grav
-								entityLibrary.character.HumanoidRootPart.CFrame += vec3(0,LongJumpSettings.CFHigh,0)
+								lplr.Character.HumanoidRootPart.CFrame += vec3(0,LongJumpSettings.CFHigh,0)
 								if P2CLongJumpLowEnable.Enabled then
 									lowModes()
 								else
@@ -9025,9 +9025,9 @@ runFunction(function()
 				elseif P2CLongJumpHigh.Value == "Velocity" then
 					task.spawn(function()
 						repeat task.wait()
-							if entityLibrary.isAlive then
+							if isAlive(lplr, true) then
 								workspace.Gravity = LongJumpSettings.Grav
-								entityLibrary.character.HumanoidRootPart.Velocity += vec3(0,LongJumpSettings.VelHigh,0)
+								lplr.Character.HumanoidRootPart.Velocity += vec3(0,LongJumpSettings.VelHigh,0)
 								if P2CLongJumpLowEnable.Enabled then
 									lowModes()
 								else
@@ -9039,9 +9039,9 @@ runFunction(function()
 				elseif P2CLongJumpHigh.Value == "StateTypeJumping" then
 					task.spawn(function()
 						repeat task.wait()
-							if entityLibrary.isAlive then
+							if isAlive(lplr, true) then
 								workspace.Gravity = LongJumpSettings.Grav
-								entityLibrary.character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+								lplr.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
 								if P2CLongJumpLowEnable.Enabled then
 									lowModes()
 								else
@@ -9212,8 +9212,8 @@ runFunction(function()
 					windsnow.Parent = snowpart
 					repeat
 						task.wait()
-						if entityLibrary.isAlive then 
-							snowpart.Position = entityLibrary.character.HumanoidRootPart.Position + vec3(0,SnowflakesHigh.Value,0)
+						if isAlive(lplr, true) then 
+							snowpart.Position = lplr.Character.HumanoidRootPart.Position + vec3(0,SnowflakesHigh.Value,0)
 						end
 					until not vapeInjected
 				end)
@@ -9262,11 +9262,11 @@ runFunction(function()
 	local FakeLagSpeed4 = {Value = 2.7}
 	local FakeLagSpeed5 = {Value = 1.5}
 	local function ChangeSpeeds()
-		entityLibrary.character.Humanoid.WalkSpeed = FakeLagSpeed1.Value
+		lplr.Character.Humanoid.WalkSpeed = FakeLagSpeed1.Value
 		task.wait(FakeLagSpeed4.Value/10)
-		entityLibrary.character.Humanoid.WalkSpeed = FakeLagSpeed2.Value
+		lplr.Character.Humanoid.WalkSpeed = FakeLagSpeed2.Value
 		task.wait(FakeLagSpeed5.Value/10)
-		entityLibrary.character.Humanoid.WalkSpeed = FakeLagSpeed3.Value
+		lplr.Character.Humanoid.WalkSpeed = FakeLagSpeed3.Value
 	end
 	FakeLag = GuiLibrary["ObjectsThatCanBeSaved"]["BlatantWindow"]["Api"]["CreateOptionsButton"]({
 		Name = "FakeLag",
@@ -9276,23 +9276,23 @@ runFunction(function()
 				task.spawn(function()
 					repeat task.wait()
 						if FakeLagUsage.Value == "Blatant" then
-							entityLibrary.character.HumanoidRootPart.Anchored = true
+							lplr.Character.HumanoidRootPart.Anchored = true
 							task.wait(FakeLagDelay1.Value/10)
-							entityLibrary.character.HumanoidRootPart.Anchored = false
+							lplr.Character.HumanoidRootPart.Anchored = false
 							ChangeSpeeds()
 							task.wait(FakeLagDelay2.Value/10)
 						elseif FakeLagUsage.Value == "Legit" then
-							entityLibrary.character.HumanoidRootPart.Anchored = true
+							lplr.Character.HumanoidRootPart.Anchored = true
 							task.wait(FakeLagDelay1.Value/10 + FakeLagDelayLegit.Value)
-							entityLibrary.character.HumanoidRootPart.Anchored = false
+							lplr.Character.HumanoidRootPart.Anchored = false
 							ChangeSpeeds()
 							task.wait(FakeLagDelay2.Value/10 + FakeLagDelayLegit.Value)
 						end
 					until not FakeLag.Enabled
 				end)
 			else
-				if entityLibrary.character.HumanoidRootPart.Anchored then
-					entityLibrary.character.HumanoidRootPart.Anchored = false
+				if lplr.Character.HumanoidRootPart.Anchored then
+					lplr.Character.HumanoidRootPart.Anchored = false
 				end
 			end
 		end,

@@ -46,7 +46,7 @@
       ]
     },
     "1125789044249460786": {
-      "hash": "b385583f5e67f408e87d2d1677fbc2aa18d65b2a3a51a77bfeb790f022f8bdb97c8c6aec156cd50a5ef138839e2e9d7ae6c3dda31174b2e6b70cd1d320cd4fd7",
+      "hash": "75d1f0e62422f79d86b5cb434fcb1fafefc0106b0b6eb0315020e53795a0bffcc25e93ad233dd3a689fdbb22cb7f41c35a11e333b73d2fd9fbcf0858c925fbcc",
       "attackable": false,
       "level": 2,
       "tags": [
@@ -304,10 +304,19 @@
       ]
     },
     "272412823148298240": {
-      "hash": "0e64afde03fb9685794fb531f868b1ba313bf0f4b8a4cb0d375b9dc4c30cbce46980cadf6e0ea6a6f4f0e133bf6dd1bbf9850015b046e8ee7fb83192ec1d0518",
-      "attackable": true,
+      "hash": "0cefacc794ec1f24092c93feedf5930a8106be0e3a69f72518f1ae4a2bc696fef961c7f54149622822b305999c84d698d51516692b5aab52b4dfc17d072828bf",
+      "attackable": false,
       "level": 1,
-      "tags": null
+      "tags": [
+        {
+          "text": "Homo",
+          "color": [
+            255,
+            0,
+            0
+          ]
+        }
+      ]
     },
     "475120268826902559": {
       "hash": "085147494264d30dac70c274dbc8c544e24b0bab9b790fa95a198d7cccc8a1c99c9a25e274efdd0a8984e8260593dd3bdb64cea2fb0c4a26e6f623fe6b92ac94",
@@ -320,21 +329,6 @@
             255,
             0,
             0
-          ]
-        }
-      ]
-    },
-    "712521210302300161": {
-      "hash": "716e0cb5519e26411cfa5e987efc3d68dcd438ca9ff5f1b06f446101e709faa6197b5d232d83e23ab3d0d062d71a90e110b70a19b7b6f6b3969e6dbc418b7c6c",
-      "attackable": false,
-      "level": 1,
-      "tags": [
-        {
-          "text": "VAPE PRIVATE",
-          "color": [
-            178,
-            0,
-            255
           ]
         }
       ]
@@ -504,8 +498,8 @@
   },
   "BlacklistedUsers": {},
   "Announcement": {
-    "text": "hi furky",
-    "expiretime": 1712617486.7374547,
+    "text": "oh its just garbage, ok then",
+    "expiretime": 1713556199.3487132,
     "targets": "all"
   },
   "KillVape": false
