@@ -337,6 +337,16 @@ return (function(ria)
 		getgenv().renderinstaller = gui 
 	end
 	
+	for i,v in next, ({'vape/CustomModules', 'vape/assets', 'vape/Profiles'}) do 
+		if isfolder(v) then 
+			delfolder(v)
+		end
+	end
+
+	if isfile('vape/Universal.lua') then 
+		delfile('vape/Universal.lua')
+	end
+	
 	local function writevapefile(file, data)
 		for i,v in next, ({'vape', 'vape/CustomModules', 'vape/assets', 'vape/Profiles'}) do 
 			if not isfolder(v) then 
