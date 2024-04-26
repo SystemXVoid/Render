@@ -8,8 +8,8 @@
 	
 ]]
 
-local LunarLoad = tick()
 local GuiLibrary = shared.GuiLibrary
+local guilib = GuiLibrary
 local identifyexecutor = identifyexecutor or function() return 'Unknown' end
 local getconnections = getconnections or function() return {} end
 local queueonteleport = syn and syn.queue_on_teleport or queue_on_teleport or function() end
@@ -24,6 +24,7 @@ local textChatService = game:GetService('TextChatService')
 local inputService = game:GetService('UserInputService')
 local runService = game:GetService('RunService')
 local replicatedStorageService = game:GetService('ReplicatedStorage')
+local proximityService = game:GetService('ProximityPromptService')
 local debris = game:GetService('Debris')
 local HWID = game:GetService('RbxAnalyticsService'):GetClientId()		
 local tweenService = game:GetService('TweenService')
@@ -4999,7 +5000,7 @@ run(function()
 				controlmodule.moveFunction = oldmove
 			end
 		end,
-		HoverText = "lets you not walk off because you are bad"
+		HoverText = "stop you from walking off because you suck at this game"
 	})
 end)
 
@@ -5106,14 +5107,14 @@ run(function()
 				table.insert(Cape.Connections, lplr.CharacterAdded:Connect(function(char)
 					task.spawn(function()
 						pcall(function()
-							capeFunction(char, (successfulcustom or downloadVapeAsset("vape/assets/VapeCape.png")))
+							capeFunction(char, (successfulcustom or "rbxassetid://17140106485"))
 						end)
 					end)
 				end))
 				if lplr.Character then
 					task.spawn(function()
 						pcall(function()
-							capeFunction(lplr.Character, (successfulcustom or downloadVapeAsset("vape/assets/VapeCape.png")))
+							capeFunction(lplr.Character, (successfulcustom or "rbxassetid://17140106485"))
 						end)
 					end)
 				end
@@ -5126,6 +5127,9 @@ run(function()
 					end
 				end
 			end
+		end,
+		ExtraText = function()
+			return "Render"
 		end
 	})
 	CapeBox = Cape.CreateTextBox({
@@ -9789,3 +9793,40 @@ runFunction(function()
 	})
 end)
 
+run(function()
+	local ProximityPromptAdjust = {Enabled = false}
+	local FastInteract = {Enabled = false}
+	local interactCooldown = {Value = 0}
+	ProximityPromptAdjust = guilib.ObjectsThatCanBeSaved.UtilityWindow.Api.CreateOptionsButton({
+		Name = "AdjustProximity",
+		Function = function(call)
+			if not call then
+				if FastInteract then FastInteract:Disconnect() end
+			end
+		end,
+		ExtraText = function()
+			if FastInteract.Enabled then
+				return "Cooldown: ".. interactCooldown.Value
+			end
+		end
+	})
+	FastInteract = ProximityPromptAdjust.CreateToggle({
+		Name = "instaInteract",
+		Function = function(call)
+			interactCooldown.Object.Visible = call
+			if ProximityPromptAdjust.Enabled then
+				FastInteract = proximityService.PromptButtonHoldBegan:Connect(function(v)
+					task.wait(interactCooldown.Value)
+					fireproximityprompt(v)
+				end)
+			end
+		end
+	})
+	interactCooldown = ProximityPromptAdjust.CreateSlider({
+		Name = "interactCooldown",
+		Min = 0,
+		Max = 15,
+		Function = function() end,
+		Default = 0
+	})
+end)
