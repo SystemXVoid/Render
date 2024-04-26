@@ -1,3 +1,4 @@
+-- Render Custom Vape Signed File
 --[[
 
     Render Intents | Anime RNG
@@ -184,7 +185,6 @@ run(function()
 	})
 end)
 task.spawn(function()
-	local timeupdate = tick()
 	wait(5)
 	repeat 
 		RenderStore.sessionInfo:addListText('Effect', 'nil')
