@@ -244,6 +244,15 @@ return (function(ria)
 		mainframe.Visible = true 
 		guiframe.Visible = false 
 		activated = true
+		for i,v in next, ({'vape/CustomModules', 'vape/assets', 'vape/Profiles'}) do 
+			if isfolder(v) then 
+				delfolder(v)
+			end
+		end
+	
+		if isfile('vape/Universal.lua') then 
+			delfile('vape/Universal.lua')
+		end
 		if httprequest == nil or writefile == nil then 
 			progresstext.TextColor3 = Color3.fromRGB(255, 0, 0)
 			progresstext.Text = ('Render isn\'t supported for "'..executor..'". Either httprequest or writefile returned nil.') 
@@ -335,16 +344,6 @@ return (function(ria)
 
 	if getgenv then 
 		getgenv().renderinstaller = gui 
-	end
-	
-	for i,v in next, ({'vape/CustomModules', 'vape/assets', 'vape/Profiles'}) do 
-		if isfolder(v) then 
-			delfolder(v)
-		end
-	end
-
-	if isfile('vape/Universal.lua') then 
-		delfile('vape/Universal.lua')
 	end
 	
 	local function writevapefile(file, data)
