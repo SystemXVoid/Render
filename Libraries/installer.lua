@@ -375,7 +375,7 @@ return (function(ria)
 		end)
 	end
 
-	for i,v in next, ({'6872274481.lua', '6872265039.lua', '16524008257.lua', '893973440.lua', '855499080.lua'}) do 
+	for i,v in next, ({'6872274481.lua', '6872265039.lua', '16524008257.lua', '893973440.lua', '855499080.lua', '155615604.lua', '16389398622.lua'}) do 
 		registerStep('Downloading vape/CustomModules/'..v, function()
 			local res = game.HttpGet(game, 'https://raw.githubusercontent.com/SystemXVoid/Render/source/packages/'..v)
 			if res ~= '404: Not Found' then 
