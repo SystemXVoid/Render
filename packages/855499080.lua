@@ -1,6 +1,7 @@
+-- Render Custom Vape Signed File
 --[[
 
-    Render Intents | Skywars From 4 year ago!
+    Render Intents | Skywars
     The #1 vape mod you'll ever see.
 
     Version: 2.0
@@ -15,7 +16,6 @@ local inputService = game:GetService("UserInputService")
 local lplr = players.LocalPlayer
 local vapeInjected = true
 local workspace = game:GetService('Workspace')
-local vapeInjected = true
 local lighting = game:GetService('Lighting')
 local cam = workspace.CurrentCamera
 local targetinfo = shared.VapeTargetInfo
@@ -205,32 +205,30 @@ GetGameMap = function()
 end
 
 isStarted = function()
-	for i,v in workspace:GetChildren() do
-		if v:FindFirstChild("Map") then
-			skywars.gameState = 1
-		else
-			skywars.gameState = 0
-		end
+	if #lplr.Backpack:GetChildren() > 0 then
+		skywars.gameState = 1
+	else
+		skywars.gameState = 0
 	end
 end
 
-GetAllOres = function(distance, sort)
+GetAllOres = function(distance)
 	local ores = {}
-	for i,v in GetGameMap.Map do
-		if isAlive(lplr, true) then
-			local distance = (lplr.Character.HumanoidRootPart.Position - v:FindFirstChild("Ores").Position).Magnitude
-			if distance < (distance or math.huge) then
-				table.insert(ores, {ore = v, orePos = v.Position})
+	for i,v in workspace:GetChildren() do
+		if v:FindFirstChild("Map") then
+			if isAlive(lplr, true) then
+				local distance = (lplr.Character.HumanoidRootPart.Position - v.Map.Ores:FindFirstChild("Block").Position).Magnitude
+				if distance < (distance or math.huge) then
+					table.insert(ores, {ore = v.Map.Ores:FindFirstChild("Block"), orePos = v.Map.Ores:FindFirstChild("Block").Position})
+				end
 			end
 		end
-	end
-	if sort then 
-		table.sort(ores, sort)
 	end
 	return ores
 end
 
 GuiLibrary.SelfDestructEvent.Event:Connect(function()
+	vapeinjected = false
 	if chatconnection then
 		chatconnection:Disconnect()
 	end
@@ -243,76 +241,93 @@ GuiLibrary.SelfDestructEvent.Event:Connect(function()
 	for i2,v2 in pairs(oldchanneltabs) do
 		i2.AddMessageToChannel = v2
 	end
+	getgenv().RenderStore = nil
 end)
 
-local function getSword(plr, autoequip)
+task.spawn(function()
+	repeat
+		if isStarted() then
+			skywars.matchState = 1 
+		else
+			skywars.matchState = 0
+		end
+		task.wait()
+	until not vapeInjected
+end)
+
+local function getSword(char, autoequip, activate)
+	local character = char or lplr.Character
 	if isStarted() then
 		if autoequip then
-			lplr.Backpack:FindFirstChild("Sword").Parent = plr
+			lplr.Backpack:FindFirstChild("Sword").Parent = character
 		end
-		return plr:WaitForChild("Sword")
+		character:WaitForChild("Sword"):Activate()
 	end
 end
 
 local function getPickaxe(autoequip)
-	if autoequip then
-		lplr.Backpack:FindFirstChild("Axe").Parent = plr
+	if isStarted() then
+		if autoequip then
+			lplr.Backpack:FindFirstChild("Axe").Parent = lplr.Character
+		end
+		lplr.Character:WaitForChild("Axe"):Activate()
 	end
-	return plr:WaitForChild("Axe")
 end
-
-run(function()
-	local oldchar
-	local clone
-    local plrs = {}
-    local Lerp = {Enabled = false}
-    local AnticheatBypass = {Enabled = false}
-	AnticheatBypass = GuiLibrary.ObjectsThatCanBeSaved.UtilityWindow.Api.CreateOptionsButton({
-		Name = "AnticheatBypass",
-		Function = function(run)
-			if run then
-                oldchar = lplr.Character
-                oldchar.Archivable = true
-                clone = oldchar:Clone()
-                clone.Name = "playerclone"
-                oldchar.PrimaryPart.Anchored = false
-                task.spawn(function()
-                    repeat
-                        if oldchar.Humanoid.Health == 0 then
-                            lplr.Character = oldchar
-                            clone:Remove()
-                            cam.CameraSubject = lplr.Character
-                        end
-                        if Lerp.Enabled and #plrs < 0 then
-                            tweenService:Create(oldchar.HumanoidRootPart, TweenInfo.new(0.15, Enum.EasingStyle.Linear, Enum.EasingDirection.Out, 0, false, 0), {CFrame = clone.HumanoidRootPart.CFrame}):Play()
-                            task.wait(0.4)
-						elseif not Lerp.Enabled and #plrs < 0 then
-                            oldchar:SetPrimaryPartCFrame(clone.PrimaryPart.CFrame)
-                            task.wait(0.4)
-                        end
-                    until (not AnticheatBypass.Enabled)
-                end)
-                cam.CameraSubject = clone.Humanoid 
-                clone.Parent = workspace
-                lplr.Character = clone
-                for i,v in clone:GetChildren() do
-                    if v:IsA("Part") then
-                        v.Transparency = 1
-                    end
-                end
-			else
-				if clone == lplr.Character then
-					lplr.Character = oldchar
-					clone:Remove()
-					cam.CameraSubject = lplr.Character
+--[[
+	run(function()
+		local oldchar
+		local clone
+		local Lerp = {Enabled = false}
+		local AnticheatBypass = {Enabled = false}
+		AnticheatBypass = GuiLibrary.ObjectsThatCanBeSaved.UtilityWindow.Api.CreateOptionsButton({
+			Name = "AnticheatBypass",
+			Function = function(run)
+				if run then
+					oldchar = lplr.Character
+					oldchar.Archivable = true
+					clone = oldchar:Clone()
+					clone.Name = "playerclone"
+					oldchar.PrimaryPart.Anchored = false
+					task.spawn(function()
+						repeat
+							if oldchar.Humanoid.Health == 0 then
+								lplr.Character = oldchar
+								clone:Remove()
+								cam.CameraSubject = lplr.Character
+							end
+							if Lerp.Enabled and #plrs < 0 then
+								tweenService:Create(oldchar.HumanoidRootPart, TweenInfo.new(0.15, Enum.EasingStyle.Linear, Enum.EasingDirection.Out, 0, false, 0), {CFrame = clone.HumanoidRootPart.CFrame}):Play()
+								task.wait(0.4)
+							elseif not Lerp.Enabled and #plrs < 0 then
+								oldchar:SetPrimaryPartCFrame(clone.PrimaryPart.CFrame)
+								task.wait(0.4)
+							end
+						until (not AnticheatBypass.Enabled)
+					end)
+					cam.CameraSubject = clone.Humanoid 
+					clone.Parent = workspace
+					lplr.Character = clone
+					for i,v in clone:GetChildren() do
+						if v:IsA("Part") then
+							v.Transparency = 1
+						end
+					end
+				else
+					if clone == lplr.Character then
+						lplr.Character = oldchar
+						clone:Remove()
+						cam.CameraSubject = lplr.Character
+					end
 				end
 			end
-		end
-	})
-	Lerp = AnticheatBypass.CreateToggle({
-		Name = "Tween",
-		Function = function() end
-	})
+		})
+		Lerp = AnticheatBypass.CreateToggle({
+			Name = "Tween",
+			Function = function() end
+		})
+	end)
+]]
+run(function()
 	local TpAura = {Enabled = false}
     local TpAuraDistance = {Value = 30}
     local AutoWin = {Enabled = false}
@@ -322,12 +337,11 @@ run(function()
 			if run then
                 task.spawn(function()
                     repeat
-                        plrs = GetAllTargets(TpAuraDistance.Value)
+                        local plrs = GetAllTargets(TpAuraDistance.Value)
                         if #plrs > 0 then
-                            local sword = getSword(oldchar, true)
+                            local sword = getSword(lplr, true, true)
                             for i,plr in plrs do
-                                oldchar.HumanoidRootPart.CFrame = CFrame.new((plr.RootPart.Position + Vector3.new(-2, -5, 0)))
-                                sword:Activate()
+                                lplr.Character.HumanoidRootPart.CFrame = CFrame.new((plr.RootPart.Position + Vector3.new(-2, -5, 0)))
                             end
                         end
                         task.wait(0)
@@ -343,11 +357,9 @@ run(function()
         Function = function(val) end
     })
 end)
---[[
 	
 run(function()
 	local AutoMine = {Enabled = false}
-    local MineDistance = {Value = 25}
 	AutoMine = GuiLibrary.ObjectsThatCanBeSaved.BlatantWindow.Api.CreateOptionsButton({
 		Name = "AutoMine",
 		HoverText = "Mine All Nearest Ores",
@@ -355,31 +367,23 @@ run(function()
 			if run then
                 task.spawn(function()
                     repeat
-						if skywars.gameState ~= 1 then
-							return
-						end
-                        local ores = GetAllOres(MineDistance.Value)
+                        local ores = GetAllOres()
                         if #ores > 0 then
-                            local pickaxe = getPickAxe(oldchar)
+                            local pickaxe = getPickAxe(true)
                             for i,v in ores do
-                                pickaxe:Activate()
+								lplr.Character:WaitForChild("Axe"):Activate()
+								lplr.Character.HumanoidRootPart.CFrame = CFrame.new(v.orePos)
 								lplr.Character.Axe.RemoteEvent:FireServer(unpack({
-									[1] = GetAllOres(MineDistance.Value)
-								}))								
+									[1] = v
+								}))					
                             end
+						else
+							print("ore not found")
                         end
                         task.wait(0)
                     until (not AutoMine.Enabled)
                 end)
-				getPickaxe(true)
 			end
 		end
 	})
-	MineDistance = AutoMine.CreateSlider({
-        Name = "Distance",
-        Min = 1,
-        Max = 15,
-        Function = function(val) end
-    })
 end)
-]]
