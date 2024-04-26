@@ -1,3 +1,4 @@
+-- Render Custom Vape Signed File
 --[[
 
     Render Intents | Flee the facility
@@ -8,10 +9,10 @@
 
 ]]
 local GuiLibrary = shared.GuiLibrary
-local players = game:GetService('Players')
+local playersService = game:GetService('Players')
 local textservice = game:GetService('TextService')
-local replicatedStorageService = game:GetService('ReplicatedStorage')
-local lplr = players.LocalPlayer
+local replicatedStorage = game:GetService('ReplicatedStorage')
+local lplr = playersService.LocalPlayer
 local workspace = game:GetService('Workspace')
 local lighting = game:GetService('Lighting')
 local cam = workspace.CurrentCamera
@@ -127,12 +128,12 @@ run(function()
         for i,v in workspace:GetChildren() do
             if v:FindFirstChild("ComputerTable") then
                 facilityStore.gameState = 1
-                for i2,v2 in game:GetService("Players"):GetPlayers() do
+                for i2,v2 in playersService:GetPlayers() do
                     if v2.TempPlayerStatsModule.IsBeast.Value then
                         facilityStore.currentBeast = v2
                     end
                 end
-                if v.Screen.BrickColor == "Dark green" then
+                if v:FindFirstChild("ComputerTable").Screen.BrickColor == "Dark green" then
                     v.Name = "Finished ComputerTable"
                     facilityStore.computerFinished += 1
                 end
@@ -147,7 +148,7 @@ run(function()
     task.spawn(function()
         repeat
             updateStore()
-            wait(2)
+            task.wait(1)
         until (not vapeInjected)
     end)
     isAlive = function(plr, nohealth) 
@@ -162,15 +163,6 @@ run(function()
         end
         return alive
     end
-    
-    getGameMap = function()
-        if facilityStore.gameState ~= 0 then return end
-        for i,v in workspace:GetChildren() do
-            if v:FindFirstChild("ComputerTable") then
-                return v.Name
-            end
-        end
-    end
 
     isBeast = function(plr)
         if lplr.TempPlayerStatsModule.IsBeast.Value then
@@ -181,8 +173,8 @@ run(function()
     end
 
     findBeast = function()
-        for i,v in game:GetService("Players"):GetPlayers() do
-            if v.TempPlayerStatsModule.IsBeast.Value then
+        for i,v in playersService:GetPlayers() do
+            if v:WaitForChild('TempPlayerStatsModule').IsBeast.Value then
                 return v
             end
         end
@@ -190,12 +182,14 @@ run(function()
 
     getAllComputer = function(distances)
         local computerTable = {}
-        local gameMatch = getGameMap()
-        for i,v in gameMatch:FindFirstChild("ComputerTable") do
-            if isAlive(lplr, true) and facilityStore.gameState ~= 0 then
-                local distance = (lplr.Character.HumanoidRootPart.Position - v.Screen.Position).Magnitude
-                if distance < (distances or math.huge) then
-                    table.insert(computerTable, {computer = v, Positions = v.Screen.Position})
+        local gameName = replicatedStorage.CurrentMap.Value
+        for i,v in workspace:GetChildren() do
+            if v.Name == gameName then
+                if isAlive(lplr, true) and facilityStore.gameState ~= 0 then
+                    local distance = (lplr.Character.HumanoidRootPart.Position - v.Screen.Position).Magnitude
+                    if distance < (distances or math.huge) then
+                        table.insert(computerTable, {computer = v, Positions = v.Screen.Position, Screen = v.Screen})
+                    end
                 end
             end
         end
@@ -239,6 +233,7 @@ run(function()
 	local AutoComputer = {Enabled = false}
     local Range = {Value = 25}
     local map
+    local Kys = nil
     local trigger
     local Teleport = {Enabled = false}
 	AutoComputer = GuiLibrary.ObjectsThatCanBeSaved.UtilityWindow.Api.CreateOptionsButton({
@@ -249,21 +244,27 @@ run(function()
                     repeat
                         if isBeast() then return end
                         local computers = getAllComputer(Range.Value)   
-                        if Teleport.Enabled then
-                           return computer.Positions
-                        end
-                        for i = 1,3 do
-                            trigger = "ComputerTrigger".. i
-                            replicatedStorageService.RemoteEvent:FireServer(unpack({
-                                [1] = "SetPlayerMinigameResult",
-                                [2] = true
-                            }))
-                            replicatedStorageService.RemoteEvent:FireServer(unpack({
-                                [1] = "Input",
-                                [2] = "Trigger",
-                                [3] = false,
-                                [4] = computers.computer[trigger].Event
-                            }))
+                        for i,v in computers do
+                            if Teleport.Enabled and Kys == false then
+                                Kys = true
+                                lplr.Character.HumanoidRootPart.CFrame = CFrame.new(v.Positions)
+                            end
+                            for i = 1,3 do
+                                trigger = "ComputerTrigger".. i
+                                replicatedStorage.RemoteEvent:FireServer(unpack({
+                                    [1] = "SetPlayerMinigameResult",
+                                    [2] = true
+                                }))
+                                replicatedStorage.RemoteEvent:FireServer(unpack({
+                                    [1] = "Input",
+                                    [2] = "Trigger",
+                                    [3] = false,
+                                    [4] = computers.computer[trigger].Event
+                                }))
+                            end
+                            if v.Screen.BrickColor == "Dark green" then
+                                Kys = false
+                            end
                         end
                         task.wait(0.5)
                     until (not AutoComputer.Enabled)
@@ -275,24 +276,22 @@ run(function()
 end)
 
 task.spawn(function()
-	local timeupdate = tick()
-    local isStarting
-	wait(5)
+    local isStarting = ""
 	repeat 
         if facilityStore.gameState == 1 then
             isStarting = "true"
         else
             isStarting = "false"
         end
-		RenderStore.sessionInfo:addListText('GameMap', getGameMap())
-		RenderStore.sessionInfo:addListText('CurrentBeast', findBeast())
+		RenderStore.sessionInfo:addListText('GameMap', tostring(replicatedStorage.CurrentMap.Value) or "nil")
+		RenderStore.sessionInfo:addListText('CurrentBeast', tostring(findBeast()) or "nil")
 		RenderStore.sessionInfo:addListText('ComputerFinished', facilityStore.computerFinished)
 		local time = os.date('*t')
 		local hour = ((time.hour - 1) % 12 + 1)
 		RenderStore.sessionInfo:addListText('Time', tostring(hour)..':'..(time.min < 10 and '0' or '')..tostring(time.min)..(time.hour < 12 and 'AM' or 'PM'))
-		RenderStore.sessionInfo:addListText('Match Started', isStarting)
-		RenderStore.sessionInfo:addListText('beastChance', facilityStore.beastChance)
+		RenderStore.sessionInfo:addListText('Match Started', isStarting or "nil")
+		RenderStore.sessionInfo:addListText('beastChance', facilityStore.beastChance or "0")
 		print("updated")
-		task.wait(5)
+		task.wait(1)
 	until (not vapeInjected)
 end)
