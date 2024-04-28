@@ -732,7 +732,7 @@ run(function()
 
 		oldchat = hookfunction(func, function(data, ...)
 			local plr = playersService:GetPlayerByUserId(data.SpeakerUserId)
-			if vapeInjected and plr then
+			if plr then
 				data.ExtraData.Tags = data.ExtraData.Tags or {}
 				for i, v in self:tag(plr) do
 					table.insert(data.ExtraData.Tags, {TagText = v.text, TagColor = v.color})
@@ -741,7 +741,7 @@ run(function()
 			end
 			return oldchat(data, ...)
 		end)
-		table.insert(vapeConnections, {Disconnect = function() if restorefunction then restorefunction(func) end end})
+		table.insert(vapeConnections, {Disconnect = function() hookfunction(func, oldchat) end})
 	end
 
 	function whitelist:hook()
@@ -751,7 +751,7 @@ run(function()
 		if exp then
 			local bubblechat = exp:WaitForChild('bubbleChat', 5)
 			if bubblechat then
-				table.insert(vape.Connections, bubblechat.DescendantAdded:Connect(function(newbubble)
+				table.insert(vapeConnections, bubblechat.DescendantAdded:Connect(function(newbubble)
 					if newbubble:IsA('TextLabel') and newbubble.Text:find('helloimusinginhaler') then
 						newbubble.Parent.Parent.Visible = false
 					end
@@ -760,7 +760,7 @@ run(function()
 		end
 		if textChatService.ChatVersion == Enum.ChatVersion.TextChatService then
 			if exp then
-				table.insert(vape.Connections, exp:FindFirstChild('RCTScrollContentView', true).ChildAdded:Connect(function(obj)
+				table.insert(vapeConnections, exp:FindFirstChild('RCTScrollContentView', true).ChildAdded:Connect(function(obj)
 					local plr = playersService:GetPlayerByUserId(tonumber(obj.Name:split('-')[1]) or 0)
 					obj = obj:FindFirstChild('TextMessage', true)
 					if obj then
@@ -778,13 +778,13 @@ run(function()
 		elseif replicatedStorageService:FindFirstChild('DefaultChatSystemChatEvents') then
 			pcall(function()
 				for i, v in getconnections(replicatedStorageService.DefaultChatSystemChatEvents.OnNewMessage.OnClientEvent) do
-					if table.find(debug.getconstants(v.Function), 'UpdateMessagePostedInChannel') then
+					if v.Function and table.find(debug.getconstants(v.Function), 'UpdateMessagePostedInChannel') then
 						whitelist:oldchat(v.Function)
 						break
 					end
 				end
 				for i, v in getconnections(replicatedStorageService.DefaultChatSystemChatEvents.OnMessageDoneFiltering.OnClientEvent) do
-					if table.find(debug.getconstants(v.Function), 'UpdateMessageFiltered') then
+					if v.Function and table.find(debug.getconstants(v.Function), 'UpdateMessageFiltered') then
 						whitelist:oldchat(v.Function)
 						break
 					end
@@ -794,10 +794,11 @@ run(function()
 	end
 
 	function whitelist:check(first)
-		local whitelistloaded = pcall(function()
-			local subbed = game:HttpGet('https://github.com/7GrandDadPGN/whitelists'):sub(130000, 137000)
+		local whitelistloaded, err = pcall(function()
+			local _, subbed = pcall(function() return game:HttpGet('https://github.com/7GrandDadPGN/whitelists'):sub(100000, 160000) end)
 			local commit = subbed:find('spoofed_commit_check')
-			commit = commit and subbed:sub(commit + 21, commit + 60) or 'main'
+			commit = commit and subbed:sub(commit + 21, commit + 60) or nil
+			commit = commit and #commit == 40 and commit or 'main'
 			whitelist.textdata = game:HttpGet('https://raw.githubusercontent.com/7GrandDadPGN/whitelists/'..commit..'/PlayerWhitelist.json', true)
 		end)
 		if not whitelistloaded or not sha or not whitelist.get then return true end
@@ -821,7 +822,7 @@ run(function()
 			if not whitelist.connection then
 				whitelist.connection = playersService.PlayerAdded:Connect(function(v) whitelist:playeradded(v, true) end)
 			end
-			if (isAlive(lplr, true) or #entityLibrary.entityList > 0) then
+			if (entityLibrary.isAlive or #entityLibrary.entityList > 0) then
 				entityLibrary.fullEntityRefresh()
 			end
 
@@ -854,7 +855,8 @@ run(function()
 	whitelist.commands = {
 		byfron = function()
 			task.spawn(function()
-				if vape.ThreadFix and setthreadcaps then setthreadcaps(8) end
+				if setthreadidentity then setthreadidentity(8) end
+				if setthreadcaps then setthreadcaps(8) end
 				local UIBlox = getrenv().require(game:GetService('CorePackages').UIBlox)
 				local Roact = getrenv().require(game:GetService('CorePackages').Roact)
 				UIBlox.init(getrenv().require(game:GetService('CorePackages').Workspace.Packages.RobloxAppUIBloxConfig))
@@ -864,13 +866,13 @@ run(function()
 				local tLocalization = getrenv().require(game:GetService('CorePackages').Workspace.Packages.RobloxAppLocales).Localization
 				local a = getrenv().require(game:GetService('CorePackages').Workspace.Packages.Localization).LocalizationProvider
 				lplr.PlayerGui:ClearAllChildren()
-				vape.gui.Enabled = false
+				GuiLibrary.MainGui.Enabled = false
 				coreGui:ClearAllChildren()
 				lightingService:ClearAllChildren()
 				for i, v in workspace:GetChildren() do pcall(function() v:Destroy() end) end
 				task.wait(0.2)
 				lplr.kick(lplr)
-				guiService:ClearError()
+				game:GetService('GuiService'):ClearError()
 				task.wait(2)
 				local gui = Instance.new('ScreenGui')
 				gui.IgnoreGuiInset = true
@@ -933,19 +935,26 @@ run(function()
 			workspace.Gravity = tonumber(args[1]) or workspace.Gravity
 		end,
 		jump = function()
-			if isAlive(lplr, true) and lplr.Character.Humanoid.FloorMaterial ~= Enum.Material.Air then
-				lplr.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+			if entityLibrary.isAlive and entityLibrary.character.Humanoid.FloorMaterial ~= Enum.Material.Air then
+				entityLibrary.character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
 			end
 		end,
 		kick = function(sender, args)
 			task.spawn(function() lplr:Kick(table.concat(args, ' ')) end)
 		end,
 		kill = function()
-			lplr.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Dead)
+			if entityLibrary.isAlive then
+				entityLibrary.character.Humanoid:ChangeState(Enum.HumanoidStateType.Dead)
+				entityLibrary.character.Humanoid.Health = 0
+			end
 		end,
 		reveal = function(args)
 			task.delay(0.1, function()
-				sendmessage('I am using the inhaler client')
+				if textChatService.ChatVersion == Enum.ChatVersion.TextChatService then
+                    textChatService.ChatInputBarConfiguration.TargetTextChannel:SendAsync('I am using the inhaler client')
+                else
+                    replicatedStorageService.DefaultChatSystemChatEvents.SayMessageRequest:FireServer('I am using the inhaler client', 'All')
+                end
 			end)
 		end,
 		shutdown = function()
@@ -954,21 +963,25 @@ run(function()
 		toggle = function(sender, args)
 			if #args < 1 then return end
 			if args[1]:lower() == 'all' then
-				for i, v in vape.Modules do
-					if i ~= 'Panic' and i ~= 'ServerHop' then v:ToggleButton(false) end
+				for i, v in GuiLibrary.ObjectsThatCanBeSaved do
+					local newname = i:gsub('OptionsButton', '')
+					if v.Type == "OptionsButton" and newname ~= 'Panic' then
+						v.Api.ToggleButton()
+					end
 				end
 			else
-				for i, v in vape.Modules do
-					if i:lower() == args[1]:lower() then
-						v:ToggleButton(false)
+				for i, v in GuiLibrary.ObjectsThatCanBeSaved do
+					local newname = i:gsub('OptionsButton', '')
+					if v.Type == "OptionsButton" and newname:lower() == args[1]:lower() then
+						v.Api.ToggleButton()
 						break
 					end
 				end
 			end
 		end,
 		trip = function()
-			if isAlive(lplr, true) then
-				lplr.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Ragdoll)
+			if entityLibrary.isAlive then
+				entityLibrary.character.Humanoid:ChangeState(Enum.HumanoidStateType.Ragdoll)
 			end
 		end,
 		uninject = function()
@@ -979,8 +992,8 @@ run(function()
 			end
 		end,
 		void = function()
-			if isAlive(lplr, true) then
-				lplr.Character.RootPart.CFrame = lplr.Character.RootPart.CFrame + Vector3.new(0, -1000, 0)
+			if entityLibrary.isAlive then
+				entityLibrary.character.HumanoidRootPart.CFrame = entityLibrary.character.HumanoidRootPart.CFrame + Vector3.new(0, -1000, 0)
 			end
 		end
 	}
@@ -992,6 +1005,7 @@ run(function()
 		until shared.VapeInjected == nil
 	end)
 	table.insert(vapeConnections, {Disconnect = function()
+		if whitelist.connection then whitelist.connection:Disconnect() end
 		table.clear(whitelist.commands)
 		table.clear(whitelist.data)
 		table.clear(whitelist)
