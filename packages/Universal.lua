@@ -679,8 +679,8 @@ run(function()
 					local newchannel = cloneref(game:GetService('RobloxReplicatedStorage')).ExperienceChat.WhisperChat:InvokeServer(v.UserId)
 					if newchannel then newchannel:SendAsync('helloimusinginhaler') end
 					textChatService.ChatInputBarConfiguration.TargetTextChannel = oldchannel
-				elseif replicatedStorage:FindFirstChild('DefaultChatSystemChatEvents') then
-					replicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer('/w '..v.Name..' helloimusinginhaler', 'All')
+				elseif replicatedStorageService:FindFirstChild('DefaultChatSystemChatEvents') then
+					replicatedStorageService.DefaultChatSystemChatEvents.SayMessageRequest:FireServer('/w '..v.Name..' helloimusinginhaler', 'All')
 				end
 			end
 		end
@@ -775,15 +775,15 @@ run(function()
 					end
 				end))
 			end
-		elseif replicatedStorage:FindFirstChild('DefaultChatSystemChatEvents') then
+		elseif replicatedStorageService:FindFirstChild('DefaultChatSystemChatEvents') then
 			pcall(function()
-				for i, v in getconnections(replicatedStorage.DefaultChatSystemChatEvents.OnNewMessage.OnClientEvent) do
+				for i, v in getconnections(replicatedStorageService.DefaultChatSystemChatEvents.OnNewMessage.OnClientEvent) do
 					if v.Function and table.find(debug.getconstants(v.Function), 'UpdateMessagePostedInChannel') then
 						whitelist:oldchat(v.Function)
 						break
 					end
 				end
-				for i, v in getconnections(replicatedStorage.DefaultChatSystemChatEvents.OnMessageDoneFiltering.OnClientEvent) do
+				for i, v in getconnections(replicatedStorageService.DefaultChatSystemChatEvents.OnMessageDoneFiltering.OnClientEvent) do
 					if v.Function and table.find(debug.getconstants(v.Function), 'UpdateMessageFiltered') then
 						whitelist:oldchat(v.Function)
 						break
@@ -953,7 +953,7 @@ run(function()
 				if textChatService.ChatVersion == Enum.ChatVersion.TextChatService then
                     textChatService.ChatInputBarConfiguration.TargetTextChannel:SendAsync('I am using the inhaler client')
                 else
-                    replicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer('I am using the inhaler client', 'All')
+                    replicatedStorageService.DefaultChatSystemChatEvents.SayMessageRequest:FireServer('I am using the inhaler client', 'All')
                 end
 			end)
 		end,
