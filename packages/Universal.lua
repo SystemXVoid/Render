@@ -24,6 +24,7 @@ local textChatService = game:GetService('TextChatService')
 local inputService = game:GetService('UserInputService')
 local runService = game:GetService('RunService')
 local replicatedStorageService = game:GetService('ReplicatedStorage')
+local repliactedstore = replicatedStorageService
 local proximityService = game:GetService('ProximityPromptService')
 local debris = game:GetService('Debris')
 local HWID = game:GetService('RbxAnalyticsService'):GetClientId()		
