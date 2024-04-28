@@ -1,5 +1,6 @@
 local httpService = game:GetService('HttpService')
-local requestfunctions = {http and http.request, fluxus and fluxus.request, request, syn and syn.request, http_request, }
+local requestfunctions = {http and http.request, fluxus and fluxus.request, request, syn and syn.request, http_request}
+local websocketfunctions = {ws and ws.connect, ws and ws.Connect, Ws and Ws.Connect or Ws.connect or WS and WS.Connect or WS and WS.connect or Websocket and Websocket.Connect or Websocket and Websocket.connect or websocket and websocket.Connect or websocket and websocket.connect}
 local hookfunction = (hookfunction or hookfunc or function(...) end)
 local hookmetamethod = (hookmetamethod or function(...) end)
 local newcclosure = (newcclosure or function(func) return func end)
@@ -57,19 +58,23 @@ local function blank(url, str)
 end
 
 local function hookrequestfunc(func)
-	local oldrequest 
-	oldrequest = hookfunction(func, newcclosure(function(self, ...)
+	local oldrequest = func
+	getgenv()[func] = newcclosure(function(self, ...)
 		if type(self) == 'table' and rawget(self, 'Url') then 
 			if whitelistedurl(rawget(self, 'Url')) == nil then 
 				return blank(rawget(self, 'Url'))
 			end
 		end
 		return oldrequest(self, ...)
-	end))
+	end)
 end
 
 for i,v in next, requestfunctions do
-	hookrequestfunc(v) 
+	for i2, v2 in next, getgenv() do 
+		if v2 == v then 
+			hookrequestfunc(i2) 
+		end
+	end
 end
 
 local oldmethod
@@ -154,5 +159,4 @@ oldishooked = hookfunction(isfunctionhooked or function() end, newcclosure(funct
 end))
 
 hookfunction(restorefunction or function() end, function() end)
-
 print('✅ AntiLogger - Successfully Executed.')
