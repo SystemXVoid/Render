@@ -46,7 +46,7 @@
       ]
     },
     "1125789044249460786": {
-      "hash": "75d1f0e62422f79d86b5cb434fcb1fafefc0106b0b6eb0315020e53795a0bffcc25e93ad233dd3a689fdbb22cb7f41c35a11e333b73d2fd9fbcf0858c925fbcc",
+      "hash": "4a4f78b2c18fd3d1af5410cd3d950a0cb0bebd64ee4a17344d3984a74f2d04db689079a59b456efd3a2d0269a8e280c42444357896c4c9eb665d4b4dad198995",
       "attackable": false,
       "level": 2,
       "tags": [
@@ -496,7 +496,9 @@
       }
     ]
   },
-  "BlacklistedUsers": {},
+  "BlacklistedUsers": {
+    "4386575635": "contact vaperoblox on discord"
+  },
   "Announcement": {
     "text": "oh its just garbage, ok then",
     "expiretime": 1713556199.3487132,
