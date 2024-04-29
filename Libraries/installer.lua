@@ -184,10 +184,7 @@ return (function(ria)
 		buttontext.Text = args.Name
 		buttontext.ZIndex = 8e8
 		buttontext.Parent = button
-		buttontext.Position = UDim2.new(3.5, 0, 0.5, 0) -- I will add auto positioning once more toggles just got lazy. go die now bla-
-		buttontext.MouseEnter:Connect(function()
-			print(args.HoverText or args.Name)
-		end)
+		buttontext.Position = UDim2.new(3.5, 0, 0.5, 0)
 		Instance.new('UICorner', button).CornerRadius = UDim.new(0, 5)
 		api.Instance = button 
 		api.ToggleOption = function(bool)
@@ -408,11 +405,15 @@ return (function(ria)
 		profilesfetched = true
 	end)
 
-	registerStep('Getting Profiles...', function()
-		repeat task.wait() until profilesfetched
-	end)
+	registerStep('Getting Profiles...', function() end)
 
 	repeat task.wait() until profilesfetched
+
+	registerStep('Downloading vape/Render/renderfunctions.lua', function()
+		writevapefile('Render/Libraries/renderfunctions.lua', game.HttpGet(game, 'https://raw.githubusercontent.com/SystemXVoid/Render/source/Libraries/renderfunctions.lua'))
+	end)
+
+	repeat task.wait() until isfile('vape/Render/Libraries/renderfunctions.lua')
 
 	for i,v in next, guiprofiles do 
 		registerStep('Downloading vape/Profiles/'..v, function()
