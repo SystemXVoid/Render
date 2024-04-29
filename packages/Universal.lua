@@ -61,13 +61,11 @@ for i,v in ({'vape/', 'vape/Render', 'vape/Render/Libraries', 'vape/Render/scrip
 	end
 end
 
-if not isfile('vape/Render/Libraries/renderfunctions.lua') then 
-	local success, response = pcall(function()
-		return game:HttpGet('https://raw.githubusercontent.com/SystemXVoid/Render/source/Libraries/renderfunctions.lua')
-	end)
-	if success then
-		writefile('vape/Render/Libraries/renderfunctions.lua', '-- Render Custom Modules Signed File\n'..response) 
-	end
+local success = pcall(function() loadfile('vape/Render/Libraries/renderfunctions.lua')() end) 
+if not success then 
+	local res = game.HttpGet(game, 'https://raw.githubusercontent.com/SystemXVoid/Render/source/Libraries/renderfunctions.lua')
+	writefile('vape/Render/Libraries/renderfucntions.lua', res)
+	loadstring(res)()
 end
 
 table.insert(vapeConnections, workspace:GetPropertyChangedSignal("CurrentCamera"):Connect(function()
