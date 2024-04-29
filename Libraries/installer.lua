@@ -13,7 +13,7 @@ return (function(ria)
 	local activated
 	local installed
 	local yielding
-	local installprofile
+	local installprofile = nil
 	
 	if getgenv and getgenv().renderinstaller then 
 		return 
@@ -409,12 +409,6 @@ return (function(ria)
 
 	repeat task.wait() until profilesfetched
 
-	registerStep('Downloading vape/Render/renderfunctions.lua', function()
-		writevapefile('Render/Libraries/renderfunctions.lua', game.HttpGet(game, 'https://raw.githubusercontent.com/SystemXVoid/Render/source/Libraries/renderfunctions.lua'))
-	end)
-
-	repeat task.wait() until isfile('vape/Render/Libraries/renderfunctions.lua')
-
 	for i,v in next, guiprofiles do 
 		registerStep('Downloading vape/Profiles/'..v, function()
 			if not installprofile then 
@@ -423,6 +417,37 @@ return (function(ria)
 			local res = game.HttpGet(game, 'https://raw.githubusercontent.com/SystemXVoid/Render/source/Libraries/Settings/'..v)
 			if res ~= '404: Not Found' then 
 				writevapefile('Profiles/'..v, res) 
+			end
+		end)
+	end
+
+	registerStep('Downloading vape/Render/renderfunctions.lua', function()
+		writevapefile('Render/Libraries/renderfunctions.lua', game.HttpGet(game, 'https://raw.githubusercontent.com/SystemXVoid/Render/source/Libraries/renderfunctions.lua'))
+	end)
+
+	repeat task.wait() until isfile('vape/Render/Libraries/renderfunctions.lua')
+
+	local guiassets = {}
+	local assetfinished = false
+	task.spawn(function()
+		local repo = game.HttpGet(game, 'https://api.github.com/repos/7GrandDadPGN/VapeV4ForRoblox/contents/assets')
+		if repo ~= '404: Not Found' then
+			for i,v in httpService:JSONDecode(repo) do
+				if type(v) == 'table' and v.name then
+					table.insert(guiassets, v.name)
+				end
+			end
+		end
+		assetfinished = true
+	end)
+	
+	repeat task.wait() until assetfinished
+
+	for i,v in guiassets do
+		registerStep('Downloading vape/assets/'.. v, function()
+			local repo = game.HttpGet(game, 'https://api.github.com/repos/7GrandDadPGN/VapeV4ForRoblox/contents/assets/'.. v)
+			if repo ~= '404: Not Found' then
+				writevapefile('assets/'.. v, repo)
 			end
 		end)
 	end
