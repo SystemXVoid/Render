@@ -37,7 +37,6 @@ local vapeTargetInfo = shared.VapeTargetInfo
 local vapeInjected = true
 local httprequest = (http and http.request or http_request or fluxus and fluxus.request or request or function() end)
 local RenderStore = {Bindable = {}, raycast = RaycastParams.new(), MessageReceived = Instance.new('BindableEvent'), tweens = {}, ping = 0, platform = inputService:GetPlatform(), LocalPosition = Vector3.zero, groundTime = tick(), UpdateGroundTick = function() end, sessionInfo = {labelInstances = {}}, clonedata = {}}
-getgenv().RenderStore = RenderStore
 local vec3 = Vector3.new
 local vec2 = Vector2.new
 local isfile = isfile or function(file)
@@ -46,6 +45,7 @@ local isfile = isfile or function(file)
 end
 
 getgenv().ria = (isfile('ria.json') and readfile('ria.json') or nil)
+getgenv().RenderStore = RenderStore
 
 if readfile == nil then
 	task.spawn(error, 'Render - Exploit not supported. Your exploit doesn\'t have filesystem support.')
@@ -6915,7 +6915,7 @@ pcall(function()
 									local tagcolor = Color3.fromHex(rendertag.Color)
 									data2.ExtraData = {
 										Tags = {unpack(data2.ExtraData.Tags), {TagText = rendertag.Text, TagColor = tagcolor}},
-										NameColor = plr.Team == nil and Color3.fromRGB(tagcolor.R + 45, tagcolor.G + 45, tagcolor.B - 10) or plr.TeamColor.Color
+										NameColor = plr.Team == nil and Color3.fromRGB(tagcolor.R * 235, tagcolor.G * 235, tagcolor.B * 235) or plr.TeamColor.Color
 									}
 								end 
 							end)
@@ -9842,3 +9842,4 @@ run(function()
 		Default = 0
 	})
 end)
+
