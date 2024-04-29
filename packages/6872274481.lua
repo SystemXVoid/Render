@@ -9731,7 +9731,7 @@ table.insert(vapeConnections, vapeEvents.EntityDamageEvent.Event:Connect(functio
 				if focusedtarget.Player == victim and (tick() - focusedtarget.Duration) >= 0.50 then 
 					RenderStore.UpdateTargetUI()
 					focusedtarget = nil
-				end
+				end	
 			end)
 		end 
 	end)
@@ -10285,6 +10285,7 @@ runFunction(function()
 	local ClanNotifier = {}
 	local clanstonotify = {ObjectList = {}}
 	local notifiedplayers = {}
+	local autofamousclan = {Enabled = false, clan = {"PVP", "ALIEN", "69", "GDoggs", "Pluto", "gg", "IPS", "CZ", "L8R"}}
 	local function clanFunction(plr)
 		repeat task.wait() until plr:GetAttribute('ClanTag')
 		if table.find(notifiedplayers, plr) then
@@ -10309,7 +10310,7 @@ runFunction(function()
 		HoverText = 'Notifies when certain\nclans are in the game.',
 		Function = function(calling) 
 			if calling then 
-				for i,v in next, playersService:GetPlayers() do 
+				for i,v in playersService:GetPlayers() do 
 					task.spawn(clanFunction, v)
 				end
 				table.insert(ClanNotifier.Connections, playersService.PlayerAdded:Connect(clanFunction))
@@ -10326,6 +10327,21 @@ runFunction(function()
 			end
 		end,
 		RemoveFunction = function() end
+	})
+	autofamousclan = ClanNotifier.CreateToggle({
+		Name = 'AddFamousClan',
+		Function = function(call)
+			if call then
+				for i,v in autofamousclan.clan do
+					table.insert(clanstonotify.ObjectList, v)
+				end
+			else
+				for i,v in autofamousclan.clan do
+					table.remove(clanstonotify.ObjectList, v)
+				end
+			end
+		end,
+		HoverText = "all nn clan will be added to the list automatically 🤢"
 	})
 end)
 
@@ -10368,14 +10384,18 @@ runFunction(function()
 		end,
 		InfiniteFly = function()
 			local bed = getEnemyBed(nil, BedTPAutoRaycast.Enabled == false, true)  
+			local connections
 			if bed == nil then return BedTP.ToggleButton() end
 			lplr.Character.HumanoidRootPart.CFrame += Vector3.new(0, 900000, 0)
-			bedtween = tweenService:Create(lplr.Character.HumanoidRootPart, TweenInfo.new(25, Enum.EasingStyle.Linear, Enum.EasingDirection.Out, 0, false, 0), {CFrame = bed.CFrame})
-			InfoNotification("BedTP", "Wait 25 Seconds Before Teleporting", 26)
+			bedtween = tweenService:Create(lplr.Character.HumanoidRootPart, TweenInfo.new(20, Enum.EasingStyle.Linear, Enum.EasingDirection.In, 0, false, 0), {CFrame = bed.CFrame})
+			InfoNotification("BedTP", "Wait Until Teleport Completed", 20)
 			bedtween:Play()
-			bedtween.Completed:Wait() 
-			lplr.Character.HumanoidRootPart.CFrame = bed.CFrame
-			BedTP.ToggleButton()
+			connections = bedtween.Completed:Connect(function()
+				task.wait(1)
+				lplr.Character.HumanoidRootPart.CFrame = bed.CFrame
+				BedTP.ToggleButton()
+				connections:Disconnect()
+			end)
 		end,
 		Instant = function()
 			local bed = getEnemyBed(nil, BedTPAutoRaycast.Enabled == false)  
