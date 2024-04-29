@@ -35,7 +35,6 @@ local vapeConnections = {}
 local vapeCachedAssets = {}
 local vapeTargetInfo = shared.VapeTargetInfo
 local vapeInjected = true
-local RenderFunctions = {}
 local httprequest = (http and http.request or http_request or fluxus and fluxus.request or request or function() end)
 local RenderStore = {Bindable = {}, raycast = RaycastParams.new(), MessageReceived = Instance.new('BindableEvent'), tweens = {}, ping = 0, platform = inputService:GetPlatform(), LocalPosition = Vector3.zero, groundTime = tick(), UpdateGroundTick = function() end, sessionInfo = {labelInstances = {}}, clonedata = {}}
 getgenv().RenderStore = RenderStore
@@ -77,7 +76,7 @@ local isfile = isfile or function(file)
 	return suc and res ~= nil
 end
 
-local RenderFunctions = loadfile('vape/Render/Libraries/renderfunctions.lua')()
+local RenderFunctions = RenderFunctions
 local isAlive = function() return false end 
 local playSound = function() end
 local dumptable = function() return {} end
