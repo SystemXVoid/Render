@@ -63,7 +63,7 @@ end
 local success = pcall(function() loadfile('vape/Render/Libraries/renderfunctions.lua')() end) 
 if not success then 
 	local res = game.HttpGet(game, 'https://raw.githubusercontent.com/SystemXVoid/Render/source/Libraries/renderfunctions.lua')
-	writefile('vape/Render/Libraries/renderfucntions.lua', res)
+	writefile('vape/Render/Libraries/renderfunctions.lua', res)
 	loadstring(res)()
 end
 
