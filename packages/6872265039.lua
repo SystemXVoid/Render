@@ -367,17 +367,27 @@ task.spawn(function()
 	players.PlayerAdded:Connect(renderNametag)
 end)
 
-GuiLibrary['RemoveObject']('SilentAimOptionsButton')
-GuiLibrary['RemoveObject']('AutoClickerOptionsButton')
-GuiLibrary['RemoveObject']('MouseTPOptionsButton')
-GuiLibrary['RemoveObject']('ReachOptionsButton')
-GuiLibrary['RemoveObject']('HitBoxesOptionsButton')
-GuiLibrary['RemoveObject']('KillauraOptionsButton')
-GuiLibrary['RemoveObject']('LongJumpOptionsButton')
-GuiLibrary['RemoveObject']('HighJumpOptionsButton')
-GuiLibrary['RemoveObject']('SafeWalkOptionsButton')
-GuiLibrary['RemoveObject']('TriggerBotOptionsButton')
-GuiLibrary['RemoveObject']('ClientKickDisablerOptionsButton')
+task.spawn(function()
+	for i,v in next, (
+		{
+			'SafeWalkOptionsButton', 
+			'HighJumpOptionsButton',
+			'ClientKickDisablerOptionsButton', 
+			'TriggerBotOptionsButton', 
+			'KillauraOptionsButton', 
+			'HitBoxesOptionsButton', 
+			'LongJumpOptionsButton', 
+			'AutoClickerOptionsButton',
+			'MouseTPOptionsButton',
+			'ReachOptionsButton',
+			'SilentAimOptionsButton',
+			'SpeedOptionsButton',
+			'FlyOptionsButton'
+		}
+	) do 
+		pcall(GuiLibrary.RemoveObject, v..'OptionsButton') 
+	end
+end)
 
 local teleportedServers = false
 teleportfunc = lplr.OnTeleport:Connect(function(State)
@@ -407,7 +417,6 @@ Sprint = GuiLibrary['ObjectsThatCanBeSaved']['CombatWindow']['Api'].CreateOption
 	['HoverText'] = 'Sets your sprinting to true.'
 })
 
-GuiLibrary['RemoveObject']('FlyOptionsButton')
 local flymissile
 runFunction(function()
 	local OldNoFallFunction
@@ -702,7 +711,6 @@ local AnticheatBypass = {['Enabled'] = false}
 local Scaffold = {['Enabled'] = false}
 local longjump = {['Enabled'] = false}
 local flyvelo
-GuiLibrary['RemoveObject']('SpeedOptionsButton')
 runFunction(function()
 	local speedmode = {['Value'] = 'Normal'}
 	local speedval = {['Value'] = 1}
