@@ -1970,26 +1970,37 @@ runFunction(function()
 	end
 end)
 
-GuiLibrary.RemoveObject('SilentAimOptionsButton')
-GuiLibrary.RemoveObject('ReachOptionsButton')
-GuiLibrary.RemoveObject('MouseTPOptionsButton')
-GuiLibrary.RemoveObject('PhaseOptionsButton')
-GuiLibrary.RemoveObject('AutoClickerOptionsButton')
-GuiLibrary.RemoveObject('SpiderOptionsButton')
-GuiLibrary.RemoveObject('LongJumpOptionsButton')
-GuiLibrary.RemoveObject('HitBoxesOptionsButton')
-GuiLibrary.RemoveObject('KillauraOptionsButton')
-GuiLibrary.RemoveObject('TriggerBotOptionsButton')
-GuiLibrary.RemoveObject('AutoLeaveOptionsButton')
-GuiLibrary.RemoveObject('SpeedOptionsButton')
-GuiLibrary.RemoveObject('FlyOptionsButton')
-GuiLibrary.RemoveObject('ClientKickDisablerOptionsButton')
-GuiLibrary.RemoveObject('NameTagsOptionsButton')
-GuiLibrary.RemoveObject('SafeWalkOptionsButton')
-GuiLibrary.RemoveObject('FOVChangerOptionsButton')
-GuiLibrary.RemoveObject('AntiVoidOptionsButton')
-GuiLibrary.RemoveObject('SongBeatsOptionsButton')
-GuiLibrary.RemoveObject('TargetStrafeOptionsButton')
+task.spawn(function()
+	for i,v in next, (
+		{
+			'ServerHop',
+			'Rejoin', 
+			'AutoRejoin', 
+			'TargetStrafeOptionsButton', 
+			'SongBeatsOptionsButton', 
+			'AntiVoidOptionsButton', 
+			'FOVChangerOptionsButton', 
+			'SafeWalkOptionsButton', 
+			'NameTagsOptionsButton', 
+			'ClientKickDisablerOptionsButton', 
+			'FlyOptionsButton', 
+			'SpeedOptionsButton', 
+			'AutoLeaveOptionsButton', 
+			'TriggerBotOptionsButton', 
+			'KillauraOptionsButton', 
+			'HitBoxesOptionsButton', 
+			'LongJumpOptionsButton', 
+			'SpiderOptionsButton',
+			'AutoClickerOptionsButton',
+			'PhaseOptionsButton',
+			'MouseTPOptionsButton',
+			'ReachOptionsButton',
+			'SilentAimOptionsButton'
+		}
+	) do 
+		pcall(GuiLibrary.RemoveObject, v..'OptionsButton') 
+	end
+end)
 
 runFunction(function()
 	local AimAssist = {}
@@ -9748,12 +9759,6 @@ task.spawn(function()
 		end
 		task.wait()
 	until not vapeInjected
-end)
-
-task.spawn(function()
-	for i,v in next, ({'ServerHop', 'Rejoin', 'AutoRejoin'}) do 
-		pcall(GuiLibrary.RemoveObject, v..'OptionsButton') 
-	end
 end)
 
 table.insert(vapeConnections, vapeEvents.MatchEndEvent.Event:Connect(function() 

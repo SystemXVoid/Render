@@ -838,13 +838,13 @@ if shared.VapeExecuted then
 		end
 	end
 
-	GuiLibrary["RemoveObject"] = function(objname)
+	GuiLibrary["RemoveObject"] = pcall(function(objname)
 		GuiLibrary.ObjectsThatCanBeSaved[objname]["Object"]:Remove()
 		if GuiLibrary.ObjectsThatCanBeSaved[objname]["Type"] == "OptionsButton" then 
 			GuiLibrary.ObjectsThatCanBeSaved[objname]["ChildrenObject"].Name = "RemovedChildren"
 		end
 		GuiLibrary.ObjectsThatCanBeSaved[objname] = nil
-	end
+	end)
 
 	GuiLibrary["CreateMainWindow"] = function()
 		local windowapi = {}
@@ -3761,7 +3761,6 @@ if shared.VapeExecuted then
 		expandbutton.MouseButton2Click:Connect(windowapi["ExpandToggle"])
 
 		windowapi["CreateOptionsButton"] = function(argstablemain)
-			pcall(GuiLibrary.RemoveObject, argstablemain.Name..'OptionsButton')
 			local buttonapi = {}
 			local amount = #children:GetChildren()
 			local button = Instance.new("TextButton")
@@ -3875,7 +3874,7 @@ if shared.VapeExecuted then
 			bindround.CornerRadius = UDim.new(0, 6)
 			bindround.Parent = bindbkg
 			if argstablemain["HoverText"] and type(argstablemain["HoverText"]) == "string" then
-				button.MouseEnter:Connect(function() 
+				button.MouseEnter:Connect(function()
 					hoverbox.Visible = (GuiLibrary["ToggleTooltips"] and hoverbox.TextSize ~= 1)
 					local textsize = textService:GetTextSize(argstablemain["HoverText"], hoverbox.TextSize, hoverbox.Font, Vector2.new(99999, 99999))
 					hoverbox.Text = " "..argstablemain["HoverText"]:gsub("\n", "\n ")
@@ -3895,7 +3894,7 @@ if shared.VapeExecuted then
 			buttonapi["GetExtraText"] = (buttonapi["HasExtraText"] and argstablemain["ExtraText"] or function() return "" end)
 			buttonapi.Connections = {}
 			local newsize = UDim2.new(0, 20, 0, 21)
-			
+
 			buttonapi["SetKeybind"] = function(key)
 				if key == "" then
 					buttonapi["Keybind"] = key
@@ -3944,16 +3943,7 @@ if shared.VapeExecuted then
 					bindtext.TextColor3 = Color3.fromRGB(88, 88, 88)
 					bindimg.ImageColor3 = Color3.fromRGB(88, 88, 88)
 				end
-				task.spawn(function()
-					local success, exception = pcall(argstablemain.Function, buttonapi.Enabled)
-					if RenderDebug and not success then 
-						pcall(function()
-							local notification = GuiLibrary.CreateNotification(argstablemain.Name, 'Callback Error | '..exception, 10, 'assets/WarningNotification.png')
-							notification.IconLabel.ImageColor3 = Color3.new(220, 0, 0)
-							notification.Frame.Frame.ImageColor3 = Color3.new(220, 0, 0)
-						end)
-					end
-				end)
+				argstablemain["Function"](buttonapi["Enabled"])
 				GuiLibrary["UpdateHudEvent"]:Fire()
 			end
 
@@ -3965,7 +3955,7 @@ if shared.VapeExecuted then
 						if v:IsA("TextButton") then
 							v.Visible = true
 						end
-					end	
+					end
 					windowicon.Visible = true
 					windowbackbutton.Visible = false
 					children2.Visible = false
@@ -4055,7 +4045,7 @@ if shared.VapeExecuted then
 					scrollframe.Size = UDim2.new(0, 220, 0, math.clamp(uilistlayout3.AbsoluteContentSize.Y, 1, 105))
 					scrollframebkg.Size = UDim2.new(0, 220, 0, math.clamp(uilistlayout3.AbsoluteContentSize.Y, 1, 105) + 3)
 				end)
-		
+
 				textGuiLibrary["Object"] = frame
 				textGuiLibrary["ScrollingObject"] = scrollframebkg
 				textGuiLibrary["ObjectList"] = {}
@@ -4110,11 +4100,11 @@ if shared.VapeExecuted then
 					end
 				end
 
-                local function AddToList() 
+                local function AddToList()
 					table.insert(textGuiLibrary["ObjectList"], textbox.Text)
 					textGuiLibrary["RefreshValues"](textGuiLibrary["ObjectList"])
 					if argstable["AddFunction"] then
-						argstable["AddFunction"](textbox.Text) 
+						argstable["AddFunction"](textbox.Text)
 					end
                     textbox.Text = ""
 				end
@@ -4163,7 +4153,7 @@ if shared.VapeExecuted then
 				textbox.PlaceholderText = argstable["TempText"]
 				textbox.TextSize = 17
 				textbox.Parent = textboxbkg
-				
+
 				textGuiLibrary["Object"] = frame
 				textGuiLibrary["Value"] = ""
 				textGuiLibrary["SetValue"] = function(val, entered)
@@ -4174,7 +4164,7 @@ if shared.VapeExecuted then
 					end
 				end
 
-				textbox.FocusLost:Connect(function(enter) 
+				textbox.FocusLost:Connect(function(enter)
 					textGuiLibrary["SetValue"](textbox.Text, true)
 					if argstable["FocusLost"] then
 						argstable["FocusLost"](enter)
@@ -4394,16 +4384,7 @@ if shared.VapeExecuted then
 							end
 							toggleframe2:TweenPosition(UDim2.new(0, 2, 0, 2), Enum.EasingDirection.InOut, Enum.EasingStyle.Linear, 0.1, true)
 						end
-						task.spawn(function()
-							local success, exception = pcall(argstable.Function, buttonapi.Enabled)
-							if RenderDebug and not success then 
-								pcall(function()
-									local notification = GuiLibrary.CreateNotification(argstable.Name, 'Callback Error | '..exception, 10, 'assets/WarningNotification.png')
-									notification.IconLabel.ImageColor3 = Color3.new(220, 0, 0)
-									notification.Frame.Frame.ImageColor3 = Color3.new(220, 0, 0)
-								end)
-							end
-						end)
+						argstable["Function"](buttonapi["Enabled"])
 					end
 					if argstable["Default"] then
 						buttonapi["ToggleButton"](argstable["Default"], true)
@@ -4432,7 +4413,7 @@ if shared.VapeExecuted then
 							tweenService:Create(toggleframe1, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut), {BackgroundColor3 = Color3.fromRGB(60, 60, 60)}):Play()
 						end
 					end)
-			
+
 					GuiLibrary.ObjectsThatCanBeSaved[argstablemain["Name"]..argstable["Name"].."TargetToggle"] = {["Type"] = "Toggle", ["Object"] = buttontext, ["Api"] = buttonapi}
 					return buttonapi
 				end
@@ -4787,7 +4768,7 @@ if shared.VapeExecuted then
 						scrollframe.Size = UDim2.new(0, 220, 0, math.clamp(uilistlayout3.AbsoluteContentSize.Y, 1, 105))
 						scrollframebkg.Size = UDim2.new(0, 220, 0, math.clamp(uilistlayout3.AbsoluteContentSize.Y, 1, 105) + 3)
 					end)
-			
+
 					textGuiLibrary["Object"] = frame
 					textGuiLibrary["ScrollingObject"] = scrollframebkg
 					textGuiLibrary["ObjectList"] = {}
@@ -4843,7 +4824,7 @@ if shared.VapeExecuted then
 							friendcircle2.BackgroundColor3 = Color3.fromRGB(31, 31, 31)
 							friendcircle2.Position = UDim2.new(0, 1, 0, 1)
 							friendcircle2.Visible = not objenabled
-							friendcircle2.Parent = friendcircle	
+							friendcircle2.Parent = friendcircle
 							itemframe:GetPropertyChangedSignal("BackgroundColor3"):Connect(function()
 								friendcircle2.BackgroundColor3 = itemframe.BackgroundColor3
 							end)
@@ -4881,7 +4862,7 @@ if shared.VapeExecuted then
 							end)
 						end
 					end
-			
+
 					GuiLibrary.ObjectsThatCanBeSaved[argstablemain["Name"]..argstable["Name"].."TextCircleList"] = {["Type"] = "TextCircleList", ["Api"] = textGuiLibrary}
 					local function AddToList()
                         local num = #textGuiLibrary["ObjectList"] + 1
@@ -4889,7 +4870,7 @@ if shared.VapeExecuted then
                         textGuiLibrary["ObjectListEnabled"][num] = true
                         textGuiLibrary["RefreshValues"](textGuiLibrary["ObjectList"])
                         if argstable["AddFunction"] then
-                            argstable["AddFunction"](textbox.Text) 
+                            argstable["AddFunction"](textbox.Text)
                         end
                         textbox.Text = ""
                     end
@@ -5133,7 +5114,7 @@ if shared.VapeExecuted then
 					dropGuiLibrary["List"] = val
 					if not table.find(list, dropGuiLibrary["Value"]) then
 						dropGuiLibrary["Value"] = list[1]
-						drop1.Text = "         "..(translations[argstable["Name"]] ~= nil and translations[argstable["Name"]] or argstable["Name"]).." - "..list[1]
+						drop1.Text = "         "..(argstable["Name"]).." - "
 						dropframe.Visible = false
 						argstable["Function"](list[1])
 					end
@@ -5351,7 +5332,7 @@ if shared.VapeExecuted then
 				sliderval.Slider.ButtonSlider.MouseButton1Down:Connect(function()
 					slidercode(sliderval.Slider, "Value")
 				end)
-				
+
 				frame.MouseEnter:Connect(function()
 					if argstable["HoverText"] and type(argstable["HoverText"]) == "string" then
 						hoverbox.Visible = (GuiLibrary["ToggleTooltips"] and hoverbox.TextSize ~= 1)
@@ -5463,9 +5444,9 @@ if shared.VapeExecuted then
 				sliderapi["SetValue"] = function(val)
 				--	val = math.clamp(val, argstable["Min"], argstable["Max"])
 					sliderapi["Value"] = val
-					pcall(function() slider2.Size = UDim2.new(math.clamp((val / argstable["Max"]), 0.02, 0.97), 0, 1, 0) end)
+					slider2.Size = UDim2.new(math.clamp((val / argstable["Max"]), 0.02, 0.97), 0, 1, 0)
 					local doublecheck = argstable["Double"] and (sliderapi["Value"] / argstable["Double"]) or sliderapi["Value"]
-					pcall(function() text2.Text = doublecheck .. " "..(argstable["Percent"] and "%  " or " ").." " end)
+					text2.Text = doublecheck .. " "..(argstable["Percent"] and "%  " or " ").." "
 					argstable["Function"](val)
 				end
 				slider3.MouseButton1Down:Connect(function()
@@ -5533,7 +5514,7 @@ if shared.VapeExecuted then
 			end
 
 			buttonapi["CreateTwoSlider"] = function(argstable)
-				
+
 				local sliderapi = {}
 				local amount2 = #children2:GetChildren()
 				local frame = Instance.new("Frame")
@@ -5790,7 +5771,7 @@ if shared.VapeExecuted then
 						tweenService:Create(toggleframe1, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut), {BackgroundColor3 = Color3.fromRGB(60, 60, 60)}):Play()
 					end
 				end)
-		
+
 				GuiLibrary.ObjectsThatCanBeSaved[argstablemain["Name"]..argstable["Name"].."Toggle"] = {["Type"] = "Toggle", ["Object"] = buttontext, ["Api"] = buttonapi}
 				return buttonapi
 			end
@@ -5798,55 +5779,51 @@ if shared.VapeExecuted then
 			if argstablemain["Default"] then
 				buttonapi["ToggleButton"](false, true)
 			end
-			button.MouseButton1Click:Connect(function() 
-				buttonapi["ToggleButton"](true) 
+			button.MouseButton1Click:Connect(function()
+				buttonapi["ToggleButton"](true)
 			end)
-			if inputService.TouchEnabled then 
-				local touched = false
+			if inputService.TouchEnabled then
+				local touchedButton = false
 				button.MouseButton1Down:Connect(function()
-					touched = true
-					local oldbuttonposition = button.AbsolutePosition
+					touchedButton = true
 					local touchtick = tick()
-					repeat 
-						task.wait() 
-						if button.AbsolutePosition ~= oldbuttonposition then 
-							touched = false
-							break
-						end
-					until (tick() - touchtick) > 1 or not touched or not clickgui.Visible
-					if touched and clickgui.Visible then 
+					local touchposition = inputService:GetMouseLocation()
+					repeat
+						task.wait()
+						if not touchedButton then break end
+						touchedButton = (inputService:GetMouseLocation() - touchposition).Magnitude < 6
+					until (tick() - touchtick) > 1 or not touchedButton or not clickgui.Visible
+					if touchedButton and clickgui.Visible then
 						clickgui.Visible = false
-						legitgui.Visible = not clickgui.Visible
-						pcall(function() game:GetService("RunService"):SetRobloxGuiFocused(clickgui.Visible and GuiLibrary["MainBlur"].Size ~= 0 or guiService:GetErrorType() ~= Enum.ConnectionError.OK) end)
-						for _, mobileButton in pairs(GuiLibrary.MobileButtons) do mobileButton.Visible = not clickgui.Visible end	
+						--runService:SetRobloxGuiFocused(guiService:GetErrorType() ~= Enum.ConnectionError.OK)
+						for _, mobileButton in pairs(GuiLibrary.MobileButtons) do mobileButton.Visible = not clickgui.Visible end
 						local touchconnection
 						touchconnection = inputService.InputBegan:Connect(function(inputType)
-							if inputType.UserInputType == Enum.UserInputType.Touch then 
-								createMobileButton(buttonapi, inputType.Position)
+							if inputType.UserInputType == Enum.UserInputType.Touch then
+								createMobileButton(buttonapi, inputType.Position + Vector3.new(0, guiService:GetGuiInset().Y, 0))
 								clickgui.Visible = true
-								legitgui.Visible = not clickgui.Visible
-								pcall(function() game:GetService("RunService"):SetRobloxGuiFocused(clickgui.Visible and GuiLibrary["MainBlur"].Size ~= 0 or guiService:GetErrorType() ~= Enum.ConnectionError.OK) end)
-								for _, mobileButton in pairs(GuiLibrary.MobileButtons) do mobileButton.Visible = not clickgui.Visible end		
+								--runService:SetRobloxGuiFocused((clickgui.Visible or guiService:GetErrorType() ~= Enum.ConnectionError.OK) and mainapi.Blur.Enabled)
+								for _, mobileButton in pairs(GuiLibrary.MobileButtons) do mobileButton.Visible = not clickgui.Visible end
 								touchconnection:Disconnect()
 							end
 						end)
 					end
 				end)
 				button.MouseButton1Up:Connect(function()
-					touched = false
+					touchedButton = false
 				end)
 			end
-			button.MouseEnter:Connect(function() 
+			button.MouseEnter:Connect(function()
 				bindbkg.Visible = true
 				if not buttonapi["Enabled"] then
 					currenttween = tweenService:Create(button, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut), {BackgroundColor3 = Color3.fromRGB(31, 30, 31)})
 					currenttween:Play()
 				end
 			end)
-			button.MouseLeave:Connect(function() 
+			button.MouseLeave:Connect(function()
 				hoverbox.Visible = false
 				if buttonapi["Keybind"] == "" then
-					bindbkg.Visible = false 
+					bindbkg.Visible = false
 				end
 				if not buttonapi["Enabled"] then
 					currenttween = tweenService:Create(button, TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut), {BackgroundColor3 = Color3.fromRGB(26, 25, 26)})
@@ -5884,14 +5861,14 @@ if shared.VapeExecuted then
 					end)
 				end
 			end)
-			bindbkg.MouseEnter:Connect(function() 
-				bindimg.Image = downloadVapeAsset("vape/assets/PencilIcon.png") 
+			bindbkg.MouseEnter:Connect(function()
+				bindimg.Image = downloadVapeAsset("vape/assets/PencilIcon.png")
 				bindimg.Visible = true
 				bindtext.Visible = false
 				bindbkg.Size = UDim2.new(0, 20, 0, 21)
 				bindbkg.Position = UDim2.new(1, -56, 0, 9)
 			end)
-			bindbkg.MouseLeave:Connect(function() 
+			bindbkg.MouseLeave:Connect(function()
 				bindimg.Image = downloadVapeAsset("vape/assets/KeybindIcon.png")
 				if buttonapi["Keybind"] ~= "" then
 					bindimg.Visible = false
@@ -5912,7 +5889,7 @@ if shared.VapeExecuted then
 			end
 			table.sort(sorttable1)
 			for i2,v2 in pairs(sorttable1) do
-				if v2:find("Button") then 
+				if v2:find("Button") then
 					local findstr = v2:gsub("Button", "Children")
 					local sortnum = i2
 					local findstr2 = v2:gsub("Button", "OptionsButton")
