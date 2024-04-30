@@ -326,13 +326,13 @@ GUI.CreateButton({
 })
 GUI.CreateDivider("Custom")
 GUI.CreateButton({
-	Name = "Target HUD",
+	Name = "TargetHUD",
 	Function = function(calling) TargetHUD.SetVisible(calling) end,
 	Icon = "vape/assets/OnlineProfilesButton.png", 
 	IconSize = 16
 })
 GUI.CreateButton({
-	Name = "Session HUD",
+	Name = "SessionHUD",
 	Function = function(calling) SessionHUD.SetVisible(calling) end,
 	Icon = "vape/assets/OnlineProfilesButton.png", 
 	IconSize = 16
@@ -1353,11 +1353,14 @@ local windowSortOrder = {
 	RenderButton = 3,
 	UtilityButton = 4,
 	WorldButton = 5,
-	FriendsButton = 6,
-	TargetsButton = 7,
-	ProfilesButton = 8
+	TargetHUDButton = 6,
+	SessionHUDButton = 7,
+	MatchmakingButton = 8,
+	FriendsButton = 9,
+	TargetsButton = 10,
+	ProfilesButton = 11
 }
-local windowSortOrder2 = {"Combat", "Blatant", "Render", "Utility", "World"}
+local windowSortOrder2 = {"Combat", "Blatant", "Render", "Utility", "World", "TargetHUD", "SessionHUD", "Matchmaking"}
 
 local function getVapeSaturation(val)
 	local sat = 0.9
@@ -1704,12 +1707,15 @@ GUISettings.CreateButton2({
 			RenderWindow = 4,
 			UtilityWindow = 5,
 			WorldWindow = 6,
-			FriendsWindow = 7,
-			TargetsWindow = 8,
-			ProfilesWindow = 9,
-			["Text GUICustomWindow"] = 10,
-			TargetInfoCustomWindow = 11,
-			RadarCustomWindow = 12,
+			TargetHUDWindow = 7,
+			SessionHUDWindow = 8,
+			MatchmakingWindow = 9,
+			FriendsWindow = 10,
+			TargetsWindow = 11,
+			ProfilesWindow = 12,
+			["Text GUICustomWindow"] = 13,
+			TargetInfoCustomWindow = 14,
+			RadarCustomWindow = 15
 		}
 		local storedpos = {}
 		local num = 6
