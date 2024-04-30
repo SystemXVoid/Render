@@ -432,11 +432,13 @@ return (function(ria)
 	task.spawn(function()
 		local repo = game.HttpGet(game, 'https://api.github.com/repos/7GrandDadPGN/VapeV4ForRoblox/contents/assets')
 		if repo ~= '404: Not Found' then
-			for i,v in httpService:JSONDecode(repo) do
-				if type(v) == 'table' and v.name then
-					table.insert(guiassets, v.name)
+			pcall(function()
+				for i,v in httpService:JSONDecode(repo) do
+					if type(v) == 'table' and v.name then
+						table.insert(guiassets, v.name)
+					end
 				end
-			end
+			end)
 		end
 		assetfinished = true
 	end)
