@@ -244,6 +244,7 @@ end
 
 local function runFunction(func) func() end
 local function runLunar(func) func() end
+local run = function(e) e() end
 
 local function isFriend(plr, recolor)
 	if GuiLibrary.ObjectsThatCanBeSaved['Use FriendsToggle'].Api.Enabled then
@@ -12414,6 +12415,7 @@ end)
 								fireproximityprompt(v.EggCollectPrompt)
 							end
 						end
+						
 					end	
 					task.wait()
 				until (not AutoEgg.Enabled)
@@ -12422,11 +12424,11 @@ end)
 	})
 end)]]
 
-runFunction(function()
+run(function()
 	local ScytheDisabler = {}
 	ScytheDisabler = GuiLibrary.ObjectsThatCanBeSaved.BlatantWindow.Api.CreateOptionsButton({
 		Name = 'ScytheDisabler',
-		HoverText = 'Only works in custom matches, sorry <3',
+		HoverText = "Works on everymatch (you need forge mechanic).",
 		Function = function(calling)
 			if calling then 
 				repeat
@@ -12988,7 +12990,7 @@ runFunction(function()
         end
     })
     ScaffoldHandCheck = Scaffold.CreateToggle({
-        Name = 'Hand',
+        Name = 'HandCheck',
         HoverText = 'Uses the block that\'s in your hand if available.',
         Function = function() end
     })
@@ -13047,4 +13049,3 @@ runFunction(function()
 		end
 	})
 end)
- 
