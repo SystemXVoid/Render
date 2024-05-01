@@ -1998,7 +1998,7 @@ task.spawn(function()
 			'SilentAimOptionsButton'
 		}
 	) do 
-		pcall(GuiLibrary.RemoveObject, v..'OptionsButton') 
+		pcall(GuiLibrary.RemoveObject, v) 
 	end
 end)
 
