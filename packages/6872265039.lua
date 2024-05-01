@@ -385,7 +385,7 @@ task.spawn(function()
 			'FlyOptionsButton'
 		}
 	) do 
-		pcall(GuiLibrary.RemoveObject, v..'OptionsButton') 
+		pcall(GuiLibrary.RemoveObject, v) 
 	end
 end)
 
