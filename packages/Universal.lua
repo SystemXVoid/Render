@@ -9844,60 +9844,23 @@ run(function()
 end)
 
 run(function()
-	local BackTrack = {}
-	local BackTrackMode = {Value = "Manual"}
-	local BackTrackBased = {Value = 300}
-	local BackTrackTick = {Value = 5}
-	local old;
-	BackTrack = GuiLibrary.ObjectsThatCanBeSaved.UtilityWindow.Api.CreateOptionsButton({
-		Name = "BackTrack",
+	local ReplicatedLag = {}
+	local ReplicatedLagTick = {Value = 5}
+	ReplicatedLag = GuiLibrary.ObjectsThatCanBeSaved.RenderWindow.Api.CreateOptionsButton({
+		Name = "ReplicatedLag",
 		Function = function(call)
 			if call then
-                task.spawn(function()
-                    if BackTrackMode ~= "Manual" then
-                        repeat
-                            settings():GetService("NetworkSettings").IncomingReplicationLag = BackTrackBased.Value 
-                            task.wait(math.random(1, 2))
-                            settings():GetService("NetworkSettings").IncomingReplicationLag = 0 
-                            task.wait(math.random(0.5,1.5))
-                        until (not BackTrack.Enabled)
-                    else
-                        return errorNotification("Render", "unfinished..", 10)
-                    end
-                end)
+                            	settings():GetService("NetworkSettings").IncomingReplicationLag = ReplicatedLagTick.Value 
 			else
 				settings():GetService("NetworkSettings").IncomingReplicationLag = 0
 			end
 		end,
 		HoverText = "Slow player rendering."
 	})
-	BackTrackBased = BackTrack.CreateTwoSlider({
-		Name = "Latency",
-		Min = 1,
-		Max = 250,
-		Default = 39,
-		Default2 = 79
-	})
-	BackTrackTick = BackTrack.CreateSlider({
+	ReplicatedLagTick = ReplicatedLag.CreateSlider({
 		Name = "Tick",
 		Min = 0.1,
 		Max = 5,
 		Default = 0.11,
-	})
-    BackTrackBased.Object.Visible = false
-    BackTrackTick.Object.Visible = false
-	BackTrackMode = BackTrack.CreateDropdown({
-		Name = "Mode",
-		List = {"Manual", "Lag Based"},
-		Function = function(val) 
-			if val == "Manual" then
-				BackTrackBased.Object.Visible = false
-				BackTrackTick.Object.Visible = true
-            else
-				BackTrackBased.Object.Visible = true
-				BackTrackTick.Object.Visible = false
-			end
-		end,
-		Default = "Lag Based"
 	})
 end)
