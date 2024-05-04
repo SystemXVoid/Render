@@ -25,6 +25,7 @@ local vapeConnections = {}
 local vapeCachedAssets = {}
 local vapeTargetInfo = shared.VapeTargetInfo
 local vapeInjected = true
+local setidentity = (setthreadcaps or set_thread_caps or set_thread_identity or function() end)
 local httprequest = (http and http.request or http_request or fluxus and fluxus.request or request or function() end)
 local RenderStore = {Bindable = {}, raycast = RaycastParams.new(), MessageReceived = Instance.new('BindableEvent'), tweens = {}, ping = 0, platform = inputService:GetPlatform(), LocalPosition = Vector3.zero, groundTime = tick(), UpdateGroundTick = function() end, sessionInfo = {labelInstances = {}}, clonedata = {}}
 local vec3 = Vector3.new
@@ -171,7 +172,7 @@ local function removeTags(str)
 	return (str:gsub("<[^<>]->", ""))
 end
 
-local function run(func) func() end
+local function run(func) setidentity(8) func() end
 local runFunction = run
 
 local function isFriend(plr, recolor)

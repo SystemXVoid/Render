@@ -44,6 +44,7 @@ local executor = (identifyexecutor and identifyexecutor() or getexecutorname and
 local tweenService = game:GetService('TweenService')
 local gameCamera = workspace.CurrentCamera
 local lplr = playersService.LocalPlayer
+local setidentity = (setthreadcaps or set_thread_caps or set_thread_identity or function() end)
 local vapeConnections = {}
 local vapeCachedAssets = {}
 local vapeEvents = setmetatable({}, {
@@ -103,7 +104,7 @@ local bedwarsStore = {
 	zephyrOrb = 0
 }
 bedwarsStore.blockRaycast.FilterType = Enum.RaycastFilterType.Include
-
+setidentity(8)
 local AutoLeave = {}
 local isAlive = function() return false end 
 local playSound = function() end
@@ -245,7 +246,7 @@ GetEnumItems = function(enum)
 	return fonts
 end
 
-local function runFunction(func) func() end
+local function runFunction(func) setidentity(8) func() end
 local function runLunar(func) func() end
 local run = function(e) e() end
 
@@ -2716,6 +2717,7 @@ runFunction(function()
 		Name = 'Fly',
 		Function = function(calling)
 			if calling then
+				setidentity(8)
 				olddeflate = bedwars.BalloonController.deflateBalloon
 				bedwars.BalloonController.deflateBalloon = function() end
 
@@ -2777,6 +2779,7 @@ runFunction(function()
 				end
 
 				if FlyAnywayProgressBarFrame and flyAllowed <= 0 and (not balloons) then 
+					setidentity(8)
 					FlyAnywayProgressBarFrame.Visible = true
 					FlyAnywayProgressBarFrame.Frame:TweenSize(UDim2.new(1, 0, 0, 20), Enum.EasingDirection.InOut, Enum.EasingStyle.Linear, 0, true)
 				end
@@ -2785,6 +2788,7 @@ runFunction(function()
 				FlyCoroutine = coroutine.create(function()
 					repeat
 						repeat task.wait() until (groundtime - tick()) < 0.6 and not onground
+						setidentity(8)
 						flyAllowed = ((lplr.Character and lplr.Character:GetAttribute('InflatedBalloons') and lplr.Character:GetAttribute('InflatedBalloons') > 0) or bedwarsStore.matchState == 2 or megacheck) and 1 or 0
 						if (not Fly.Enabled) then break end
 						local Flytppos = -99999
@@ -4267,6 +4271,7 @@ runFunction(function()
 	end)
 	task.spawn(function()
 		repeat task.wait() until (RenderFunctions.whitelist.state > 0)
+		setidentity(8)
 		killauranorender.Object.Visible = (RenderFunctions.whitelist:get(3) > 1)
 	end)
 end)

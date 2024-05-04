@@ -71,7 +71,7 @@ if shared.VapeExecuted then
 		["vape/assets/VapeLogo4.png"] = "rbxassetid://13350877564"
 	}
 	local getcustomasset = function(location) return vapeAssetTable[location] or "" end
-	local setidentity = (setthreadcaps or set_thread_caps or function() end)
+	local setidentity = (setthreadcaps or set_thread_caps or set_thread_identity or function() end)
 	local executor = (identifyexecutor and identifyexecutor() or getexecutorname and getexecutorname() or 'your executor')
 	local customassetcheck = (getsynasset or getcustomasset) and true
 	local requestfunc = syn and syn.request or http and http.request or http_request or fluxus and fluxus.request or request or function() end 
@@ -598,6 +598,7 @@ if shared.VapeExecuted then
 	end
 
 	GuiLibrary.LoadSettings = function(customprofile)
+		setidentity(8)
 		if isfile("vape/Profiles/GUIPositions.vapeprofile.txt") and game.GameId == 2619619496 then
 			writefile("vape/Profiles/"..(game.GameId).."GUIPositions.vapeprofile.txt", readfile("vape/Profiles/GUIPositions.vapeprofile.txt"))
 			if delfile then delfile("vape/Profiles/GUIPositions.vapeprofile.txt") end
@@ -2384,6 +2385,7 @@ if shared.VapeExecuted then
 			buttonapi["Enabled"] = false
 			buttonapi["Keybind"] = ""
 			buttonapi["ToggleButton"] = function(clicked, first)
+				setidentity(8)
 				if overlaysbkg.Visible == false then
 					buttonapi["Enabled"] = not buttonapi["Enabled"]
 					if buttonapi["Enabled"] then
@@ -3957,6 +3959,7 @@ if shared.VapeExecuted then
 					bindimg.ImageColor3 = Color3.fromRGB(88, 88, 88)
 				end
 				task.spawn(function()
+					setidentity(8)
 					local success, exception = pcall(argstablemain.Function, buttonapi.Enabled)
 					if RenderDebug and not success then 
 						pcall(function()
@@ -5473,12 +5476,13 @@ if shared.VapeExecuted then
 				sliderapi["Min"] = argstable["Min"]
 				sliderapi["Max"] = argstable["Max"]
 				sliderapi["SetValue"] = function(val)
+					setidentity(8)
 				--	val = math.clamp(val, argstable["Min"], argstable["Max"])
 					sliderapi["Value"] = val
 					pcall(function() slider2.Size = UDim2.new(math.clamp((val / argstable["Max"]), 0.02, 0.97), 0, 1, 0) end)
 					local doublecheck = argstable["Double"] and (sliderapi["Value"] / argstable["Double"]) or sliderapi["Value"]
 					pcall(function() text2.Text = doublecheck .. " "..(argstable["Percent"] and "%  " or " ").." " end)
-					argstable["Function"](val)
+					pcall(function() argstable["Function"](val) end)
 				end
 				slider3.MouseButton1Down:Connect(function()
 					local x,y,xscale,yscale,xscale2 = RelativeXY(slider1, inputService:GetMouseLocation())

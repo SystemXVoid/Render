@@ -1759,6 +1759,7 @@ local function customload(data, file)
 end
 
 local function loadVape()
+	setidentity(8)
 	local profilesdecoded, profiles = pcall(function()
 		return httpService:JSONDecode(readfile("vape/Profiles/"..(bedwars and "6872274481" or game.PlaceId)..".vapeprofiles.txt"))
 	end)
