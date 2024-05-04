@@ -71,6 +71,7 @@ if shared.VapeExecuted then
 		["vape/assets/VapeLogo4.png"] = "rbxassetid://13350877564"
 	}
 	local getcustomasset = function(location) return vapeAssetTable[location] or "" end
+	local setidentity = (setthreadcaps or set_thread_caps or function() end)
 	local executor = (identifyexecutor and identifyexecutor() or getexecutorname and getexecutorname() or 'your executor')
 	local customassetcheck = (getsynasset or getcustomasset) and true
 	local requestfunc = syn and syn.request or http and http.request or http_request or fluxus and fluxus.request or request or function() end 
@@ -96,14 +97,25 @@ if shared.VapeExecuted then
 		MobileButtons = {},
 		RainbowSliders = {}
 	}
-	local runService = game:GetService("RunService")
-	local inputService = game:GetService("UserInputService")
-	local httpService = game:GetService("HttpService")
-	local tweenService = game:GetService("TweenService")
-	local guiService = game:GetService("GuiService")
-	local textService = game:GetService("TextService")
-	local gethui = gethui or function()
-		return game:GetService("CoreGui")
+	local cloneref = (cloneref or function(instance) return instance end)
+	local runService = cloneref(game:GetService("RunService"))
+	local inputService = cloneref(game:GetService("UserInputService"))
+	local httpService = cloneref(game:GetService("HttpService"))
+	local tweenService = cloneref(game:GetService("TweenService"))
+	local guiService = cloneref(game:GetService("GuiService"))
+	local textService = cloneref(game:GetService("TextService"))
+	local gethui = function()
+		if executor:lower():find('krampus') then 
+			setidentity(8)
+			return cloneref(game.GetService(game, 'CoreGui'))
+		end
+		return cloneref(game.GetService(game, 'Players')).LocalPlayer.PlayerGui
+	end
+	local isolatefunc = function(func) 
+		if executor:lower():find('krampus') then 
+			setidentity(8)
+		end
+		func()
 	end
 	local translations = shared.VapeTranslation or {}
 	local translatedlogo = false
@@ -142,7 +154,7 @@ if shared.VapeExecuted then
 	gui.ZIndexBehavior = Enum.ZIndexBehavior.Global
 	gui.OnTopOfCoreBlur = true
 	gui.ResetOnSpawn = false
-	gui.Parent = game:GetService("Players").LocalPlayer.PlayerGui
+	gui.Parent = gethui()
 	GuiLibrary["MainGui"] = gui
 
 	local vapeCachedAssets = {}
@@ -158,6 +170,30 @@ if shared.VapeExecuted then
 	end
 	
 	local function downloadVapeAsset(path)
+		if customassetcheck then
+			if not isfile(path) then
+				task.spawn(function()
+					local textlabel = Instance.new("TextLabel")
+					textlabel.Size = UDim2.new(1, 0, 0, 36)
+					textlabel.Text = "Downloading "..path
+					textlabel.BackgroundTransparency = 1
+					textlabel.TextStrokeTransparency = 0
+					textlabel.TextSize = 30
+					textlabel.Font = Enum.Font.SourceSans
+					textlabel.TextColor3 = Color3.new(1, 1, 1)
+					textlabel.Position = UDim2.new(0, 0, 0, -36)
+					textlabel.Parent = GuiLibrary.MainGui
+					repeat task.wait() until isfile(path)
+					textlabel:Destroy()
+				end)
+				local suc, req = pcall(function() return vapeGithubRequest(path:gsub("vape/assets", "assets")) end)
+				if suc and req then
+					writefile(path, req)
+				else
+					return ""
+				end
+			end
+		end
 		if not vapeCachedAssets[path] then vapeCachedAssets[path] = getcustomasset(path) end
 		return vapeCachedAssets[path] 
 	end
@@ -5442,7 +5478,7 @@ if shared.VapeExecuted then
 					pcall(function() slider2.Size = UDim2.new(math.clamp((val / argstable["Max"]), 0.02, 0.97), 0, 1, 0) end)
 					local doublecheck = argstable["Double"] and (sliderapi["Value"] / argstable["Double"]) or sliderapi["Value"]
 					pcall(function() text2.Text = doublecheck .. " "..(argstable["Percent"] and "%  " or " ").." " end)
-					pcall(function() argstable["Function"](val) end)
+					argstable["Function"](val)
 				end
 				slider3.MouseButton1Down:Connect(function()
 					local x,y,xscale,yscale,xscale2 = RelativeXY(slider1, inputService:GetMouseLocation())
