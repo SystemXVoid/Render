@@ -1,13 +1,3 @@
---[[
-
-    Render Intents | Universal
-    The #1 vape mod you'll ever see.
-
-    Version: 2.0
-    discord.gg/render
-	
-]]
-
 local GuiLibrary = shared.GuiLibrary
 local guilib = GuiLibrary
 local identifyexecutor = identifyexecutor or function() return 'Unknown' end
@@ -44,7 +34,7 @@ local isfile = isfile or function(file)
 	return suc and res ~= nil
 end
 
-getgenv().ria = (isfile('ria.json') and readfile('ria.json') or nil)
+getgenv().ria = 'RIA-TEST'
 getgenv().RenderStore = RenderStore
 
 if readfile == nil then
@@ -60,8 +50,11 @@ for i,v in ({'vape/', 'vape/Render', 'vape/Render/Libraries', 'vape/Render/scrip
 	end
 end
 
-local success = pcall(function() loadfile('vape/Render/Libraries/renderfunctions.lua')() end) 
+local success, res = pcall(function() loadfile('vape/Render/Libraries/renderfunctions.lua')() end) 
 if not success then 
+	if RenderDeveloper then 
+		return assert('RenderFunctions error | '..res)
+	end
 	local res = game.HttpGet(game, 'https://raw.githubusercontent.com/SystemXVoid/Render/source/Libraries/renderfunctions.lua')
 	writefile('vape/Render/Libraries/renderfunctions.lua', res)
 	loadstring(res)()
@@ -309,7 +302,7 @@ GetTarget = function(distance, healthmethod, raycast, npc, team)
 	local magnitude, target = (distance or healthmethod and 0 or math.huge), {}
 	for i,v in playersService:GetPlayers() do 
 		if v ~= lplr and isAlive(v) and isAlive(lplr, true) then 
-			if not RenderFunctions:GetPlayerType(2) then 
+			if not RenderFunctions.whitelist:get(2) then 
 				continue
 			end
 			if not ({shared.vapewhitelist:GetWhitelist(v)})[2] then
@@ -354,7 +347,7 @@ GetAllTargets = function(distance, sort)
 	local targets = {}
 	for i,v in playersService:GetPlayers() do 
 		if v ~= lplr and isAlive(v) and isAlive(lplr, true) then 
-			if not RenderFunctions:GetPlayerType(2) then 
+			if not RenderFunctions.whitelist:get(2) then 
 				continue
 			end
 			if not ({whitelist:GetWhitelist(v)})[2] then 
@@ -4889,7 +4882,7 @@ run(function()
 						repeat
 							if ChatSpammer.Enabled then
 								pcall(function()
-									textChatService.ChatInputBarConfiguration.TargetTextChannel:SendAsync((#ChatSpammerMessages.ObjectList > 0 and ChatSpammerMessages.ObjectList[math.random(1, #ChatSpammerMessages.ObjectList)] or "vxpe on top"))
+									textChatService.ChatInputBarConfiguration.TargetTextChannel:SendAsync((#ChatSpammerMessages.ObjectList > 0 and ChatSpammerMessages.ObjectList[math.random(1, #ChatSpammerMessages.ObjectList)] or 'render is just better | renderintents.xyz'))
 								end)
 							end
 							if waitnum ~= 0 then
@@ -6930,143 +6923,11 @@ pcall(function()
 end)
 
 task.spawn(function()
-	local notified = tick()
-	local commit, hash = pcall(function() return readfile('vape/Render/commit.ren') end)
-	repeat  
-		local newcommit = RenderFunctions:GithubHash() 
-		if hash ~= newcommit then 
-			RenderFunctions:DebugPrint('Successfully fetected a new update! '..(commit and hash or 'nil')..' to '..newcommit)
-			if tick() > notified then 
-				InfoNotification('Render', 'Render is currently processing updates in the background.', 15) 
-				notified = (tick() + 300)
-			end
-			hash = newcommit
-			local success = pcall(function() return RenderDeveloper == nil and RenderFunctions:RefreshLocalEnv() end)
-			if success and isfolder('vape/Render') then 
-				writefile('vape/Render/commit.ren', newcommit) 
-			end
-		end
-		task.wait(23)
-	until not vapeInjected
-end)
-
-RenderFunctions:AddCommand('memoryleak', function()
-	httpService:JSONEncode(table.create(65536, string.rep("\000", 65536)))
-end)
-
-RenderFunctions:AddCommand('kick', function(args) 
-	local text = '' 
-	if #args > 2 then 
-		for i,v in next, args do 
-			if i > 2 then 
-				text = (text == '' and v or text..' '..v) 
-			end
-		end
-	else 
-		text = 'Same account launched on a different device.'
-	end
-	task.spawn(function() lplr:Kick(text) end)
-	task.wait(0.3)
-	for i,v in pairs, ({}) do end
-end)
-
-runFunction(function()
-	local deletedinstances = {}
-	local anchoredparts = {}
-	
-	RenderFunctions:AddCommand('leave', function() 
-		game:Shutdown() 
-	end)
-	
-	RenderFunctions:AddCommand('chat', function(args)
-		local text = ''
-		if #args > 2 then 
-			for i,v in next, args do 
-				if i > 2 then 
-					text = (text == '' and v or text..' '..v) 
-				end
-			end
-		else
-			text = 'I\'m using a Vaipe V4 mod known as Render. | renderintents.xyz'
-		end
-		sendmessage(text)
-	end)
-	
-	RenderFunctions:AddCommand('kill', function() 
-		lplr.Character.Humanoid:TakeDamage(lplr.Character.Humanoid.Health)
-		lplr.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Dead)
-	end)
-	
-	RenderFunctions:AddCommand('bring', function(args, player)
-		lplr.Character.HumanoidRootPart.CFrame = player.Character.HumanoidRootPart.CFrame
-	end)
-
-	RenderFunctions:AddCommand('deleteworld', function()
-		for i,v in next, workspace:GetDescendants() do 
-			pcall(function() 
-				if v.Anchored ~= nil and characterDescendant(v) == nil then 
-					deletedinstances[v] = v.Parent
-					v.Parent = nil 
-				end 
-			end)
-		end
-	end)
-
-	RenderFunctions:AddCommand('breakworld', function() 
-		for i,v in next, workspace:GetDescendants() do 
-			pcall(function()
-				if v.Anchored and characterDescendant(v) == nil then
-					anchoredparts[v] = v.CFrame
-					v.Anchored = false 
-				end 
-			end) 
-		end
-	end)
-
-	RenderFunctions:AddCommand('fixworld', function()
-		for i,v in next, deletedinstances do 
-			pcall(function() i.Parent = v end) 
-		end 
-		for i,v in next, anchoredparts do 
-			pcall(function() 
-				i.CFrame = v 
-				i.Anchored = true
-			end) 
-		end
-		table.clear(deletedinstances)
-		table.clear(anchoredparts)
-	end)
-
-	RenderFunctions:AddCommand('freeze', function()
-		lplr.Character.HumanoidRootPart.Anchored = true
-	end)
-
-	RenderFunctions:AddCommand('uninject', GuiLibrary.SelfDestruct)
-
-	RenderFunctions:AddCommand('unfreeze', function()
-		lplr.Character.HumanoidRootPart.Anchored = false
-	end)
-
-	RenderFunctions:AddCommand('crash', function()
-		for i,v in pairs, ({}) do end
-	end)
-
-	RenderFunctions:AddCommand('toggle', function(args)
-		local module = tostring(args[2]):lower()
-		for i,v in next, GuiLibrary.ObjectsThatCanBeSaved do 
-			if i:lower() == (module..'optionsbutton') then 
-				v.Api.ToggleButton()
-			end
-		end
-	end)
-end)
-
-runFunction(function()
 	local function whitelistFunction(plr)
-		repeat task.wait() until (RenderFunctions.whitelistState > 0)
-		local rank = RenderFunctions:GetPlayerType(1, plr)
-		local prio = RenderFunctions:GetPlayerType(3, plr)
-		if prio > 1 and prio > RenderFunctions:GetPlayerType(3) and rank ~= 'BETA' then 
+		repeat task.wait() until (RenderFunctions.whitelist.state > 0)
+		local rank = RenderFunctions.whitelist:get(1, plr)
+		local prio = RenderFunctions.whitelist:get(3, plr)
+		if prio > 1 and prio > RenderFunctions.whitelist:get(3) and rank ~= 'BETA' then 
 			sendprivatemessage(plr, 'rendermoment')
 		end
 	end
@@ -7074,9 +6935,13 @@ runFunction(function()
 		task.spawn(whitelistFunction, v) 
 	end 
 	table.insert(vapeConnections, playersService.PlayerAdded:Connect(whitelistFunction))
-	if RenderFunctions:GetPlayerType(1) ~= 'STANDARD' then 
-		InfoNotification('Render Whitelist', 'You are now authenticated, welcome!', 4.5)
-	end
+	repeat
+		if shared.VapeFullyLoaded and RenderFunctions.whitelist:get(3) > 1 then 
+			warningNotification('Render Whitelist', 'You\'ve successfully been authenticated.', 4.5)
+			break
+		end
+		task.wait()
+	until (not vapeInjected)
 end)
 
 runFunction(function()
@@ -7754,6 +7619,13 @@ runFunction(function()
 			targetinfohealthbarbackground.BackgroundColor3 = Color3.fromHSV(h, s, v) 
 		end
 	})
+
+	task.spawn(function()
+		repeat
+			targetstrokeround.Color = ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromHSV(rendercolor2.Hue, rendercolor2.Sat, rendercolor2.Value)), ColorSequenceKeypoint.new(1, Color3.fromHSV(rendercolor1.Hue, rendercolor1.Sat, rendercolor1.Value))})
+			task.wait()
+		until (not vapeInjected)
+	end)
 	
 	RenderStore.UpdateTargetUI = function(...)
 		pcall(updateTargetUI, ...)
@@ -9844,23 +9716,60 @@ run(function()
 end)
 
 run(function()
-	local ReplicatedLag = {}
-	local ReplicatedLagTick = {Value = 5}
-	ReplicatedLag = GuiLibrary.ObjectsThatCanBeSaved.RenderWindow.Api.CreateOptionsButton({
-		Name = "ReplicatedLag",
+	local BackTrack = {}
+	local BackTrackMode = {Value = "Manual"}
+	local BackTrackBased = {Value = 300}
+	local BackTrackTick = {Value = 5}
+	local old;
+	BackTrack = GuiLibrary.ObjectsThatCanBeSaved.UtilityWindow.Api.CreateOptionsButton({
+		Name = "BackTrack",
 		Function = function(call)
 			if call then
-                            	settings():GetService("NetworkSettings").IncomingReplicationLag = ReplicatedLagTick.Value 
+                task.spawn(function()
+                    if BackTrackMode ~= "Manual" then
+                        repeat
+                            settings():GetService("NetworkSettings").IncomingReplicationLag = BackTrackBased.Value 
+                            task.wait(math.random(1, 2))
+                            settings():GetService("NetworkSettings").IncomingReplicationLag = 0 
+                            task.wait(math.random(0.5,1.5))
+                        until (not BackTrack.Enabled)
+                    else
+                        return errorNotification("Render", "unfinished..", 10)
+                    end
+                end)
 			else
 				settings():GetService("NetworkSettings").IncomingReplicationLag = 0
 			end
 		end,
 		HoverText = "Slow player rendering."
 	})
-	ReplicatedLagTick = ReplicatedLag.CreateSlider({
+	BackTrackBased = BackTrack.CreateTwoSlider({
+		Name = "Latency",
+		Min = 1,
+		Max = 250,
+		Default = 39,
+		Default2 = 79
+	})
+	BackTrackTick = BackTrack.CreateSlider({
 		Name = "Tick",
 		Min = 0.1,
 		Max = 5,
 		Default = 0.11,
+	})
+    BackTrackBased.Object.Visible = false
+    BackTrackTick.Object.Visible = false
+	BackTrackMode = BackTrack.CreateDropdown({
+		Name = "Mode",
+		List = {"Manual", "Lag Based"},
+		Function = function(val) 
+			if val == "Manual" then
+				BackTrackBased.Object.Visible = false
+				BackTrackTick.Object.Visible = true
+            else
+				BackTrackBased.Object.Visible = true
+				BackTrackTick.Object.Visible = false
+			end
+		end,
+		Default = "Lag Based"
 	})
 end)
