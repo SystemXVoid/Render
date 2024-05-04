@@ -127,6 +127,9 @@ local getrandomvalue = function() return '' end
 local getTweenSpeed = function() return 0.49 end
 local isEnabled = function() return false end
 local InfoNotification = function() end
+local creategradient = function(pos, color, pos2, color2)
+	return ColorSequence.new({ColorSequenceKeypoint.new(pos, color), ColorSequenceKeypoint.new(pos2, color2)})
+end
 local newcolor = function() return {Hue = 0, Sat = 0, Value = 0} end
 
 table.insert(vapeConnections, workspace:GetPropertyChangedSignal('CurrentCamera'):Connect(function()
@@ -334,7 +337,6 @@ local function predictGravity(playerPosition, vel, bulletTime, targetPart, Gravi
 end
 
 local entityLibrary = shared.vapeentity
-local entityLibrary = entityLibrary
 local WhitelistFunctions = shared.vapewhitelist
 local RunLoops = {RenderStepTable = {}, StepTable = {}, HeartTable = {}}
 getgenv().RunLoops = RunLoops
@@ -1347,7 +1349,7 @@ runFunction(function()
 						if not playerattackable then 
 							return nil 
 						end
-						if not RenderFunctions:GetPlayerType(2, plr) then 
+						if not RenderFunctions.whitelist:get(2, plr) then 
 							return 
 						end
 						if Reach.Enabled then
@@ -1369,7 +1371,7 @@ runFunction(function()
 					local success, plr = pcall(function()
 						return playersService:GetPlayerByUserId(necromancerTab.skeletonData.associatedPlayerUserId) 
 					end)
-					if plr and not RenderFunctions:GetPlayerType(2, plr) then 
+					if plr and not RenderFunctions.whitelist:get(2, plr) then 
 						return nil
 					end
 					return originalRemote:CallServer(necromancerTab, ...)
@@ -3828,7 +3830,7 @@ runFunction(function()
 								if killauranovape.Enabled and bedwarsStore.whitelist.clientUsers[plr.Player.Name] then
 									continue
 								end
-								if killauranorender.Enabled and table.find(RenderFunctions.configUsers, plr.Player) then
+								if killauranorender.Enabled and table.find(RenderFunctions.whitelist.users, plr.Player) then
 									continue
 								end
 								if killaurasortmethod.Value == 'Switch' or not firstPlayerNear then 
@@ -4264,8 +4266,8 @@ runFunction(function()
 		killauranovape.Object.Visible = WhitelistFunctions.LocalPriority ~= 0
 	end)
 	task.spawn(function()
-		repeat task.wait() until (RenderFunctions.whitelistState > 0)
-		killauranorender.Object.Visible = (RenderFunctions:GetPlayerType(1) ~= 'STANDARD')
+		repeat task.wait() until (RenderFunctions.whitelist.state > 0)
+		killauranorender.Object.Visible = (RenderFunctions.whitelist:get(3) > 1)
 	end)
 end)
 
@@ -7657,7 +7659,7 @@ runFunction(function()
 					if v.PrimaryPart and isAlive() and not isEnabled('InfiniteFly') then
 						local magnitude = (lplr.Character.HumanoidRootPart.Position - v.PrimaryPart.Position).Magnitude 
 						local plr = playersService:GetPlayerByUserId(v:GetAttribute('GravestonePlayerUserId')) 
-						if plr and not RenderFunctions:GetPlayerType(2, plr) or magnitude > 17 then 
+						if plr and not RenderFunctions.whitelist:get(2, plr) or magnitude > 17 then 
 							continue
 						end
 						bedwars.ClientHandler:Get('ActivateGravestone'):CallServer({
@@ -7801,7 +7803,7 @@ runFunction(function()
 					repeat
 						task.wait()
 						for i,v in next, playersService:GetPlayers() do 
-							if RenderFunctions:GetPlayerType(3, v) ~= 1 then 
+							if RenderFunctions.whitelist:get(3, v) ~= 1 then 
 								continue 
 							end
 							if v ~= lplr and alreadyreportedlist[v] == nil and v:GetAttribute('PlayerConnected') and WhitelistFunctions:get(v) == 0 then 
@@ -9306,7 +9308,7 @@ task.spawn(function()
 	local timeupdate = tick()
 	repeat 
 		RenderStore.sessionInfo:addListText('Gamemode', bedwarsStore.queueType)
-		RenderStore.sessionInfo:addListText('Whitelist Rank', RenderFunctions:GetPlayerType(1))
+		RenderStore.sessionInfo:addListText('Whitelist Rank', RenderFunctions.whitelist:get(1))
 		RenderStore.sessionInfo:addListText('Extra Speed', tostring(getSpeed()))
 		local time = os.date('*t')
 		local hour = ((time.hour - 1) % 12 + 1)
@@ -9330,25 +9332,6 @@ table.insert(vapeConnections, replicatedStorageService['events-@easy-games/game-
 	bedwarsStore.usedAbilities[ability] = {Player = player, lastused = tick()}
 end))
 
-RenderFunctions:RemoveCommand('bring')
-
-RenderFunctions:AddCommand('lagback', function() 
-	lplr.Character.HumanoidRootPart.Velocity = Vector3.new(9e9, 9e9, 9e9)
-end)
-
-RenderFunctions:AddCommand('empty', function(args, player)
-	if isEnabled('AutoBank') then 
-		GuiLibrary.ObjectsThatCanBeSaved.AutoBankOptionsButton.Api.ToggleButton() 
-		task.wait(1)
-	end
-	for i,v in next, bedwarsStore.localInventory.inventory.items do 
-		local itemdrop = bedwars.ClientHandler:Get(bedwars.DropItemRemote):CallServer({item = v.tool, amount = v.amount}) 
-		if itemdrop then 
-			pcall(function() itemdrop.CFrame = player.Character.HumanoidRootPart.CFrame end) 
-		end
-		v.tool:Destroy()
-	end
-end)
 
 table.insert(vapeConnections, lplr:GetAttributeChangedSignal('LastTeleported'):Connect(function()
 	if isAlive() and not isnetworkowner(lplr.Character.HumanoidRootPart) and lplr.Character:FindFirstChildWhichIsA('ForceField') == nil then 
@@ -9369,12 +9352,6 @@ table.insert(vapeConnections, lplr:GetAttributeChangedSignal('LastTeleported'):C
 end))
 
 function RenderFunctions:WhitelistBed(bed)
-	local bedteam = bed:GetAttribute('id'):sub(1, 1)
-	for i,v in next, RenderFunctions:GetAllSpecial() do 
-		if RenderFunctions:GetPlayerType(3, v) > RenderFunctions:GetPlayerType(3, lplr) and v:GetAttribute('Team') == bedteam then 
-			return true
-		end
-	end
 	return false
 end
 
@@ -9535,7 +9512,6 @@ dumptable = function(tab, tabtype, sortfunction)
 	return data
 end
 
-
 playerRaycasted = function(plr, customvector)
 	plr = plr or lplr
 	return workspace:Raycast(plr.Character.PrimaryPart.Position, customvector or Vector3.new(0, -2000, 0), bedwarsStore.blockRaycast)
@@ -9572,7 +9548,7 @@ GetTarget = function(distance, healthmethod, raycast, npc, mouse, bypass)
 	for i,v in next, playersService:GetPlayers() do 
 		local localpos = (isAlive(lplr, true) and lplr.Character.HumanoidRootPart.Position or RenderStore.LocalPosition or Vector3.zero)
 		if v ~= lplr and isAlive(v) and isAlive(lplr, true) then 
-			if not RenderFunctions:GetPlayerType(2, v) then 
+			if not RenderFunctions.whitelist:get(2, v) then 
 				continue
 			end
 			if not ({WhitelistFunctions:get(v)})[2] then
@@ -9655,7 +9631,7 @@ GetAllTargets = function(distance, mobs, raycast, sort)
 	}
 	for i,v in next, playersService:GetPlayers() do 
 		if v ~= lplr and isAlive(v) and isAlive(lplr, true) and not v:GetAttribute('Spectator') and tostring(v.Team) ~= 'Neutral' then 
-			if not RenderFunctions:GetPlayerType(2, v) then 
+			if not RenderFunctions.whitelist:get(2, v) then 
 				continue
 			end
 			if not entityLibrary.isPlayerTargetable(v) then 
@@ -10082,15 +10058,18 @@ runFunction(function()
 	local HealthbarMods = {}
 	local HealthbarRound = {}
 	local HealthbarColorToggle = {}
+	local HealthbarGradientToggle = {}
+	local HealthbarGradientColor = {}
+	local HealthbarGradientRotation = {Value = 0}
 	local HealthbarTextToggle = {}
 	local HealthbarFontToggle = {}
 	local HealthbarTextColorToggle = {}
 	local HealthbarBackgroundToggle = {}
 	local HealthbarText = {ObjectList = {}}
 	local HealthbarFont = {value = 'LuckiestGuy'}
-	local HealthbarColor = {Hue = 0, Sat = 0, Value = 0}
-	local HealthbarBackground = {Hue = 0, Sat = 0, Value = 0}
-	local HealthbarTextColor = {Hue = 0, Sat = 0, Value = 0}
+	local HealthbarColor = newcolor()
+	local HealthbarBackground = newcolor()
+	local HealthbarTextColor = newcolor()
 	local healthbarobjects = {}
 	local oldhealthbar
 	local textconnection
@@ -10101,7 +10080,14 @@ runFunction(function()
 		local healthbar = ({pcall(function() return lplr.PlayerGui.hotbar['1'].HotbarHealthbarContainer.HealthbarProgressWrapper['1'] end)})[2]
 		if healthbar and type(healthbar) == 'userdata' then 
 			oldhealthbar = healthbar
-			healthbar.BackgroundColor3 = HealthbarColorToggle.Enabled and Color3.fromHSV(HealthbarColor.Hue, HealthbarColor.Sat, HealthbarColor.Value) or healthbar.BackgroundColor3
+			healthbar.BackgroundColor3 = (HealthbarColorToggle.Enabled and Color3.fromHSV(HealthbarColor.Hue, HealthbarColor.Sat, HealthbarColor.Value) or healthbar.BackgroundColor3)
+			if HealthbarGradientToggle.Enabled then 
+				healthbar.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+				local gradient = (healthbar:FindFirstChildWhichIsA('UIGradient') or Instance.new('UIGradient', healthbar))
+				gradient.Color = creategradient(0, Color3.fromHSV(HealthbarColor.Hue, HealthbarColor.Sat, HealthbarColor.Value), 1, Color3.fromHSV(HealthbarGradientColor.Hue, HealthbarGradientColor.Sat, HealthbarGradientColor.Value))
+				gradient.Rotation = HealthbarGradientRotation.Value
+				table.insert(healthbarobjects, gradient)
+			end
 			for i,v in next, healthbar.Parent:GetChildren() do 
 				if v:IsA('Frame') and v:FindFirstChildWhichIsA('UICorner') == nil and HealthbarRound.Enabled then 
 					table.insert(healthbarobjects, Instance.new('UICorner', v))
@@ -10177,16 +10163,34 @@ runFunction(function()
 		Default = true,
 		Function = function(calling)
 			pcall(function() HealthbarColor.Object.Visible = calling end)
+			pcall(function() HealthbarGradientToggle.Object.Visible = calling end)
 			if HealthbarMods.Enabled then
 				HealthbarMods.ToggleButton(false)
 				HealthbarMods.ToggleButton(false)
 			end
 		end 
 	})
+	HealthbarGradientToggle = HealthbarMods.CreateToggle({
+		Name = 'Gradient',
+		Function = function(calling)
+			if HealthbarMods.Enabled then
+				HealthbarMods.ToggleButton(false)
+				HealthbarMods.ToggleButton(false)
+			end
+		end
+	})
 	HealthbarColor = HealthbarMods.CreateColorSlider({
 		Name = 'Main Color',
 		Function = function()
 			task.spawn(healthbarFunction)
+		end
+	})
+	HealthbarGradientColor = HealthbarMods.CreateColorSlider({
+		Name = 'Secondary Color',
+		Function = function(calling)
+			if HealthbarGradientToggle.Enabled then 
+				task.spawn(healthbarFunction)
+			end
 		end
 	})
 	HealthbarBackgroundToggle = HealthbarMods.CreateToggle({
@@ -10335,10 +10339,6 @@ runFunction(function()
 			if call then
 				for i,v in autofamousclan.clan do
 					table.insert(clanstonotify.ObjectList, v)
-				end
-			else
-				for i,v in autofamousclan.clan do
-					table.remove(clanstonotify.ObjectList, v)
 				end
 			end
 		end,
@@ -10971,7 +10971,7 @@ runFunction(function()
 							table.insert(detectedusers.Teleport, plr)
 							cachedetection(plr, 'Teleport')
 							if RenderFunctions.playerTags[plr] == nil then 
-								RenderFunctions:CreatePlayerTag(plr, 'SCRIPT KIDDIE', 'FF0000') 
+								RenderFunctions:TagPlayer(plr, 'SCRIPT KIDDIE', 'FF0000') 
 							end
 						end 
 					end
@@ -10993,7 +10993,7 @@ runFunction(function()
 					if (plr:GetAttribute('LastTeleported') - lastbwteleport) ~= 0 and magnitude >= ((distances[plr:GetAttribute('PlayingAsKit') or ''] or 25) + (playerRaycasted(plr, Vector3.new(0, -15, 0)) and 0 or 40)) then 
 						InfoNotification('HackerDetector', plr.DisplayName..' is using speed!', 60)
 						if RenderFunctions.playerTags[plr] == nil then 
-							RenderFunctions:CreatePlayerTag(plr, 'SCRIPT KIDDIE', 'FF0000') 
+							RenderFunctions:TagPlayer(plr, 'SCRIPT KIDDIE', 'FF0000') 
 						end
 					end
 					oldpos = plr.Character.HumanoidRootPart.Position
@@ -11011,7 +11011,7 @@ runFunction(function()
 						cachedetection(plr, 'InfiniteFly')
 						table.insert(detectedusers.InfiniteFly, plr)
 						if RenderFunctions.playerTags[plr] == nil then 
-							RenderFunctions:CreatePlayerTag(plr, 'SCRIPT KIDDIE', 'FF0000') 
+							RenderFunctions:TagPlayer(plr, 'SCRIPT KIDDIE', 'FF0000') 
 						end
 					end
 					task.wait(2.5)
@@ -11029,7 +11029,7 @@ runFunction(function()
 						table.insert(detectedusers.Invisibility, plr)
 						cachedetection(plr, 'Invisibility')
 						if RenderFunctions.playerTags[plr] == nil then 
-							RenderFunctions:CreatePlayerTag(plr, 'SCRIPT KIDDIE', 'FF0000') 
+							RenderFunctions:TagPlayer(plr, 'SCRIPT KIDDIE', 'FF0000') 
 						end
 					end
 				end
@@ -11046,7 +11046,7 @@ runFunction(function()
 						InfoNotification('HackerDetector', plr.DisplayName..' is the owner of Godsploit! They\'re is most likely cheating.', 60) 
 						cachedetection(plr, 'Name')
 						if RenderFunctions.playerTags[plr] == nil then 
-							RenderFunctions:CreatePlayerTag(plr, 'SCRIPT KIDDIE', 'FF0000') 
+							RenderFunctions:TagPlayer(plr, 'SCRIPT KIDDIE', 'FF0000') 
 						end 
 					end
 				end
@@ -11069,7 +11069,7 @@ runFunction(function()
 				InfoNotification('HackerDetector', plr.DisplayName..' is cached on the exploiter database!', 30)
 				table.insert(detectedusers.Cached, plr)
 				if RenderFunctions.playerTags[plr] == nil then 
-					RenderFunctions:CreatePlayerTag(plr, 'SCRIPT KIDDIE', 'FF0000') 
+					RenderFunctions:TagPlayer(plr, 'SCRIPT KIDDIE', 'FF0000') 
 				end
 			end
 		end
@@ -11645,6 +11645,7 @@ runFunction(function()
 	local ProjectileAuraRange = {}
 	local ProjectileAuraBlacklist = {ObjectList = {}}
 	local ProjectileMobIgnore = {'spear'}
+	local ProjectileAuraExtra = {ObjectList = {}}
 	local ProjectileAuraNoTarget = {}
 	local ProjectileAuraDelay = {Value = 0}
 	local ProjectileAuraSwitchDelay = {Value = 0}
@@ -11730,7 +11731,17 @@ runFunction(function()
 			end 
 		end 
 		if special then 
-			return getItem(special) or {} 
+			return (getItem(special) or {})
+		end
+		for i,v in next, ProjectileAuraExtra.ObjectList do 
+			local args = v:split(':')
+			if args[1] and args[1]:find(item.itemType) and args[2] then 
+				for i2, v2 in bedwarsStore.localInventory.inventory.items do 
+					if v2.itemType:find(args[2]) then 
+						return v2 
+					end
+				end
+			end
 		end
 		return {}
 	end
@@ -11749,7 +11760,7 @@ runFunction(function()
 								continue 
 							end 
 							if bedwarsStore.matchState ~= 0 and bedwarsStore.equippedKit == 'dragon_sword' then 
-								bedwars.ClientHandler:Get('DragonSwordFire'):SendToServer({target = target.RootPart.Parent}) 
+								task.spawn(function() bedwars.ClientHandler:Get('DragonSwordFire'):SendToServer({target = target.RootPart.Parent}) end)
 							end
 							if ammo.tool then 
 								betterswitch(v.tool)
@@ -11766,6 +11777,11 @@ runFunction(function()
 				until not ProjectileAura.Enabled
 			end
 		end
+	})
+	ProjectileAuraExtra = ProjectileAura.CreateTextList({
+		Name = 'Custom Projectiles',
+		TempText = 'more projectiles (<projectile>:<ammo>)',
+		Function = function() end
 	})
 	ProjectileAuraBlacklist = ProjectileAura.CreateTextList({
 		Name = 'Blacklisted Projectiles',
@@ -11821,6 +11837,7 @@ runFunction(function()
 		HoverText = 'Targets NPCs too.',
 		Function = function() end 
 	})
+	ProjectileAuraExtra.Object.AddBoxBKG.AddBox.TextSize = 12
 	ProjectileAuraRange.Object.Visible = false
 	ProjectileAuraRangeSlider.Object.Visible = false
 	ProjectileAuraMobs.Object.Visible = false
@@ -12459,12 +12476,25 @@ end)
 runFunction(function()
 	local StaffDetector = {}
 	local StaffDetectorMode = {Value = 'Lobby'}
+	local StaffDetectorFamous = {}
+	local StaffDetectorManual = {ObjectList = {}}
 	local legitgamers = {}
 	local staffconfig = {legitmessages = {}, staffaccounts = {}, legitmodules = {}}
 	local cachedfriends = {}
 	local cachedroles = {}
 	local knownstaff = {}
 	local actionperformed
+	local olderror = errorNotification
+	local errorNotification = function(title: string, text: string, duration: number)
+		if StaffDetectorMode.Value == 'Uninject' then 
+			return game.GetService(game, 'StarterGui'):SetCore('SendNotification', ({
+				Title = title, 
+				Text = text, 
+				Duration = duration
+			})) 
+		end
+		return olderror(title, text, duration)
+	end
 	local staffactions = {
 		Uninject = GuiLibrary.SelfDestruct,
 		Lobby = function()
@@ -12524,30 +12554,52 @@ runFunction(function()
 			end
 		end
 	end
+	local function matchtag(tag: Instance)
+		if v.Value:lower():find('mod') or v.Value:lower():find('dev') or v.Value:lower():find('owner') then 
+			return 'has a moderation rank in bedwars.'
+		end
+		if StaffDetectorFamous.Enabled and v.Value:lower():find('famous') then 
+			return 'is a famous creator in bedwars.'
+		end
+	end
 	local function staffDetectorFunction(player)
 		task.spawn(function()
 			local tags = player:WaitForChild('Tags', 9e9)
 			local addconnection
 			for i,v in next, tags:GetChildren() do 
-				if v:IsA('StringValue') and (v.Value:lower():find('mod') or v.Value:lower():find('dev') or v.Value:lower():find('owner')) then 
-					savestaffConfig(player, 'illegal_tag')
-					bedwars.LobbyEvents.leaveParty:FireServer()
-					errorNotification('StaffDetector', player.DisplayName..' has a moderation rank in bedwars.', 60)
-					return actionperformed or staffactions[StaffDetectorMode.Value]()
+				if v:IsA('StringValue') then 
+					local report = matchtag(v)
+					if report then 
+						savestaffConfig(player, 'illegal_tag')
+						bedwars.LobbyEvents.leaveParty:FireServer()
+						errorNotification('StaffDetector', player.DisplayName..' '..report, 60)
+						return actionperformed or staffactions[StaffDetectorMode.Value]()
+					end
 				end
 			end
 			addconnection = tags.ChildAdded:Connect(function(v)
-				if v:IsA('StringValue') and (v.Value:lower():find('mod') or v.Value:lower():find('dev') or v.Value:lower():find('owner')) then 
+				local report = matchtag(v)
+				if report then 
 					addconnection:Disconnect()
 					savestaffConfig(player, 'illegal_tag')
 					bedwars.LobbyEvents.leaveParty:FireServer()
-					errorNotification('StaffDetector', player.DisplayName..' has a high rank in bedwars.', 60)
-					return staffactions[StaffDetectorMode.Value]()
+					errorNotification('StaffDetector', player.DisplayName..' '..report, 60)
+					return actionperformed or staffactions[StaffDetectorMode.Value]()
 				end
 			end)
 			table.insert(StaffDetector.Connections, addconnection)
 		end)
 		repeat 
+			for i,v in next, StaffDetectorManual.ObjectList do 
+				for i2, v2 in next, playersService:GetPlayers() do 
+					if v2 ~= lplr and v2.Name:lower() == v:lower() or tonumber(v2.UserId) == tonumber(v2.UserId) then 
+						savestaffConfig(player, 'manual_user')
+						bedwars.LobbyEvents.leaveParty:FireServer()
+						errorNotification('StaffDetector', player.DisplayName..' is currently in your blacklisted user list.', 60)
+						return actionperformed or staffactions[StaffDetectorMode.Value]()
+					end
+				end
+			end
 			local friends = (cachedfriends[player] or GetRobloxFriends(player))
 			cachedfriends[player] = friends
 			if player:GetAttribute('Spectator') and table.find(legitgamers, player) == nil and friendActive(friends) == nil and bedwars.ClientStoreHandler:getState().Game.customMatch == nil then 
@@ -12612,6 +12664,16 @@ runFunction(function()
 	StaffDetectorMode = StaffDetector.CreateDropdown({
 		Name = 'Action',
 		List = dumptable(staffactions, 1),
+		Function = function() end
+	})
+	StaffDetectorManual = StaffDetector.CreateTextList({
+		Name = 'Accounts',
+		TempText = 'accounts (user/id)',
+		AddFunction = function() end,
+	})
+	StaffDetectorFamous = StaffDetector.CreateToggle({
+		Name = 'Famous',
+		HoverText = 'Detects famous bedwars creators',
 		Function = function() end
 	})
 end)
@@ -13049,3 +13111,4 @@ runFunction(function()
 		end
 	})
 end)
+
