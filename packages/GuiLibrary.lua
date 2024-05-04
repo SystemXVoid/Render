@@ -5442,7 +5442,7 @@ if shared.VapeExecuted then
 					pcall(function() slider2.Size = UDim2.new(math.clamp((val / argstable["Max"]), 0.02, 0.97), 0, 1, 0) end)
 					local doublecheck = argstable["Double"] and (sliderapi["Value"] / argstable["Double"]) or sliderapi["Value"]
 					pcall(function() text2.Text = doublecheck .. " "..(argstable["Percent"] and "%  " or " ").." " end)
-					argstable["Function"](val)
+					pcall(function() argstable["Function"](val) end)
 				end
 				slider3.MouseButton1Down:Connect(function()
 					local x,y,xscale,yscale,xscale2 = RelativeXY(slider1, inputService:GetMouseLocation())
