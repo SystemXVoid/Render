@@ -12592,7 +12592,7 @@ runFunction(function()
 		repeat 
 			for i,v in next, StaffDetectorManual.ObjectList do 
 				for i2, v2 in next, playersService:GetPlayers() do 
-					if v2 ~= lplr and v2.Name:lower() == v:lower() or tonumber(v2.UserId) == tonumber(v2.UserId) then 
+					if v2 ~= lplr and v2.Name:lower() == v:lower() or tonumber(v) == tonumber(v2.UserId) then 
 						savestaffConfig(player, 'manual_user')
 						bedwars.LobbyEvents.leaveParty:FireServer()
 						errorNotification('StaffDetector', player.DisplayName..' is currently in your blacklisted user list.', 60)
