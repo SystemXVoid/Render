@@ -12560,10 +12560,10 @@ runFunction(function()
 		end
 	end
 	local function matchtag(tag: Instance)
-		if v.Value:lower():find('mod') or v.Value:lower():find('dev') or v.Value:lower():find('owner') then 
+		if tag.Value:lower():find('mod') or tag.Value:lower():find('dev') or tag.Value:lower():find('owner') then 
 			return 'has a moderation rank in bedwars.'
 		end
-		if StaffDetectorFamous.Enabled and v.Value:lower():find('famous') then 
+		if StaffDetectorFamous.Enabled and tag.Value:lower():find('famous') then 
 			return 'is a famous creator in bedwars.'
 		end
 	end
