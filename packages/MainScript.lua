@@ -135,7 +135,6 @@ local function displayErrorPopup(text, funclist)
 	}}, 'Default')
 	prompt:setParent(gui)
 	prompt:_open(text)
-	setidentity(oldidentity)
 end
 
 local function vapeGithubRequest(scripturl)
@@ -1616,6 +1615,7 @@ GuiLibrary.SelfDestruct = function()
 	for i,v in pairs(GuiLibrary.ObjectsThatCanBeSaved) do
 		if (v.Type == "Button" or v.Type == "OptionsButton" or v.Type == "LegitModule") and v.Api.Enabled then
 			task.spawn(function() 
+				setidentity(8)
 				v.Api.ToggleButton()
 			end)
 		end
