@@ -34,7 +34,7 @@ local isfile = isfile or function(file)
 	return suc and res ~= nil
 end
 
-getgenv().ria = 'RIA-TEST'
+getgenv().ria = (isfile('ria.ren') and readfile('ria.ren') or nil)
 getgenv().RenderStore = RenderStore
 
 if readfile == nil then
