@@ -53,6 +53,7 @@ local vapeEvents = setmetatable({}, {
 		return self[index]
 	end
 })
+setidentity(8)
 local vapeTargetInfo = shared.VapeTargetInfo
 local vapeInjected = true
 local bedwars = {}
@@ -247,8 +248,8 @@ GetEnumItems = function(enum)
 end
 
 local function runFunction(func) setidentity(8) func() end
-local function runLunar(func) func() end
-local run = function(e) e() end
+local function runLunar(func) setidentity(8) func() end
+local run = function(e) setidentity(8) e() end
 
 local function isFriend(plr, recolor)
 	if GuiLibrary.ObjectsThatCanBeSaved['Use FriendsToggle'].Api.Enabled then

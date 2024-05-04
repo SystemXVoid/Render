@@ -107,7 +107,7 @@ if shared.VapeExecuted then
 	local gethui = function()
 		if executor:lower():find('krampus') then 
 			setidentity(8)
-			return cloneref(game.GetService(game, 'CoreGui'))
+			--return cloneref(game.GetService(game, 'CoreGui'))
 		end
 		return cloneref(game.GetService(game, 'Players')).LocalPlayer.PlayerGui
 	end
