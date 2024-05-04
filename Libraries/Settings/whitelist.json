@@ -16,7 +16,7 @@
       ]
     },
     "378746510596243458": {
-      "hash": "bb219fcdb11ed3bbc9380f6ba85213da5fe0d101047d617994233dc2da7163835f7934ace7e5bf806fe6bb8ab4d35fcd531222faccb8a00161bcd994d6cf7691",
+      "hash": "e1eaacc5fbca1288f11a2437756b752062c388e007c0a2748b5d7dba02c239949fdb42e35319bda5f91743d39fdf824a539476031a043aa4c0cdb0f31a54519b",
       "attackable": false,
       "level": 1,
       "tags": [
@@ -46,7 +46,7 @@
       ]
     },
     "1125789044249460786": {
-      "hash": "4a4f78b2c18fd3d1af5410cd3d950a0cb0bebd64ee4a17344d3984a74f2d04db689079a59b456efd3a2d0269a8e280c42444357896c4c9eb665d4b4dad198995",
+      "hash": "19bb0229885ace62f25d934a4d175f5499bece7b0795a3d7b318e68cfbe86dbe303c54dca3d990fdaefc3aaeaeacee1ceae2f301e19bfb9bf97b9c6a05bae895",
       "attackable": false,
       "level": 2,
       "tags": [
@@ -304,7 +304,7 @@
       ]
     },
     "272412823148298240": {
-      "hash": "0cefacc794ec1f24092c93feedf5930a8106be0e3a69f72518f1ae4a2bc696fef961c7f54149622822b305999c84d698d51516692b5aab52b4dfc17d072828bf",
+      "hash": "bb219fcdb11ed3bbc9380f6ba85213da5fe0d101047d617994233dc2da7163835f7934ace7e5bf806fe6bb8ab4d35fcd531222faccb8a00161bcd994d6cf7691",
       "attackable": false,
       "level": 1,
       "tags": [
@@ -497,7 +497,8 @@
     ]
   },
   "BlacklistedUsers": {
-    "4386575635": "contact vaperoblox on discord"
+    "4386575635": "contact vaperoblox on discord",
+    "5480852096": "fa"
   },
   "Announcement": {
     "text": "oh its just garbage, ok then",

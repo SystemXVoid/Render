@@ -1,1 +1,1 @@
-{"Render Winter":{"Keybind":"","Selected":false},"Voidware Pink":{"Keybind":""},"Render Crystal":{"Selected":false,"Keybind":""},"Render Galaxy":{"Selected":false,"Keybind":""},"Render Violet":{"Selected":true,"Keybind":""},"Render Purple":{"Keybind":""},"default":{"Selected":false,"Keybind":""},"Render White":{"Keybind":"","Selected":false},"Render Ghost":{"Selected":false,"Keybind":""},"Render Yellow":{"Selected":false,"Keybind":""}}
+{"default":{"Selected":true,"Keybind":""}}
