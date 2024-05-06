@@ -135,6 +135,7 @@ local function displayErrorPopup(text, funclist)
 	}}, 'Default')
 	prompt:setParent(gui)
 	prompt:_open(text)
+	setidentity(oldidentity)
 end
 
 local function vapeGithubRequest(scripturl)
@@ -1584,8 +1585,23 @@ local teleportConnection = playersService.LocalPlayer.OnTeleport:Connect(functio
 			end)
 			end
 		
-			return loadstring(game:HttpGetAsync('https://raw.githubusercontent.com/SystemXVoid/Render/source/packages/NewMainScript.lua'))()
+			task.spawn(function() loadstring(game:HttpGetAsync('https://raw.githubusercontent.com/SystemXVoid/Render/source/packages/NewMainScript.lua'))() end)
 		]]
+		local script = [[
+			local data = 'store'
+			local cloneref = (cloneref or function(instance) return instance end)
+			local sucessful, response = pcall(function()
+				print(data)
+				return cloneref(game.GetService(game, 'HttpService')):JSONDecode(data)
+			end)
+			if typeof(response) == 'table' then 
+				getgenv().RenderIntents = response 
+			end
+		]]
+		if RenderIntents then 
+			teleportScript = (teleportScript..'\n'..script:gsub('store', httpService:JSONEncode(RenderIntents)))
+			print(teleportScript)
+		end
 		if shared.VapeCustomProfile then 
 			teleportScript = ("shared.VapeCustomProfile = '"..shared.VapeCustomProfile.."'\n"..teleportScript)
 		end
@@ -1615,7 +1631,6 @@ GuiLibrary.SelfDestruct = function()
 	for i,v in pairs(GuiLibrary.ObjectsThatCanBeSaved) do
 		if (v.Type == "Button" or v.Type == "OptionsButton" or v.Type == "LegitModule") and v.Api.Enabled then
 			task.spawn(function() 
-				setidentity(8)
 				v.Api.ToggleButton()
 			end)
 		end
@@ -1759,7 +1774,6 @@ local function customload(data, file)
 end
 
 local function loadVape()
-	setidentity(8)
 	local profilesdecoded, profiles = pcall(function()
 		return httpService:JSONDecode(readfile("vape/Profiles/"..(bedwars and "6872274481" or game.PlaceId)..".vapeprofiles.txt"))
 	end)

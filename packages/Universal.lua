@@ -25,7 +25,6 @@ local vapeConnections = {}
 local vapeCachedAssets = {}
 local vapeTargetInfo = shared.VapeTargetInfo
 local vapeInjected = true
-local setidentity = (setthreadcaps or set_thread_caps or set_thread_identity or function() end)
 local httprequest = (http and http.request or http_request or fluxus and fluxus.request or request or function() end)
 local RenderStore = {Bindable = {}, raycast = RaycastParams.new(), MessageReceived = Instance.new('BindableEvent'), tweens = {}, ping = 0, platform = inputService:GetPlatform(), LocalPosition = Vector3.zero, groundTime = tick(), UpdateGroundTick = function() end, sessionInfo = {labelInstances = {}}, clonedata = {}}
 local vec3 = Vector3.new
@@ -172,7 +171,7 @@ local function removeTags(str)
 	return (str:gsub("<[^<>]->", ""))
 end
 
-local function run(func) setidentity(8) func() end
+local function run(func) func() end
 local runFunction = run
 
 local function isFriend(plr, recolor)
@@ -436,36 +435,34 @@ local WhitelistFunctions = whitelist
 local entityLibrary = loadstring(vapeGithubRequest("Libraries/entityHandler.lua"))()
 shared.vapeentity = entityLibrary
 do
-	pcall(function()
-		entityLibrary.selfDestruct()
-		table.insert(vapeConnections, GuiLibrary.ObjectsThatCanBeSaved.FriendsListTextCircleList.Api.FriendRefresh.Event:Connect(function()
-			entityLibrary.fullEntityRefresh()
-		end))
-		table.insert(vapeConnections, GuiLibrary.ObjectsThatCanBeSaved["Teams by colorToggle"].Api.Refresh.Event:Connect(function()
-			entityLibrary.fullEntityRefresh()
-		end))
-		local oldUpdateBehavior = entityLibrary.getUpdateConnections
-		entityLibrary.getUpdateConnections = function(newEntity)
-			local oldUpdateConnections = oldUpdateBehavior(newEntity)
-			table.insert(oldUpdateConnections, {Connect = function()
-				newEntity.Friend = isFriend(newEntity.Player) and true
-				newEntity.Target = isTarget(newEntity.Player) and true
-				return {Disconnect = function() end}
-			end})
-			return oldUpdateConnections
-		end
-		entityLibrary.isPlayerTargetable = function(plr)
-			if isFriend(plr) then return false end
-			if not ({whitelist:get(plr)})[2] then return false end
-			if (not GuiLibrary.ObjectsThatCanBeSaved["Teams by colorToggle"].Api.Enabled) then return true end
-			if (not lplr.Team) then return true end
-			if (not plr.Team) then return true end
-			if plr.Team ~= lplr.Team then return true end
-			return #plr.Team:GetPlayers() == playersService.NumPlayers
-		end
+	entityLibrary.selfDestruct()
+	table.insert(vapeConnections, GuiLibrary.ObjectsThatCanBeSaved.FriendsListTextCircleList.Api.FriendRefresh.Event:Connect(function()
 		entityLibrary.fullEntityRefresh()
-		entityLibrary.LocalPosition = Vector3.zero
-	end)
+	end))
+	table.insert(vapeConnections, GuiLibrary.ObjectsThatCanBeSaved["Teams by colorToggle"].Api.Refresh.Event:Connect(function()
+		entityLibrary.fullEntityRefresh()
+	end))
+	local oldUpdateBehavior = entityLibrary.getUpdateConnections
+	entityLibrary.getUpdateConnections = function(newEntity)
+		local oldUpdateConnections = oldUpdateBehavior(newEntity)
+		table.insert(oldUpdateConnections, {Connect = function()
+			newEntity.Friend = isFriend(newEntity.Player) and true
+			newEntity.Target = isTarget(newEntity.Player) and true
+			return {Disconnect = function() end}
+		end})
+		return oldUpdateConnections
+	end
+	entityLibrary.isPlayerTargetable = function(plr)
+		if isFriend(plr) then return false end
+		if not ({whitelist:get(plr)})[2] then return false end
+		if (not GuiLibrary.ObjectsThatCanBeSaved["Teams by colorToggle"].Api.Enabled) then return true end
+		if (not lplr.Team) then return true end
+		if (not plr.Team) then return true end
+		if plr.Team ~= lplr.Team then return true end
+        return #plr.Team:GetPlayers() == playersService.NumPlayers
+	end
+	entityLibrary.fullEntityRefresh()
+	entityLibrary.LocalPosition = Vector3.zero
 
 	task.spawn(function()
 		local postable = {}
@@ -8072,8 +8069,11 @@ runFunction(function()
 				for i,v in workspace:GetDescendants() do 
 					modifypart(v)
 				end
+				if sethiddenproperty then 
+					sethiddenproperty(game.Lighting, 'Technology', 'Compatability') 
+				end
 				if FPSBoostTextures.Enabled then 
-					for i,v in game:GetService('MaterialService'):GetChildren() do 
+					for i,v in next, game:GetService('MaterialService'):GetChildren() do 
 						local material = v:Clone()
 						material.Parent = nil
 						table.insert(materials2, material)
@@ -8567,7 +8567,7 @@ runFunction(function()
 		lightingService.FogStart = LightingFogStart.Value
 		blur.Size = LightingBlurSize.Value  
 		blur.Enabled = (LightingBlurSize.Value > 0)
-		if sethiddenproperty then 
+		if sethiddenproperty and not isEnabled('FPSBoost') and not RenderPerformance then 
 			sethiddenproperty(lightingService, 'Technology', LightingTechnology.Value) 
 		end
 	end
@@ -9719,23 +9719,61 @@ run(function()
 end)
 
 run(function()
-	local ReplicatedLag = {}
-	local ReplicatedLagTick = {Value = 5}
-	ReplicatedLag = GuiLibrary.ObjectsThatCanBeSaved.RenderWindow.Api.CreateOptionsButton({
-		Name = "ReplicatedLag",
+	local BackTrack = {}
+	local BackTrackMode = {Value = "Manual"}
+	local BackTrackBased = {Value = 300}
+	local BackTrackTick = {Value = 5}
+	local old;
+	BackTrack = GuiLibrary.ObjectsThatCanBeSaved.UtilityWindow.Api.CreateOptionsButton({
+		Name = "BackTrack",
 		Function = function(call)
 			if call then
-				settings():GetService("NetworkSettings").IncomingReplicationLag = ReplicatedLagTick.Value
+                task.spawn(function()
+                    if BackTrackMode ~= "Manual" then
+                        repeat
+                            settings():GetService("NetworkSettings").IncomingReplicationLag = BackTrackBased.Value 
+                            task.wait(math.random(1, 2))
+                            settings():GetService("NetworkSettings").IncomingReplicationLag = 0 
+                            task.wait(math.random(0.5,1.5))
+                        until (not BackTrack.Enabled)
+                    else
+                        return errorNotification("Render", "unfinished..", 10)
+                    end
+                end)
 			else
-                settings():GetService("NetworkSettings").IncomingReplicationLag = 0 
+				settings():GetService("NetworkSettings").IncomingReplicationLag = 0
 			end
 		end,
-		HoverText = "Ping Increased."
+		HoverText = "Slow player rendering."
 	})
-	ReplicatedLagTick = ReplicatedLag.CreateSlider({
+	BackTrackBased = BackTrack.CreateTwoSlider({
+		Name = "Latency",
+		Min = 1,
+		Max = 250,
+		Default = 39,
+		Default2 = 79
+	})
+	BackTrackTick = BackTrack.CreateSlider({
 		Name = "Tick",
 		Min = 0.1,
 		Max = 5,
-		Default = 0.23,
+		Default = 0.11,
+	})
+    BackTrackBased.Object.Visible = false
+    BackTrackTick.Object.Visible = false
+	BackTrackMode = BackTrack.CreateDropdown({
+		Name = "Mode",
+		List = {"Manual", "Lag Based"},
+		Function = function(val) 
+			if val == "Manual" then
+				BackTrackBased.Object.Visible = false
+				BackTrackTick.Object.Visible = true
+            else
+				BackTrackBased.Object.Visible = true
+				BackTrackTick.Object.Visible = false
+			end
+		end,
+		Default = "Lag Based"
 	})
 end)
+
