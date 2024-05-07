@@ -10373,10 +10373,12 @@ run(function()
 			if not canRespawn() then 
 				return 
 			end
+			if isEnabled('Desync') then
+				return errorNotification('Render', 'Disable Desync.', 5)
+			end
 			for i = 1, 30 do 
 				if isAlive(lplr, true) and lplr.Character.Humanoid:GetState() ~= Enum.HumanoidStateType.Dead then
-					lplr.Character.Humanoid:TakeDamage(lplr.Character.Humanoid.Health)
-					lplr.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Dead)
+					bedwars.ResetRemote:SendToServer()
 				end
 			end
 			lplr.CharacterAdded:Wait()
@@ -10398,14 +10400,11 @@ run(function()
 			if bed == nil then return BedTP.ToggleButton() end
 			lplr.Character.HumanoidRootPart.CFrame += Vector3.new(0, 900000, 0)
 			bedtween = tweenService:Create(lplr.Character.HumanoidRootPart, TweenInfo.new(20, Enum.EasingStyle.Linear, Enum.EasingDirection.In, 0, false, 0), {CFrame = bed.CFrame})
-			InfoNotification("BedTP", "Wait Until Teleport Completed", 20)
 			bedtween:Play()
-			connections = bedtween.Completed:Connect(function()
-				task.wait(1)
-				lplr.Character.HumanoidRootPart.CFrame = bed.CFrame
-				BedTP.ToggleButton()
-				connections:Disconnect()
-			end)
+			bedtween.Completed:Wait()
+			lplr.Character.HumanoidRootPart.CFrame = bed.CFrame
+			BedTP.ToggleButton()
+			connections:Disconnect()
 		end,
 		Instant = function()
 			local bed = getEnemyBed(nil, BedTPAutoRaycast.Enabled == false)  
