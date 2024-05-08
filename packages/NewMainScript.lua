@@ -1,9 +1,10 @@
 local cloneref = (cloneref or function(instance) return instance end)
 local lplr = cloneref(game.GetService(game, 'Players')).LocalPlayer
-local httpService = cloneref(game.GetService('HttpService'))
+local httpService = cloneref(game.GetService(game, 'HttpService'))
 local identity = (getidentity or syn and syn.getidentity or function() return 2 end)
 local executor = (identifyexecutor or getexecutorname or function() return 'your executor suck ball' end)()
 local hookfunction = (hookfunction or hookfunc or replacefunction or replacefunc or function(func) return func end)
+local getnamecallmethod = (getnamecallmethod or function() return '' end)
 local hookmetamethod = (hookmetamethod or hookmt or function() end)
 local checkcaller = (checkcaller or function() return false end)
 local setidentity = (setthreadcaps or syn and syn.set_thread_identity or set_thread_identity or setidentity or setthreadidentity or function() end)
