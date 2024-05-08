@@ -1,4 +1,7 @@
 local cloneref = (cloneref or function(instance) return instance end)
+local hookfunction = (hookfunction or hookfunc or function() end)
+local hookmetamethod = (hookmetamethod or hookmt or function() end)
+
 local lplr = cloneref(game.GetService(game, 'Players')).LocalPlayer
 
 hookfunction(lplr.Kick, function(self) print('no kick') end)
