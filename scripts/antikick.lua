@@ -1,6 +1,8 @@
 local cloneref = (cloneref or function(instance) return instance end)
 local hookfunction = (hookfunction or hookfunc or function() end)
 local hookmetamethod = (hookmetamethod or hookmt or function() end)
+local getnamecallmethod = (getnamecallmethod or function() return '' end)
+local checkcaller = (checkcaller or function() return false end)
 
 local lplr = cloneref(game.GetService(game, 'Players')).LocalPlayer
 
