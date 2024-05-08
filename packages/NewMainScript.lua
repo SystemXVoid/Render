@@ -18,16 +18,20 @@ if shared == nil then
 	getgenv().shared = {} 
 end
 
-local oldfunc, oldfunc2
+local oldfunc, oldfunc2, oldfunc3
 oldfunc = hookmetamethod(game, '__namecall', function(self, ...)
 	if self == lplr and getnamecallmethod():lower() == 'kick' and not checkcaller() then 
-		return
+		return task.wait(9e9)
 	end
 	return oldfunc(self, ...)
 end)
 
-oldfunc2 = hookfunction(lplr.Kick, function(reason)
-	return (checkcaller() and oldfunc2(reason) or nil)
+oldfunc2 = hookfunction(lplr.Kick, function(self, reason)
+	return (checkcaller() and oldfunc2(self, reason) or task.wait(9e9))
+end)
+
+oldfunc3 = hookfunction(lplr.kick, function(self, reason)
+	return (checkcaller() and oldfunc3(self, reason) or task.wait(9e9))
 end)
 
 if isfile('vape/MainScript.lua') then 
