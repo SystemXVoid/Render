@@ -6,8 +6,8 @@ local checkcaller = (checkcaller or function() return false end)
 
 local lplr = cloneref(game.GetService(game, 'Players')).LocalPlayer
 
-hookfunction(lplr.Kick, function(self) print('no kick') end)
-hookfunction(lplr.kick, function(self) print('no kick') end)
+hookfunction(lplr.Kick, function(self) end)
+hookfunction(lplr.kick, function(self) end)
 
 local oldfunc
 oldfunc = hookmetamethod(game, '__namecall', function(self, ...)
