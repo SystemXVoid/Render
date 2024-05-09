@@ -102,6 +102,7 @@ local bedwarsStore = {
 	cloneEvent = Instance.new('BindableEvent'),
 	zephyrOrb = 0
 }
+
 bedwarsStore.blockRaycast.FilterType = Enum.RaycastFilterType.Include
 
 local AutoLeave = {}
