@@ -13361,3 +13361,138 @@ run(function()
 		Function = function() end
 	})
 end)
+
+run(function()
+	local la = {Enabled = false}
+	local range = {Value = 14}
+	local laAngle = {Value = 50}
+	local norender = {}
+	local moveCheck = {Enabled = false}
+	local mousedown = {Enabled = false}
+	local laremote = bedwars.ClientHandler:Get(bedwars.AttackRemote).instance
+	local SwingMiss = replicatedStorageService["rbxts_include"]["node_modules"]["@rbxts"]["net"]["out"]["_NetManaged"]["SwordSwingMiss"]
+  
+	local function getAttackData()
+	  	if GuiLibrary.ObjectsThatCanBeSaved['Lobby CheckToggle'].Api.Enabled then
+			if bedwarsStore.matchState == 0 then 
+				return false 
+			end
+	  	end
+	  	local sword = bedwarsStore.localHand or getSword()
+	  	if not sword or not sword.tool then return false end
+  
+	  	local swordmeta = bedwars.ItemTable[sword.tool.Name]
+	  	return sword, swordmeta
+	end
+	local sorts = {
+		Distance = function(a, b)
+			return (a.RootPart.Position - lplr.Character.HumanoidRootPart.Position).Magnitude < (b.RootPart.Position - lplr.Character.HumanoidRootPart.Position).Magnitude
+		end,
+		Health = function(a, b) 
+			return a.Player.Character:GetAttribute('Health') < b.Player.Character:GetAttribute('Health')
+		end
+	}
+	local sort = {Value = 'Health'}
+	local lookat = {Enabled = false}
+	local old
+	local switchtool = {Enabled = false}
+	local mousedown = {Enabled = false}
+	la = GuiLibrary.ObjectsThatCanBeSaved.CombatWindow.Api.CreateOptionsButton({
+	  	Name = 'SilentAura',
+	  	HoverText = 'yzfunny being unfunny dude',
+	  	Function = function(call)
+			if call then
+				repeat
+					local plrs = GetAllTargets(range.Value, false, nil, sorts[sort.Value])
+					if #plrs > 0 then
+						local sword, swordmeta = getAttackData()
+						if sword then
+							for i, plr in plrs do
+								local root = plr.RootPart
+								if moveCheck.Enabled and lplr.Character.Humanoid.MoveDirection ~= Vector3.zero then
+									continue
+								end
+								local localfacing = entityLibrary.character.HumanoidRootPart.CFrame.lookVector
+								local vec = (root.Position - entityLibrary.character.HumanoidRootPart.Position).unit
+								local angle = math.acos(localfacing:Dot(vec))
+								if angle >= math.rad(laAngle.Value) / 2 then
+									continue
+								end
+								local selfrootpos = entityLibrary.character.HumanoidRootPart.Position
+								if not bedwars.SwordController:canSee({player = plr.Player, getInstance = function() return plr.Player.Character end}) then
+									continue
+								end
+								local selfpos = selfrootpos + (range.Value > 14 and (selfrootpos - root.Position).magnitude > 14.4 and (CFrame.lookAt(selfrootpos, root.Position).lookVector * ((selfrootpos - root.Position).magnitude - 14)) or Vector3.zero)
+								bedwars.SwordController.lastAttack = workspace:GetServerTimeNow()
+								bedwarsStore.attackReach = math.floor((selfrootpos - root.Position).magnitude * 100) / 100
+								bedwarsStore.attackReachUpdate = tick() + 1
+								bedwars.SwordController:playSwordEffect(swordmeta, false)
+								laremote:FireServer({
+									weapon = sword.tool,
+									chargedAttack = {
+										chargeRatio = swordmeta.sword.chargedAttack or 0
+									},
+									entityInstance = plr.Player.Character,
+									validate = {
+										raycast = {
+											cameraPosition = attackValue(root.Position),
+											cursorDirection = attackValue(CFrame.new(selfpos, root.Position).lookVector)
+										},
+										targetPosition = attackValue(root.Position),
+										selfPosition = attackValue(selfpos)
+									}
+								})
+								if lookat.Enabled and plr.Human then
+									local direction = (plr.Player.Character.Head.Position - lplr.Character.Head.Position).Unit
+									lplr.Character:SetPrimaryPartCFrame(CFrame.new(lplr.Character.PrimaryPart.Position, lplr.Character.PrimaryPart.Position + direction))
+								end
+							end
+						end
+					elseif not sword and switchtool.Enabled then
+						task.spawn(switchItem, sword.tool)
+					end
+					task.wait(0.085)
+				until (not la.Enabled)
+			end
+	  	end,
+		ExtraText = function()
+			return sort.Value
+		end
+	})
+	range = la.CreateSlider({
+	  	Name = "Range",
+	  	Min = 1,
+	  	Max = 14,
+	  	Function = function() end,
+	  	Default = 13
+	})
+	lookat = la.CreateToggle({
+		Name = 'AutoLook',
+		Function = function() end,
+		HoverText = 'AutoLook at your target.'
+	})
+	switchtool = la.CreateToggle({
+		Name = 'SwitchTool',
+		Function = function() end,
+		HoverText = 'Basically semi blatant with this.'
+	})
+	laAngle = la.CreateSlider({
+	  	Name = "Angle",
+	  	Min = 0,
+	  	Max = 80,
+	  	Function = function() end,
+	  	Default = 65
+	})
+	sort = la.CreateDropdown({
+		Name = 'Sort',
+		List = {'Distance', 'Health'},
+		Function = function() end,
+		Default = 'Health'
+	})
+	moveCheck = la.CreateToggle({
+		Name = 'Only While Moving',
+		Function = function() end,
+		Default = true,
+		HoverText = 'SilentAura will only work when you move.'
+	})
+end)
