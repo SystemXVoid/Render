@@ -12408,7 +12408,7 @@ run(function()
 						end
 						break
 					end
-					task.wait()
+					task.wait(2)
 				until not AutoQueue.Enabled
 			end
 		end
@@ -13361,14 +13361,12 @@ run(function()
 		Function = function() end
 	})
 end)
-
 run(function()
-	local la = {Enabled = false}
+	local la = {}
 	local range = {Value = 14}
 	local laAngle = {Value = 50}
-	local norender = {}
-	local moveCheck = {Enabled = false}
-	local mousedown = {Enabled = false}
+	local moveCheck = {}
+	local mousedown = {}
 	local laremote = bedwars.ClientHandler:Get(bedwars.AttackRemote).instance
 	local SwingMiss = replicatedStorageService["rbxts_include"]["node_modules"]["@rbxts"]["net"]["out"]["_NetManaged"]["SwordSwingMiss"]
   
@@ -13395,21 +13393,25 @@ run(function()
 	local sort = {Value = 'Health'}
 	local lookat = {Enabled = false}
 	local old
+	local plrs
 	local switchtool = {Enabled = false}
-	local mousedown = {Enabled = false}
 	la = GuiLibrary.ObjectsThatCanBeSaved.CombatWindow.Api.CreateOptionsButton({
 	  	Name = 'SilentAura',
-	  	HoverText = 'yzfunny being unfunny dude',
+	  	HoverText = 'Tired of getting ban? this is your chance of closet cheating without getting detected',
 	  	Function = function(call)
 			if call then
+				print(bedwarsStore.equippedKit)
 				repeat
-					local plrs = GetAllTargets(range.Value, false, nil, sorts[sort.Value])
+					plrs = GetAllTargets(range.Value, nil, nil, sorts[sort.Value])
 					if #plrs > 0 then
 						local sword, swordmeta = getAttackData()
 						if sword then
+							if switchtool.Enabled then
+								task.spawn(switchItem, sword.tool)
+							end
 							for i, plr in plrs do
 								local root = plr.RootPart
-								if moveCheck.Enabled and lplr.Character.Humanoid.MoveDirection ~= Vector3.zero then
+								if not root then 
 									continue
 								end
 								local localfacing = entityLibrary.character.HumanoidRootPart.CFrame.lookVector
@@ -13426,37 +13428,33 @@ run(function()
 								bedwars.SwordController.lastAttack = workspace:GetServerTimeNow()
 								bedwarsStore.attackReach = math.floor((selfrootpos - root.Position).magnitude * 100) / 100
 								bedwarsStore.attackReachUpdate = tick() + 1
-								bedwars.SwordController:playSwordEffect(swordmeta, false)
-								laremote:FireServer({
-									weapon = sword.tool,
-									chargedAttack = {
-										chargeRatio = swordmeta.sword.chargedAttack or 0
-									},
-									entityInstance = plr.Player.Character,
-									validate = {
-										raycast = {
-											cameraPosition = attackValue(root.Position),
-											cursorDirection = attackValue(CFrame.new(selfpos, root.Position).lookVector)
+								if moveCheck.Enabled and lplr.Character.Humanoid.MoveDirection ~= Vector3.zero then
+									bedwars.SwordController:playSwordEffect(swordmeta, false)
+									laremote:FireServer({
+										weapon = sword.tool,
+										chargedAttack = {
+											chargeRatio = swordmeta.sword.chargedAttack or 0
 										},
-										targetPosition = attackValue(root.Position),
-										selfPosition = attackValue(selfpos)
-									}
-								})
-								if lookat.Enabled and plr.Human then
-									local direction = (plr.Player.Character.Head.Position - lplr.Character.Head.Position).Unit
-									lplr.Character:SetPrimaryPartCFrame(CFrame.new(lplr.Character.PrimaryPart.Position, lplr.Character.PrimaryPart.Position + direction))
+										entityInstance = plr.Player.Character,
+										validate = {
+											raycast = {
+												cameraPosition = attackValue(root.Position),
+												cursorDirection = attackValue(CFrame.new(selfpos, root.Position).lookVector)
+											},
+											targetPosition = attackValue(root.Position),
+											selfPosition = attackValue(selfpos)
+										}
+									})
 								end
 							end
 						end
-					elseif not sword and switchtool.Enabled then
-						task.spawn(switchItem, sword.tool)
 					end
-					task.wait(0.085)
+					task.wait(0.1)
 				until (not la.Enabled)
 			end
 	  	end,
 		ExtraText = function()
-			return sort.Value
+			return "Very Legit"
 		end
 	})
 	range = la.CreateSlider({
@@ -13465,16 +13463,25 @@ run(function()
 	  	Max = 14,
 	  	Function = function() end,
 	  	Default = 13
-	})
+	}) 
 	lookat = la.CreateToggle({
 		Name = 'AutoLook',
-		Function = function() end,
+		Function = function(call)
+			if call then
+				task.spawn(function()
+					repeat
+						if la.Enabled then
+							for i, plr in plrs do
+								local direction = (plr.Player.Character.Head.Position - lplr.Character.Head.Position).Unit
+								lplr.Character:SetPrimaryPartCFrame(CFrame.new(lplr.Character.PrimaryPart.Position, lplr.Character.PrimaryPart.Position + direction))
+							end
+						end
+						task.wait()
+					until (not lookat.Enabled)
+				end)
+			end
+		end,
 		HoverText = 'AutoLook at your target.'
-	})
-	switchtool = la.CreateToggle({
-		Name = 'SwitchTool',
-		Function = function() end,
-		HoverText = 'Basically semi blatant with this.'
 	})
 	laAngle = la.CreateSlider({
 	  	Name = "Angle",
