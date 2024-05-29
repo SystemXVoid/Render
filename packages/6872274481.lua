@@ -10379,7 +10379,8 @@ run(function()
 			end
 			for i = 1, 30 do 
 				if isAlive(lplr, true) and lplr.Character.Humanoid:GetState() ~= Enum.HumanoidStateType.Dead then
-					bedwars.ResetRemote:SendToServer()
+					lplr.Character.Humanoid:TakeDamage(lplr.Character.Humanoid.Health)
+					lplr.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Dead)
 				end
 			end
 			lplr.CharacterAdded:Wait()
@@ -13365,22 +13366,18 @@ run(function()
 	local la = {}
 	local range = {Value = 14}
 	local laAngle = {Value = 50}
-	local moveCheck = {}
-	local mousedown = {}
+	local moveCheck = {Enabled = false}
 	local laremote = bedwars.ClientHandler:Get(bedwars.AttackRemote).instance
-	local SwingMiss = replicatedStorageService["rbxts_include"]["node_modules"]["@rbxts"]["net"]["out"]["_NetManaged"]["SwordSwingMiss"]
   
 	local function getAttackData()
-	  	if GuiLibrary.ObjectsThatCanBeSaved['Lobby CheckToggle'].Api.Enabled then
-			if bedwarsStore.matchState == 0 then 
-				return false 
-			end
-	  	end
-	  	local sword = bedwarsStore.localHand or getSword()
-	  	if not sword or not sword.tool then return false end
-  
-	  	local swordmeta = bedwars.ItemTable[sword.tool.Name]
-	  	return sword, swordmeta
+		if GuiLibrary.ObjectsThatCanBeSaved['Lobby CheckToggle'].Api.Enabled then 
+			if bedwarsStore.matchState == 0 then return false end
+		end
+		local sword = getSword()
+		if not sword or not sword.tool then return false end
+		local swordmeta = bedwars.ItemTable[sword.tool.Name]
+		local holdingTool = bedwarsStore.localHand
+		return sword, swordmeta, holdingTool
 	end
 	local sorts = {
 		Distance = function(a, b)
@@ -13392,7 +13389,6 @@ run(function()
 	}
 	local sort = {Value = 'Health'}
 	local lookat = {Enabled = false}
-	local old
 	local plrs
 	local switchtool = {Enabled = false}
 	la = GuiLibrary.ObjectsThatCanBeSaved.CombatWindow.Api.CreateOptionsButton({
@@ -13400,52 +13396,48 @@ run(function()
 	  	HoverText = 'Tired of getting ban? this is your chance of closet cheating without getting detected',
 	  	Function = function(call)
 			if call then
-				print(bedwarsStore.equippedKit)
 				repeat
-					plrs = GetAllTargets(range.Value, nil, nil, sorts[sort.Value])
+					plrs = GetAllTargets(range.Value, false, nil, sorts[sort.Value])
 					if #plrs > 0 then
-						local sword, swordmeta = getAttackData()
+						local sword, swordmeta, holdingTool = getAttackData()
+						if switchtool.Enabled then
+							task.spawn(switchItem, sword.tool)
+						end
 						if sword then
-							if switchtool.Enabled then
-								task.spawn(switchItem, sword.tool)
-							end
 							for i, plr in plrs do
 								local root = plr.RootPart
 								if not root then 
 									continue
 								end
-								local localfacing = entityLibrary.character.HumanoidRootPart.CFrame.lookVector
-								local vec = (root.Position - entityLibrary.character.HumanoidRootPart.Position).unit
+								local localfacing = lplr.Character.HumanoidRootPart.CFrame.lookVector
+								local vec = (root.Position - lplr.Character.HumanoidRootPart.Position).unit
 								local angle = math.acos(localfacing:Dot(vec))
 								if angle >= math.rad(laAngle.Value) / 2 then
 									continue
 								end
-								local selfrootpos = entityLibrary.character.HumanoidRootPart.Position
+								local selfrootpos = lplr.Character.HumanoidRootPart.Position
 								if not bedwars.SwordController:canSee({player = plr.Player, getInstance = function() return plr.Player.Character end}) then
 									continue
 								end
 								local selfpos = selfrootpos + (range.Value > 14 and (selfrootpos - root.Position).magnitude > 14.4 and (CFrame.lookAt(selfrootpos, root.Position).lookVector * ((selfrootpos - root.Position).magnitude - 14)) or Vector3.zero)
 								bedwars.SwordController.lastAttack = workspace:GetServerTimeNow()
 								bedwarsStore.attackReach = math.floor((selfrootpos - root.Position).magnitude * 100) / 100
-								bedwarsStore.attackReachUpdate = tick() + 1
-								if moveCheck.Enabled and lplr.Character.Humanoid.MoveDirection ~= Vector3.zero then
-									bedwars.SwordController:playSwordEffect(swordmeta, false)
-									laremote:FireServer({
-										weapon = sword.tool,
-										chargedAttack = {
-											chargeRatio = swordmeta.sword.chargedAttack or 0
+								bedwars.SwordController:playSwordEffect(swordmeta, false)
+								laremote:FireServer({
+									weapon = sword.tool,
+									chargedAttack = {
+										chargeRatio = swordmeta.sword.chargedAttack or 0
+									},
+									entityInstance = plr.Player.Character,
+									validate = {
+										raycast = {
+											cameraPosition = attackValue(root.Position),
+											cursorDirection = attackValue(CFrame.new(selfpos, root.Position).lookVector)
 										},
-										entityInstance = plr.Player.Character,
-										validate = {
-											raycast = {
-												cameraPosition = attackValue(root.Position),
-												cursorDirection = attackValue(CFrame.new(selfpos, root.Position).lookVector)
-											},
-											targetPosition = attackValue(root.Position),
-											selfPosition = attackValue(selfpos)
-										}
-									})
-								end
+										targetPosition = attackValue(root.Position),
+										selfPosition = attackValue(selfpos)
+									}
+								})
 							end
 						end
 					end
@@ -13458,37 +13450,32 @@ run(function()
 		end
 	})
 	range = la.CreateSlider({
-	  	Name = "Range",
-	  	Min = 1,
-	  	Max = 14,
-	  	Function = function() end,
-	  	Default = 13
-	}) 
+		Name = 'Range',
+		Min = 1,
+		Max = 17,
+		Function = function() end
+	})
 	lookat = la.CreateToggle({
 		Name = 'AutoLook',
-		Function = function(call)
+		Function = function(call) 
 			if call then
-				task.spawn(function()
-					repeat
-						if la.Enabled then
-							for i, plr in plrs do
-								local direction = (plr.Player.Character.Head.Position - lplr.Character.Head.Position).Unit
-								lplr.Character:SetPrimaryPartCFrame(CFrame.new(lplr.Character.PrimaryPart.Position, lplr.Character.PrimaryPart.Position + direction))
-							end
+				table.insert(lookat.Connections, runService.RenderStepped:Connect(function()
+					for i,plr in plrs do
+						if lookat.Enabled and la.Enabled then 
+							lplr.Character.HumanoidRootPart.CFrame = CFrame.lookAt(lplr.Character.HumanoidRootPart.Position, plr.RootPart.Position)
 						end
-						task.wait()
-					until (not lookat.Enabled)
-				end)
+					end
+				end))
 			end
 		end,
-		HoverText = 'AutoLook at your target.'
+		HoverText = 'Face at your target.'
 	})
 	laAngle = la.CreateSlider({
-	  	Name = "Angle",
-	  	Min = 0,
-	  	Max = 80,
-	  	Function = function() end,
-	  	Default = 65
+		Name = "Angle",
+		Min = 0,
+		Max = 160,
+		Function = function() end,
+		Default = 65
 	})
 	sort = la.CreateDropdown({
 		Name = 'Sort',
@@ -13496,10 +13483,9 @@ run(function()
 		Function = function() end,
 		Default = 'Health'
 	})
-	moveCheck = la.CreateToggle({
-		Name = 'Only While Moving',
+	switchtool = la.CreateToggle({
+		Name = 'Semi Blatant',
 		Function = function() end,
-		Default = true,
-		HoverText = 'SilentAura will only work when you move.'
+		HoverText = 'basically just auto switch tool for you.'
 	})
 end)
