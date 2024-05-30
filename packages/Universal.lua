@@ -206,24 +206,19 @@ local function isEnabled(module)
 	return GuiLibrary.ObjectsThatCanBeSaved[module] and GuiLibrary.ObjectsThatCanBeSaved[module].Api.Enabled and true or false
 end
 
-task.spawn(function()
-	local function chatfunc(plr)
-		table.insert(vapeConnections, plr.Chatted:Connect(function(message)
-			RenderStore.MessageReceived:Fire(plr, message)
-		end))
+table.insert(vapeConnections, textChatService.MessageReceived:Connect(function(data)
+	local success, player = pcall(function() 
+		return playersService:GetPlayerByUserId(data.TextSource.UserId) 
+	end)
+	if success then 
+		RenderStore.MessageReceived:Fire(player, playersService:FindFirstChild(data.FromSpeaker).Text)
 	end
-	table.insert(vapeConnections, textChatService.MessageReceived:Connect(function(data)
-		local success, player = pcall(function() 
-			return playersService:GetPlayerByUserId(data.TextSource.UserId) 
-		end)
-		if success then 
-			RenderStore.MessageReceived:Fire(player, data.Text)
-		end
+end))
+
+RenderFunctions:IsolateFunction(function() 
+	table.insert(vapeConnections, replicatedStorageService.DefaultChatSystemChatEvents.OnMessageDoneFiltering.OnClientEvent:Connect(function(i)
+		RenderStore.MessageReceived:Fire(playersService:FindFirstChild(i.FromSpeaker), i.Message)
 	end))
-	for i,v in playersService:GetPlayers() do 
-		chatfunc(v)
-	end
-	table.insert(vapeConnections, playersService.PlayerAdded:Connect(chatfunc))
 end)
 
 getTablePosition = function(tab, val, first)
@@ -6750,6 +6745,34 @@ run(function()
 	ReachCorner.Parent = FPSLabel
 end)
 
+run(function() -- from vape
+	local MemoryDisplay = {}
+	local MemoryLabel
+	MemoryDisplay = GuiLibrary.CreateLegitModule({
+		Name = 'Memory Usage',
+		Function = function(calling)
+			if calling then 
+				task.spawn(function()
+					repeat
+						task.wait(0.4)
+						MemoryLabel.Text = (math.floor(game:GetService('Stats'):GetTotalMemoryUsageMb())..' MB')
+					until (not MemoryDisplay.Enabled)
+				end)
+			end
+		end
+	})
+	MemoryLabel = Instance.new('TextLabel', MemoryDisplay.GetCustomChildren())
+	MemoryLabel.Size = UDim2.new(0, 100, 0, 41)
+	MemoryLabel.BackgroundTransparency = 0.5
+	MemoryLabel.TextSize = 15
+	MemoryLabel.Font = Enum.Font.Gotham
+	MemoryLabel.Text = '0.00 studs'
+	MemoryLabel.TextColor3 = Color3.new(1, 1, 1)
+	MemoryLabel.BackgroundColor3 = Color3.new()
+	local MemoryCorner = Instance.new('UICorner', MemoryLabel)
+	MemoryCorner.CornerRadius = UDim.new(0, 4)
+end)
+
 
 run(function()
 	local Ping = {}
@@ -6760,7 +6783,7 @@ run(function()
 			if callback then
 				task.spawn(function()
 					repeat
-						PingLabel.Text = math.floor(tonumber(game:GetService("Stats"):FindFirstChild("PerformanceStats").Ping:GetValue())).." ms"
+						PingLabel.Text = math.floor(RenderStore.ping).." ms"
 						task.wait(1)
 					until false
 				end)
@@ -9717,3 +9740,4 @@ run(function()
 		Default = 0
 	})
 end)
+
