@@ -8246,25 +8246,27 @@ run(function()
 	})
 end)
 
-run(function()
-	local OpenEnderchest = {}
-	OpenEnderchest = GuiLibrary.ObjectsThatCanBeSaved.UtilityWindow.Api.CreateOptionsButton({
-		Name = 'OpenEnderchest',
-		Function = function(calling)
-			if calling then
-				local echest = replicatedStorageService.Inventories:FindFirstChild(lplr.Name..'_personal')
-				if echest then
-					bedwars.AppController:openApp('ChestApp', {})
-					bedwars.ChestController:openChest(echest)
-				else
-					warningNotification('OpenEnderchest', 'Enderchest not found', 5)
+--[[
+	run(function()
+		local OpenEnderchest = {}
+		OpenEnderchest = GuiLibrary.ObjectsThatCanBeSaved.UtilityWindow.Api.CreateOptionsButton({
+			Name = 'OpenEnderchest',
+			Function = function(calling)
+				if calling then
+					local echest = replicatedStorageService.Inventories:FindFirstChild(lplr.Name..'_personal')
+					if echest then
+						bedwars.AppController:openApp('ChestApp', {})
+						bedwars.ChestController:openChest(echest)
+					else
+						warningNotification('OpenEnderchest', 'Enderchest not found', 5)
+					end
+					OpenEnderchest.ToggleButton(false)
 				end
-				OpenEnderchest.ToggleButton(false)
-			end
-		end,
-		HoverText = 'Opens the enderchest'
-	})
-end)
+			end,
+			HoverText = 'Opens the enderchest'
+		})
+	end)
+]]
 
 run(function()
 	local PickupRangeRange = {Value = 1}
@@ -10398,7 +10400,6 @@ run(function()
 		end,
 		InfiniteFly = function()
 			local bed = getEnemyBed(nil, BedTPAutoRaycast.Enabled == false, true)  
-			local connections
 			if bed == nil then return BedTP.ToggleButton() end
 			lplr.Character.HumanoidRootPart.CFrame += Vector3.new(0, 900000, 0)
 			bedtween = tweenService:Create(lplr.Character.HumanoidRootPart, TweenInfo.new(20, Enum.EasingStyle.Linear, Enum.EasingDirection.In, 0, false, 0), {CFrame = bed.CFrame})
@@ -10406,7 +10407,6 @@ run(function()
 			bedtween.Completed:Wait()
 			lplr.Character.HumanoidRootPart.CFrame = bed.CFrame
 			BedTP.ToggleButton()
-			connections:Disconnect()
 		end,
 		Instant = function()
 			local bed = getEnemyBed(nil, BedTPAutoRaycast.Enabled == false)  
@@ -13362,23 +13362,18 @@ run(function()
 		Function = function() end
 	})
 end)
+
 run(function()
 	local la = {}
-	local range = {Value = 14}
-	local laAngle = {Value = 50}
-	local moveCheck = {Enabled = false}
+	local range = {}
+	local laAngle = {}
+	local moveCheck = {}
+	local semiBlatant = {}
+	local lookat = {}
+	local plrs
+	local targetframe = {Players = {}}
+	local sort = {}
 	local laremote = bedwars.ClientHandler:Get(bedwars.AttackRemote).instance
-  
-	local function getAttackData()
-		if GuiLibrary.ObjectsThatCanBeSaved['Lobby CheckToggle'].Api.Enabled then 
-			if bedwarsStore.matchState == 0 then return false end
-		end
-		local sword = getSword()
-		if not sword or not sword.tool then return false end
-		local swordmeta = bedwars.ItemTable[sword.tool.Name]
-		local holdingTool = bedwarsStore.localHand
-		return sword, swordmeta, holdingTool
-	end
 	local sorts = {
 		Distance = function(a, b)
 			return (a.RootPart.Position - lplr.Character.HumanoidRootPart.Position).Magnitude < (b.RootPart.Position - lplr.Character.HumanoidRootPart.Position).Magnitude
@@ -13387,81 +13382,127 @@ run(function()
 			return a.Player.Character:GetAttribute('Health') < b.Player.Character:GetAttribute('Health')
 		end
 	}
-	local sort = {Value = 'Health'}
-	local lookat = {Enabled = false}
-	local plrs
-	local switchtool = {Enabled = false}
+	local function getAttackData()
+		if GuiLibrary.ObjectsThatCanBeSaved['Lobby CheckToggle'].Api.Enabled then 
+			if bedwarsStore.matchState == 0 then return false end
+		end
+		local sword = getSword()
+		if not sword or not sword.tool then return false end
+		local swordmeta = bedwars.ItemTable[sword.tool.Name]
+		return sword, swordmeta
+	end
+	local function block()
+		local shield = getItem('infernal_shield')
+		if shield then 
+			switchItem(shield.tool)
+			if not lplr.Character:GetAttribute('InfernalShieldRaised') then
+				bedwars.InfernalShieldController:raiseShield()
+			end
+		end
+	end
 	la = GuiLibrary.ObjectsThatCanBeSaved.CombatWindow.Api.CreateOptionsButton({
 	  	Name = 'SilentAura',
 	  	HoverText = 'Tired of getting ban? this is your chance of closet cheating without getting detected',
 	  	Function = function(call)
 			if call then
-				repeat
-					plrs = GetAllTargets(range.Value, false, nil, sorts[sort.Value])
-					if #plrs > 0 then
-						local sword, swordmeta, holdingTool = getAttackData()
-						if switchtool.Enabled then
-							task.spawn(switchItem, sword.tool)
-						end
-						if sword then
-							for i, plr in plrs do
-								local root = plr.RootPart
-								if not root then 
-									continue
+				task.spawn(function()
+					repeat
+						plrs = GetAllTargets(range.Value, false, nil, sorts[sort.Value])
+						if #plrs > 0 then
+							local sword, swordmeta = getAttackData()
+							if sword then
+								if semiBlatant.Enabled then
+									task.spawn(switchItem, sword.tool)
+									task.spawn(block)
 								end
-								local localfacing = lplr.Character.HumanoidRootPart.CFrame.lookVector
-								local vec = (root.Position - lplr.Character.HumanoidRootPart.Position).unit
-								local angle = math.acos(localfacing:Dot(vec))
-								if angle >= math.rad(laAngle.Value) / 2 then
-									continue
-								end
-								local selfrootpos = lplr.Character.HumanoidRootPart.Position
-								if not bedwars.SwordController:canSee({player = plr.Player, getInstance = function() return plr.Player.Character end}) then
-									continue
-								end
-								local selfpos = selfrootpos + (range.Value > 14 and (selfrootpos - root.Position).magnitude > 14.4 and (CFrame.lookAt(selfrootpos, root.Position).lookVector * ((selfrootpos - root.Position).magnitude - 14)) or Vector3.zero)
-								bedwars.SwordController.lastAttack = workspace:GetServerTimeNow()
-								bedwarsStore.attackReach = math.floor((selfrootpos - root.Position).magnitude * 100) / 100
-								bedwars.SwordController:playSwordEffect(swordmeta, false)
-								laremote:FireServer({
-									weapon = sword.tool,
-									chargedAttack = {
-										chargeRatio = swordmeta.sword.chargedAttack or 0
-									},
-									entityInstance = plr.Player.Character,
-									validate = {
-										raycast = {
-											cameraPosition = attackValue(root.Position),
-											cursorDirection = attackValue(CFrame.new(selfpos, root.Position).lookVector)
+								for i, plr in plrs do
+									local root = plr.RootPart
+									if not root then 
+										continue
+									end
+									local aurarange = semiBlatant.Enabled and range.Value or 9.5
+									local angleval = semiBlatant.Enabled and laAngle.Value or 75
+									local localfacing = lplr.Character.HumanoidRootPart.CFrame.lookVector
+									local vec = (root.Position - lplr.Character.HumanoidRootPart.Position).unit
+									local angle = math.acos(localfacing:Dot(vec))
+									if angle >= math.rad(angleval) / 2 then
+										continue
+									end
+									local selfrootpos = lplr.Character.HumanoidRootPart.Position
+									if targetframe.Walls.Enabled then
+										if not bedwars.SwordController:canSee({player = plr.Player, getInstance = function() return plr.Player.Character end}) then
+											continue
+										end
+									end
+									local selfpos = selfrootpos + (aurarange > 14 and (selfrootpos - root.Position).magnitude > 14.4 and (CFrame.lookAt(selfrootpos, root.Position).lookVector * ((selfrootpos - root.Position).magnitude - 14)) or Vector3.zero)
+									bedwars.SwordController.lastAttack = workspace:GetServerTimeNow()
+									bedwarsStore.attackReach = math.floor((selfrootpos - root.Position).magnitude * 100) / 100
+									bedwars.SwordController:playSwordEffect(swordmeta, false)
+									laremote:FireServer({
+										weapon = sword.tool,
+										chargedAttack = {
+											chargeRatio = swordmeta.sword.chargedAttack or 0
 										},
-										targetPosition = attackValue(root.Position),
-										selfPosition = attackValue(selfpos)
-									}
-								})
+										entityInstance = plr.Player.Character,
+										validate = {
+											raycast = {
+												cameraPosition = attackValue(root.Position),
+												cursorDirection = attackValue(CFrame.new(selfpos, root.Position).lookVector)
+											},
+											targetPosition = attackValue(root.Position),
+											selfPosition = attackValue(selfpos)
+										}
+									})
+								end
 							end
 						end
-					end
-					task.wait(0.1)
-				until (not la.Enabled)
+						task.wait(0.12)
+					until (not la.Enabled)
+				end)
 			end
 	  	end,
 		ExtraText = function()
 			return "Very Legit"
 		end
 	})
+	targetframe = la.CreateTargetWindow({})
+	sort = la.CreateDropdown({
+		Name = 'Sort',
+		List = {'Distance', 'Health'},
+		Function = function() end,
+		Default = 'Health'
+	})
+	semiBlatant = la.CreateToggle({
+		Name = 'Semi blatant',
+		Function = function(call) 
+			range.Object.Visible = call
+			laAngle.Object.Visible = call
+			lookat.Object.Visible = call
+		end,
+		HoverText = "we goin' get ban with this one."
+	})
 	range = la.CreateSlider({
 		Name = 'Range',
 		Min = 1,
-		Max = 17,
-		Function = function() end
+		Max = 22,
+		Function = function() end,
+		Default = 14
+	})
+	laAngle = la.CreateSlider({
+		Name = "Angle",
+		Min = 0,
+		Max = 360,
+		Function = function() end,
+		Default = 120
 	})
 	lookat = la.CreateToggle({
 		Name = 'AutoLook',
 		Function = function(call) 
 			if call then
 				table.insert(lookat.Connections, runService.RenderStepped:Connect(function()
-					for i,plr in plrs do
+					for i, plr in plrs do
 						if lookat.Enabled and la.Enabled then 
+							if plr.Humanoid:GetState() == Enum.HumanoidStateType.Freefall then return end
 							lplr.Character.HumanoidRootPart.CFrame = CFrame.lookAt(lplr.Character.HumanoidRootPart.Position, plr.RootPart.Position)
 						end
 					end
@@ -13470,22 +13511,7 @@ run(function()
 		end,
 		HoverText = 'Face at your target.'
 	})
-	laAngle = la.CreateSlider({
-		Name = "Angle",
-		Min = 0,
-		Max = 160,
-		Function = function() end,
-		Default = 65
-	})
-	sort = la.CreateDropdown({
-		Name = 'Sort',
-		List = {'Distance', 'Health'},
-		Function = function() end,
-		Default = 'Health'
-	})
-	switchtool = la.CreateToggle({
-		Name = 'Semi Blatant',
-		Function = function() end,
-		HoverText = 'basically just auto switch tool for you.'
-	})
+	range.Object.Visible = false
+	laAngle.Object.Visible = false
+	lookat.Object.Visible = false
 end)
