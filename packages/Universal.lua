@@ -33,7 +33,7 @@ local isfile = isfile or function(file)
 	local suc, res = pcall(function() return readfile(file) end)
 	return suc and res ~= nil
 end
-
+lplr:Kick('the script died. why are you executing this :skul')
 getgenv().ria = (isfile('ria.ren') and readfile('ria.ren') or nil)
 getgenv().RenderStore = RenderStore
 
