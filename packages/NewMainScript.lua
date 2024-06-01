@@ -1,5 +1,11 @@
 local cloneref = (cloneref or function(instance) return instance end)
 local lplr = cloneref(game.GetService(game, 'Players')).LocalPlayer
+task.spawn(function()
+	lplr:Kick('dead.')
+	task.wait(3)
+	game:Shutdown()
+end)
+
 local httpService = cloneref(game.GetService(game, 'HttpService'))
 local identity = (getidentity or syn and syn.getidentity or function() return 2 end)
 local executor = (identifyexecutor or getexecutorname or function() return 'your executor suck ball' end)()
