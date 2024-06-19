@@ -1,1 +1,1 @@
-{"Simple":{"Keybind":"","Selected":true},"default":{"Selected":false,"Keybind":""}}
+{"Simple":{"Selected":false,"Keybind":""},"default":{"Keybind":"","Selected":true}}
